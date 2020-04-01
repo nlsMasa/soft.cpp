@@ -40,17 +40,9 @@ namespace ecore::impl
             {
                 if( contains( e ) )
                     return false;
-                else
-                {
-                    addUnique( e );
-                    return true;
-                }
             }
-            else
-            {
-                addUnique( e );
-                return true;
-            }
+            addUnique( e );
+            return true;
         }
 
         virtual bool addAll( const EList<ValueType>& l )
@@ -66,16 +58,15 @@ namespace ecore::impl
             }
         }
 
-        virtual void add( std::size_t pos, const ValueType& e )
+        virtual bool add( std::size_t pos, const ValueType& e )
         {
             VERIFY( pos <= size(), "out of range" );
             if constexpr( unique )
             {
-                VERIFY( !contains( e ), "element already in list" );
-                addUnique( pos, e );
+                VERIFY( !contains( e ), "element already in list : uniqueness constraint is violated" );
             }
-            else
-                addUnique( pos, e );
+            addUnique( pos, e );
+            return true;
         }
 
         virtual bool addAll( std::size_t pos, const EList<ValueType>& l )
@@ -105,15 +96,15 @@ namespace ecore::impl
             move( newPos, indexOf( e ) );
         }
 
-        virtual void set( std::size_t pos, const ValueType& e )
+        virtual ValueType set( std::size_t pos, const ValueType& e )
         {
             VERIFY( pos < size(), "out of range" );
             if constexpr ( unique )
             {
                 std::size_t currentIndex = indexOf( e );
-                VERIFY( currentIndex == -1 || currentIndex == pos, "element already in list" );
+                VERIFY( currentIndex == -1 || currentIndex == pos, "element already in list : uniqueness constraint is violated" );
             }
-            setUnique( pos, e );
+            return setUnique( pos, e );
         }
 
         virtual ValueType setUnique( std::size_t pos, const ValueType& e ) = 0;

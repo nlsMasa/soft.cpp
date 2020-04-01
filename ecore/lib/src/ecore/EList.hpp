@@ -25,8 +25,8 @@ namespace ecore {
         virtual bool add( const T& e ) = 0;
 
         virtual bool addAll( const EList<T>& l ) = 0;
-
-        virtual void add( std::size_t pos, const T& e ) = 0;
+        
+        virtual bool add( std::size_t pos, const T& e ) = 0;
 
         virtual bool addAll( std::size_t pos, const EList<T>& l ) = 0;
 
@@ -36,7 +36,7 @@ namespace ecore {
 
         virtual T get( std::size_t pos ) const = 0;
 
-        virtual void set( std::size_t pos, const T& e ) = 0;
+        virtual T set( std::size_t pos, const T& e ) = 0;
 
         virtual T remove( std::size_t pos ) = 0;
 
