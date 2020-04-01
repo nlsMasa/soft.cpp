@@ -13,19 +13,19 @@
 #include "ecore/EList.hpp"
 #include "ecore/impl/ImmutableEList.hpp"
 
+#include <unordered_set>
 #include <vector>
-#include<unordered_set>
 
 namespace ecore::impl
 {
 
-    template<typename I, bool unique >
+    template <typename I, bool unique>
     class AbstractEList : public I
     {
     public:
         typedef typename I InterfaceType;
         typedef typename I::ValueType ValueType;
-        
+
         AbstractEList()
         {
         }
@@ -36,24 +36,58 @@ namespace ecore::impl
 
         virtual bool add( const ValueType& e )
         {
-            return doAdd( e );
+            if constexpr( unique )
+            {
+                if( contains( e ) )
+                    return false;
+                else
+                {
+                    addUnique( e );
+                    return true;
+                }
+            }
+            else
+            {
+                addUnique( e );
+                return true;
+            }
         }
 
         virtual bool addAll( const EList<ValueType>& l )
         {
-            return doAddAll( l );
+            if constexpr( unique )
+            {
+                auto nonDuplicates = getNonDuplicates( l );
+                return addAllUnique( *nonDuplicates );
+            }
+            else
+            {
+                return addAllUnique( l );
+            }
         }
 
         virtual void add( std::size_t pos, const ValueType& e )
         {
-            VERIFY( pos <= size() , "out of range" );
-            doAdd( pos, e );
+            VERIFY( pos <= size(), "out of range" );
+            if constexpr( unique )
+            {
+                VERIFY( !contains( e ), "element already in list" );
+                addUnique( pos, e );
+            }
+            else
+                addUnique( pos, e );
         }
 
         virtual bool addAll( std::size_t pos, const EList<ValueType>& l )
         {
             VERIFY( pos <= size(), "out of range" );
-            return doAddAll( pos, l );
+            if constexpr( unique )
+            {
+                auto nonDuplicates = getNonDuplicates( l );
+                return addAllUnique( pos, *nonDuplicates );
+            }
+            else
+                return addAllUnique( pos, l );
         }
 
         virtual void addUnique( const ValueType& e ) = 0;
@@ -74,7 +108,12 @@ namespace ecore::impl
         virtual void set( std::size_t pos, const ValueType& e )
         {
             VERIFY( pos < size(), "out of range" );
-            doSet( pos, e );
+            if constexpr ( unique )
+            {
+                std::size_t currentIndex = indexOf( e );
+                VERIFY( currentIndex == -1 || currentIndex == pos, "element already in list" );
+            }
+            setUnique( pos, e );
         }
 
         virtual ValueType setUnique( std::size_t pos, const ValueType& e ) = 0;
@@ -82,7 +121,7 @@ namespace ecore::impl
         virtual bool remove( const ValueType& e )
         {
             std::size_t index = indexOf( e );
-            if (index >= 0)
+            if( index >= 0 )
             {
                 remove( index );
                 return true;
@@ -101,7 +140,6 @@ namespace ecore::impl
         }
 
     protected:
-
         virtual void didSet( std::size_t pos, const ValueType& newObject, const ValueType& oldObject )
         {
             // Do nothing.
@@ -117,8 +155,9 @@ namespace ecore::impl
             // Do nothing.
         }
 
-        virtual void didClear( const std::vector<ValueType>& oldObjects ) {
-            for (int i = 0; i < oldObjects.size(); ++i)
+        virtual void didClear( const std::vector<ValueType>& oldObjects )
+        {
+            for( int i = 0; i < oldObjects.size(); ++i )
                 didRemove( i, oldObjects[i] );
         }
 
@@ -133,98 +172,23 @@ namespace ecore::impl
         }
 
     private:
-        
-        template <bool u = unique>
-        typename std::enable_if< u, bool >::type doAdd( const ValueType& e )
-        {
-            if ( contains( e ))
-                return  false;
-            else
-            {
-                addUnique( e );
-                return true;
-            }
-        }
-
-        template <bool u = unique>
-        typename std::enable_if< !u, bool >::type doAdd( const ValueType& e )
-        {
-            addUnique( e );
-            return true;
-        }
-
-        template <bool u = unique>
-        typename std::enable_if< u, void >::type doAdd( std::size_t pos, const ValueType& e )
-        {
-            VERIFY( !contains( e ) , "element already in list" );
-            addUnique( pos, e );
-        }
-
-        template <bool u = unique>
-        typename std::enable_if < !u, void > ::type doAdd( std::size_t pos, const ValueType& e )
-        {
-            addUnique( pos, e );
-        }
-
-        template <bool u = unique>
-        typename std::enable_if< u, bool >::type doAddAll( const EList<ValueType>& l )
-        {
-            auto nonDuplicates = getNonDuplicates( l );
-            return addAllUnique( *nonDuplicates );
-        }
-
-        template <bool u = unique>
-        typename std::enable_if< !u, bool >::type doAddAll( const EList<ValueType>& l )
-        {
-            return addAllUnique( l );
-        }
-
-        template <bool u = unique>
-        typename std::enable_if< u, bool >::type doAddAll( std::size_t pos, const EList<ValueType>& l )
-        {
-            auto nonDuplicates = getNonDuplicates( l );
-            return addAllUnique( pos, *nonDuplicates );
-        }
-
-        template <bool u = unique>
-        typename std::enable_if< !u, bool >::type doAddAll( std::size_t pos, const EList<ValueType>& l )
-        {
-            return addAllUnique( pos, l );
-        }
-
-        template <bool u = unique>
-        typename std::enable_if< u, void >::type doSet( std::size_t pos, const ValueType& e )
-        {
-            std::size_t currentIndex = indexOf( e );
-            VERIFY( currentIndex == -1 || currentIndex == pos , "element already in list");
-            setUnique( pos, e );
-        }
-
-        template <bool u = unique>
-        typename std::enable_if< !u, void >::type doSet( std::size_t pos, const ValueType& e )
-        {
-            setUnique( pos, e );
-        }
-
-    private:
         std::unique_ptr<EList<ValueType>> getNonDuplicates( const EList<ValueType>& l )
         {
             std::unordered_set<ValueType> s;
             std::vector<ValueType> v;
-            for (auto e : l)
+            for( auto e : l )
             {
                 auto i = s.insert( e );
-                if (i.second)
+                if( i.second )
                 {
-                    if (!contains( e ))
+                    if( !contains( e ) )
                         v.push_back( e );
                 }
             }
             return std::make_unique<ImmutableEList<ValueType>>( std::move( v ) );
         }
-
     };
 
-}
+} // namespace ecore::impl
 
 #endif /* ECORE_ABSTRACTELIST_HPP_ */
