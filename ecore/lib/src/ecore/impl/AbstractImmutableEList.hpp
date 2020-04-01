@@ -33,7 +33,7 @@ namespace ecore::impl
             throw "UnsupportedOperationException";
         }
 
-        virtual void add( std::size_t pos, const T& e )
+        virtual bool add( std::size_t pos, const T& e )
         {
             throw "UnsupportedOperationException";
         }
@@ -53,7 +53,7 @@ namespace ecore::impl
             throw "UnsupportedOperationException";
         }
 
-        virtual void set( std::size_t pos, const T& e )
+        virtual T set( std::size_t pos, const T& e )
         {
             throw "UnsupportedOperationException";
         }

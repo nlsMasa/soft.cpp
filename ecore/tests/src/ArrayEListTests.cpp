@@ -1,5 +1,5 @@
-#include <boost/test/unit_test.hpp>
 #include <boost/test/execution_monitor.hpp>
+#include <boost/test/unit_test.hpp>
 
 #include "ecore/Stream.hpp"
 #include "ecore/impl/ArrayEList.hpp"
@@ -134,8 +134,8 @@ BOOST_AUTO_TEST_CASE( Add_InvalidIndex, *boost::unit_test::precondition( no_debu
 BOOST_AUTO_TEST_CASE( Add_Index )
 {
     ArrayEList<int> list;
-    list.add( 0, 1 );
-    list.add( 0, 2 );
+    BOOST_CHECK( list.add( 0, 1 ) );
+    BOOST_CHECK( list.add( 0, 2 ) );
     BOOST_CHECK_EQUAL( list.size(), 2 );
     BOOST_CHECK_EQUAL( list.get( 0 ), 2 );
     BOOST_CHECK_EQUAL( list.get( 1 ), 1 );
@@ -260,9 +260,25 @@ BOOST_AUTO_TEST_CASE( Set_InvalidIndex, *boost::unit_test::precondition( no_debu
 BOOST_AUTO_TEST_CASE( Set )
 {
     ArrayEList<int> list = {1, 2};
-    list.set( 0, 3 );
+    BOOST_CHECK_EQUAL( list.set( 0, 3 ), 1 );
     BOOST_CHECK_EQUAL( list.get( 0 ), 3 );
 }
+
+BOOST_AUTO_TEST_CASE( Set_Unique )
+{
+    ArrayEList<int, true> list = {1, 2};
+    BOOST_CHECK_EQUAL( list.set( 0, 3 ), 1 );
+    BOOST_CHECK_EQUAL( list.set( 0, 3 ), 3 );
+    
+}
+
+#ifdef _DEBUG
+BOOST_AUTO_TEST_CASE( Set_UniqueInvalid, *boost::unit_test::precondition( no_debugger() ) )
+{
+    ArrayEList<int,true> list = {1, 2};
+    BOOST_CHECK_THROW( list.set( 1, 1 ), boost::execution_exception );
+}
+#endif
 
 BOOST_AUTO_TEST_CASE( Clear )
 {
@@ -322,7 +338,7 @@ BOOST_AUTO_TEST_CASE( Delegate_Any )
     auto delegate = list->asEListOf<Any>();
 
     auto newA = std::make_shared<A>();
-    BOOST_CHECK( delegate->add( newA) );
+    BOOST_CHECK( delegate->add( newA ) );
     BOOST_CHECK_EQUAL( list->size(), 3 );
     BOOST_CHECK_EQUAL( list->get( 2 ), newA );
     BOOST_CHECK_EQUAL( delegate->get( 2 ), newA );
