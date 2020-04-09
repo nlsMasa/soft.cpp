@@ -228,8 +228,7 @@ namespace ecore::impl
                 {
                     notifications->add( notification );
                     notifications->dispatch();
-                }
-                if( auto notifier = getNotifier() )
+                } else if( auto notifier = getNotifier() )
                     notifier->eNotify( notification );
             }
             else
@@ -242,7 +241,7 @@ namespace ecore::impl
         bool isNotificationRequired() const
         {
             auto notifier = getNotifier();
-            return notifier ? ( notifier->eDeliver() && !notifier->eAdapters().empty() ) : false;
+            return notifier && notifier->eDeliver() && !notifier->eAdapters().empty();
         }
 
     private:
