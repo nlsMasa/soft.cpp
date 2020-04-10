@@ -172,18 +172,6 @@ namespace ecore::impl
     }
 
     template <typename... I>
-    std::shared_ptr<ecore::EObject> AbstractEObject<I...>::eContainer() const
-    {
-        return eContainer_.lock();
-    }
-
-    template <typename... I>
-    int AbstractEObject<I...>::eContainerFeatureID() const
-    {
-        return eContainerFeatureID_;
-    }
-
-    template <typename... I>
     std::shared_ptr<EObject> AbstractEObject<I...>::eObjectForFragmentSegment( const std::string& uriSegment ) const
     {
         std::size_t index = std::string::npos;
@@ -193,7 +181,7 @@ namespace ecore::impl
             if( index != std::string::npos )
             {
                 auto position = std::stoi( uriSegment.substr( index + 1 ) );
-                auto eFeatureName = uriSegment.substr( 1, index - 1);
+                auto eFeatureName = uriSegment.substr( 1, index - 1 );
                 auto eFeature = eStructuralFeature( eFeatureName );
                 auto value = eGet( eFeature );
                 auto list = anyListCast<std::shared_ptr<EObject>>( value );
@@ -203,7 +191,7 @@ namespace ecore::impl
         }
         if( index == std::string::npos )
         {
-            auto eFeature = eStructuralFeature( uriSegment.substr(1) );
+            auto eFeature = eStructuralFeature( uriSegment.substr( 1 ) );
             auto value = eGet( eFeature );
             return anyCast<std::shared_ptr<EObject>>( value );
         }
@@ -306,20 +294,20 @@ namespace ecore::impl
     }
 
     template <typename... I>
-    std::shared_ptr<EResource> AbstractEObject<I...>::eDirectResource() const
+    std::shared_ptr<EResource> AbstractEObject<I...>::eInternalResource() const
     {
         return eResource_.lock();
     }
 
     template <typename... I>
-    void AbstractEObject<I...>::eSetDirectResource( const std::shared_ptr<EResource>& resource )
+    void AbstractEObject<I...>::eSetInternalResource( const std::shared_ptr<EResource>& resource )
     {
         eResource_ = resource;
     }
 
     template <typename... I>
-    std::shared_ptr<ENotificationChain> AbstractEObject<I...>::eSetResource( const std::shared_ptr<EResource>& newResource,
-                                                                             const std::shared_ptr<ENotificationChain>& n )
+    std::shared_ptr<ENotificationChain> AbstractEObject<I...>::eSetInternalResource( const std::shared_ptr<EResource>& newResource,
+                                                                                     const std::shared_ptr<ENotificationChain>& n )
     {
         auto notifications = n;
         auto oldResource = eResource_.lock();
@@ -354,7 +342,7 @@ namespace ecore::impl
                 notifications = eBasicSetContainer( nullptr, -1, notifications );
             }
         }
-        eSetDirectResource( newResource );
+        eSetInternalResource( newResource );
         return notifications;
     }
 
@@ -391,7 +379,7 @@ namespace ecore::impl
         VERIFYN( eClass()->getEAllOperations()->contains( eOperation ),
                  "The operation '%s' is not a valid operation",
                  eOperation->getName().c_str() );
-        return eOperationID( eOperation->eContainer() , eOperation->getOperationID() );
+        return eOperationID( eOperation->eContainer(), eOperation->getOperationID() );
     }
 
     template <typename... I>
@@ -545,13 +533,60 @@ namespace ecore::impl
     }
 
     template <typename... I>
+    std::shared_ptr<ecore::EObject> AbstractEObject<I...>::eContainer() const
+    {
+        return const_cast<AbstractEObject<I...>*>( this )->eContainer();
+    }
+
+    template <typename... I>
+    std::shared_ptr<EObject> AbstractEObject<I...>::eContainer()
+    {
+        auto eContainer = eContainer_.lock();
+        if( eContainer && eContainer->eIsProxy() )
+        {
+            auto resolved = eResolveProxy( eContainer );
+            if( resolved != eContainer )
+            {
+                auto notifications = eBasicRemoveFromContainer( nullptr );
+                eBasicSetContainer( resolved, eContainerFeatureID_ );
+                if( notifications )
+                    notifications->dispatch();
+                if( eNotificationRequired() && eContainerFeatureID_ >= EOPPOSITE_FEATURE_BASE )
+                    eNotify( std::make_shared<Notification>(
+                        getThisAsEObject(), Notification::RESOLVE, eContainerFeatureID_, eContainer, resolved ) );
+            }
+            return resolved;
+        }
+        return eContainer;
+    }
+
+    template <typename... I>
+    std::shared_ptr<EObject> AbstractEObject<I...>::eInternalContainer() const
+    {
+        return eContainer_.lock();
+    }
+
+    template <typename... I>
+    int AbstractEObject<I...>::eContainerFeatureID() const
+    {
+        return eContainerFeatureID_;
+    }
+
+    template <typename... I>
+    inline void AbstractEObject<I...>::eBasicSetContainer( const std::shared_ptr<EObject>& newContainer, int newContainerFeatureID )
+    {
+        eContainer_ = newContainer;
+        eContainerFeatureID_ = newContainerFeatureID;
+    }
+
+    template <typename... I>
     std::shared_ptr<ENotificationChain> AbstractEObject<I...>::eBasicSetContainer( const std::shared_ptr<EObject>& newContainer,
                                                                                    int newContainerFeatureID,
                                                                                    const std::shared_ptr<ENotificationChain>& n )
     {
         auto notifications = n;
         auto oldContainer = eContainer_.lock();
-        auto oldResource = eDirectResource();
+        auto oldResource = eResource_.lock();
         auto thisObject = getThisAsEObject();
 
         // resource
@@ -562,7 +597,7 @@ namespace ecore::impl
             {
                 auto list = std::static_pointer_cast<ENotifyingList<std::shared_ptr<EObject>>>( oldResource->getContents() );
                 notifications = list->remove( thisObject, notifications );
-                eSetDirectResource( nullptr );
+                eSetInternalResource( nullptr );
                 newResource = newContainer->eResource();
             }
             else
@@ -585,8 +620,7 @@ namespace ecore::impl
 
         // basic set
         int oldContainerFeatureID = eContainerFeatureID_;
-        eContainer_ = newContainer;
-        eContainerFeatureID_ = newContainerFeatureID;
+        eBasicSetContainer( newContainer, newContainerFeatureID );
 
         // notification
         if( eNotificationRequired() )
@@ -659,14 +693,18 @@ namespace ecore::impl
         }
 
         // Inherited via EObjectInternal
-        virtual std::shared_ptr<EResource> eDirectResource() const override
+        virtual std::shared_ptr<EResource> eInternalResource() const override
         {
-            return getObject().eDirectResource();
+            return getObject().eInternalResource();
         }
-        virtual std::shared_ptr<ENotificationChain> eSetResource( const std::shared_ptr<EResource>& resource,
-                                                                  const std::shared_ptr<ENotificationChain>& notifications ) override
+        virtual std::shared_ptr<ENotificationChain> eSetInternalResource(
+            const std::shared_ptr<EResource>& resource, const std::shared_ptr<ENotificationChain>& notifications ) override
         {
-            return getObject().eSetResource( resource, notifications );
+            return getObject().eSetInternalResource( resource, notifications );
+        }
+        virtual std::shared_ptr<EObject> eInternalContainer() const
+        {
+            return getObject().eInternalContainer();
         }
         virtual std::shared_ptr<EObject> eObjectForFragmentSegment( const std::string& uriSegment ) const override
         {

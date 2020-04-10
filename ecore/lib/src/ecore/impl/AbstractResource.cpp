@@ -125,7 +125,7 @@ std::string AbstractResource::getURIFragment( const std::shared_ptr<EObject>& eO
     if( id.empty() )
     {
         auto eCurrent = eObject;
-        if(eCurrent->getInternal().eDirectResource() == getThisPtr() )
+        if(eCurrent->getInternal().eInternalResource() == getThisPtr() )
             return "/" + getURIFragmentRootSegment( eObject );
         else
         {
@@ -141,7 +141,7 @@ std::string AbstractResource::getURIFragment( const std::shared_ptr<EObject>& eO
 
                 eCurrent = eContainer;
 
-                if( eContainer->getInternal().eDirectResource() == getThisPtr() )
+                if( eContainer->getInternal().eInternalResource() == getThisPtr() )
                 {
                     isContained = true;
                     break;
@@ -356,7 +356,7 @@ std::shared_ptr<EList<std::shared_ptr<EObject>>> AbstractResource::initContents(
                                                                 const std::shared_ptr<ENotificationChain>& n ) const
         {
             auto notifications = n;
-            notifications = eObject->getInternal().eSetResource( resource_.getThisPtr(), notifications );
+            notifications = eObject->getInternal().eSetInternalResource( resource_.getThisPtr(), notifications );
             resource_.attached( eObject );
             return notifications;
         }
@@ -366,7 +366,7 @@ std::shared_ptr<EList<std::shared_ptr<EObject>>> AbstractResource::initContents(
         {
             auto notifications = n;
             resource_.detached( eObject );
-            notifications = eObject->getInternal().eSetResource( nullptr, notifications );
+            notifications = eObject->getInternal().eSetInternalResource( nullptr, notifications );
             return notifications;
         }
 

@@ -330,7 +330,7 @@ void XMLSave::saveContainedMany( const std::shared_ptr<EObject>& eObject, const 
 
 void XMLSave::saveEObject( const std::shared_ptr<EObject>& eObject, const std::shared_ptr<EStructuralFeature>& eFeature )
 {
-    if (eObject->eIsProxy() || eObject->getInternal().eDirectResource() )
+    if (eObject->eIsProxy() || eObject->getInternal().eInternalResource() )
         saveHRef(eObject, eFeature);
     else {
         str_.startElement(getQName(eFeature));

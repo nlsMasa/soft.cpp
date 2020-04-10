@@ -54,30 +54,6 @@ namespace ecore::impl
         virtual bool eIsProxy() const;
         virtual std::shared_ptr<EResource> eResource() const;
 
-        // Resource
-        virtual std::shared_ptr<EResource> eDirectResource() const;
-
-        virtual std::shared_ptr<ENotificationChain> eSetResource( const std::shared_ptr<EResource>& resource,
-                                                                  const std::shared_ptr<ENotificationChain>& notifications );
-
-        // Container
-        virtual std::shared_ptr<ENotificationChain> eInverseAdd( const std::shared_ptr<EObject>& otherEnd,
-                                                                 int featureID,
-                                                                 const std::shared_ptr<ENotificationChain>& notifications );
-        virtual std::shared_ptr<ENotificationChain> eInverseRemove( const std::shared_ptr<EObject>& otherEnd,
-                                                                    int featureID,
-                                                                    const std::shared_ptr<ENotificationChain>& notifications );
-
-        // Proxy
-        virtual URI eProxyURI() const;
-        virtual void eSetProxyURI( const URI& uri );
-        virtual std::shared_ptr<EObject> eResolveProxy( const std::shared_ptr<EObject>& proxy ) const;
-
-        // Fragment
-        virtual std::shared_ptr<EObject> eObjectForFragmentSegment( const std::string& uriSegment ) const;
-        virtual std::string eURIFragmentSegment( const std::shared_ptr<EStructuralFeature>& feature,
-                                                 const std::shared_ptr<EObject>& eObject ) const;
-
     protected:
         std::shared_ptr<EObject> getThisAsEObject() const;
 
@@ -98,26 +74,56 @@ namespace ecore::impl
         virtual void eUnset( int featureID );
         virtual Any eInvoke( int operationID, const std::shared_ptr<EList<Any>>& arguments );
 
+        // Resource
+        virtual std::shared_ptr<EResource> eInternalResource() const;
+
+        virtual void eSetInternalResource( const std::shared_ptr<EResource>& resource );
+
+        virtual std::shared_ptr<ENotificationChain> eSetInternalResource( const std::shared_ptr<EResource>& resource,
+                                                                          const std::shared_ptr<ENotificationChain>& notifications );
+
+        // Inverse
+        virtual std::shared_ptr<ENotificationChain> eInverseAdd( const std::shared_ptr<EObject>& otherEnd,
+                                                                 int featureID,
+                                                                 const std::shared_ptr<ENotificationChain>& notifications );
+        virtual std::shared_ptr<ENotificationChain> eInverseRemove( const std::shared_ptr<EObject>& otherEnd,
+                                                                    int featureID,
+                                                                    const std::shared_ptr<ENotificationChain>& notifications );
         virtual std::shared_ptr<ENotificationChain> eBasicInverseAdd( const std::shared_ptr<EObject>& otherEnd,
                                                                       int featureID,
                                                                       const std::shared_ptr<ENotificationChain>& notifications );
         virtual std::shared_ptr<ENotificationChain> eBasicInverseRemove( const std::shared_ptr<EObject>& otherEnd,
                                                                          int featureID,
                                                                          const std::shared_ptr<ENotificationChain>& notifications );
+
+        // Container
+        virtual std::shared_ptr<EObject> eContainer();
+        virtual std::shared_ptr<EObject> eInternalContainer() const;
+
+        int eContainerFeatureID() const;
+
+        void eBasicSetContainer( const std::shared_ptr<EObject>& newContainer, int newContainerFeatureID );
         std::shared_ptr<ENotificationChain> eBasicSetContainer( const std::shared_ptr<EObject>& newContainer,
                                                                 int newContainerFeatureID,
                                                                 const std::shared_ptr<ENotificationChain>& notifications );
         std::shared_ptr<ENotificationChain> eBasicRemoveFromContainer( const std::shared_ptr<ENotificationChain>& notifications );
         std::shared_ptr<ENotificationChain> eBasicRemoveFromContainerFeature( const std::shared_ptr<ENotificationChain>& notifications );
+
+        // Proxy
+        virtual URI eProxyURI() const;
+        virtual void eSetProxyURI( const URI& uri );
+        virtual std::shared_ptr<EObject> eResolveProxy( const std::shared_ptr<EObject>& proxy ) const;
+
+        // Fragment
+        virtual std::shared_ptr<EObject> eObjectForFragmentSegment( const std::string& uriSegment ) const;
+        virtual std::string eURIFragmentSegment( const std::shared_ptr<EStructuralFeature>& feature,
+                                                 const std::shared_ptr<EObject>& eObject ) const;
+
+    private:
         static std::shared_ptr<EReference> eContainmentFeature( const std::shared_ptr<EObject>& eObject,
                                                                 const std::shared_ptr<EObject>& eContainer,
                                                                 int eContainerFeatureID );
 
-        void eSetDirectResource( const std::shared_ptr<EResource>& resource );
-
-        int eContainerFeatureID() const;
-
-    private:
         class EContentsEList;
         std::shared_ptr<const EList<std::shared_ptr<EObject>>> eContentsList();
         std::shared_ptr<const EList<std::shared_ptr<EObject>>> eCrossReferencesList();
