@@ -81,14 +81,6 @@ namespace ecore::impl
                 return doAddAll( pos, l );
         }
 
-        virtual void doAdd( const ValueType& e ) = 0;
-
-        virtual void doAdd( std::size_t pos, const ValueType& e ) = 0;
-
-        virtual bool doAddAll( const EList<ValueType>& l ) = 0;
-
-        virtual bool doAddAll( std::size_t pos, const EList<ValueType>& l ) = 0;
-
         using EList::move;
 
         virtual void move( std::size_t newPos, const ValueType& e )
@@ -102,8 +94,6 @@ namespace ecore::impl
             return doGet( pos );
         }
 
-        virtual ValueType doGet( std::size_t pos ) const = 0;
-
         virtual ValueType set( std::size_t pos, const ValueType& e )
         {
             VERIFY( pos < size(), "out of range" );
@@ -114,8 +104,6 @@ namespace ecore::impl
             }
             return doSet( pos, e );
         }
-
-        virtual ValueType doSet( std::size_t pos, const ValueType& e ) = 0;
 
         virtual bool remove( const ValueType& e )
         {
@@ -137,6 +125,21 @@ namespace ecore::impl
         {
             return size() == 0;
         }
+
+    protected:
+
+        virtual ValueType doGet( std::size_t pos ) const = 0;
+
+        virtual ValueType doSet( std::size_t pos, const ValueType& e ) = 0;
+
+        virtual void doAdd( const ValueType& e ) = 0;
+
+        virtual void doAdd( std::size_t pos, const ValueType& e ) = 0;
+
+        virtual bool doAddAll( const EList<ValueType>& l ) = 0;
+
+        virtual bool doAddAll( std::size_t pos, const EList<ValueType>& l ) = 0;
+
 
     protected:
         virtual void didSet( std::size_t pos, const ValueType& newObject, const ValueType& oldObject )
