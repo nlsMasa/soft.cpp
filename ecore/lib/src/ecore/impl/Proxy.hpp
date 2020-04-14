@@ -33,6 +33,15 @@ namespace ecore::impl
     {
     public:
         
+        Proxy()
+        {
+        }
+
+        Proxy( const T& value )
+        {
+            set( value );
+        }
+
         Proxy( const Proxy& o )
             : resolved_( o.resolved_ )
             , value_( o.value_ )
@@ -65,6 +74,11 @@ namespace ecore::impl
                 resolved_.reset();
                 value_.reset();
             }
+        }
+
+        void setForced( const T& value ) const
+        {
+            const_cast<Proxy<T>*>( this )->set( value );
         }
 
         explicit operator bool() const
@@ -125,13 +139,13 @@ namespace ecore::impl
     template <typename T>
     bool operator==( std::nullptr_t, const Proxy<T>& right ) noexcept
     { // test if nullptr == shared_ptr
-        return ( nullptr == right.value() );
+        return ( nullptr == right.get() );
     }
 
     template <typename T>
     bool operator==( const Proxy<T>& left, nullptr_t ) noexcept
     { // test if nullptr == shared_ptr
-        return ( left.value() == nullptr );
+        return ( left.get() == nullptr );
     }
 
     template <typename T>

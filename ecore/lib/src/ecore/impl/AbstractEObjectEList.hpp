@@ -35,8 +35,8 @@ namespace ecore::impl
         }
 
         template <typename = std::enable_if<!std::is_same<ValueType, StorageType>::value>::type>
-        AbstractEObjectEList( std::function<ValueType( const StorageType& )> from,
-                              std::function<StorageType( const ValueType& )> to,
+        AbstractEObjectEList( std::function<ValueType( std::size_t, const StorageType& )> from,
+                              std::function<StorageType( std::size_t, const ValueType& )> to,
                               const std::weak_ptr<EObject>& owner,
                               int featureID,
                               int inverseFeatureID = -1 )
@@ -113,9 +113,9 @@ namespace ecore::impl
         virtual std::shared_ptr<ENotificationChain> inverseRemove( const ValueType& object,
                                                                    const std::shared_ptr<ENotificationChain>& notifications ) const
         {
-            if constexpr ( inverse )
+            if constexpr( inverse )
             {
-                if constexpr ( opposite )
+                if constexpr( opposite )
                     return object->getInternal().eInverseRemove( getOwner(), inverseFeatureID_, notifications );
                 else
                     return object->getInternal().eInverseRemove( getOwner(), EOPPOSITE_FEATURE_BASE - featureID_, notifications );
