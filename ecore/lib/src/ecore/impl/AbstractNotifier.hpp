@@ -38,13 +38,13 @@ namespace ecore::impl
             eDeliver_ = deliver;
         }
 
-        virtual void eNotify( const std::shared_ptr<ENotification>& notification )
+        virtual void eNotify( const std::shared_ptr<ENotification>& notification ) const
         {
             for( auto eAdapter : *eAdapters_ )
                 eAdapter->notifyChanged( notification );
         }
 
-        bool eNotificationRequired()
+        bool eNotificationRequired() const
         { 
             return eDeliver_ && eAdapters_->size() > 0;
         }
