@@ -121,6 +121,12 @@ namespace ecore::impl
 
         virtual ValueType remove( std::size_t index ) = 0;
 
+
+        virtual void clear()
+        {
+            doClear();
+        }
+
         virtual bool empty() const
         {
             return size() == 0;
@@ -140,6 +146,7 @@ namespace ecore::impl
 
         virtual bool doAddAll( std::size_t pos, const EList<ValueType>& l ) = 0;
 
+        virtual void doClear() = 0;
 
     protected:
         virtual void didSet( std::size_t pos, const ValueType& newObject, const ValueType& oldObject )

@@ -12,52 +12,52 @@
 
 #include "ecore/impl/AbstractEList.hpp"
 
-#include <vector>
 #include <functional>
 #include <type_traits>
+#include <vector>
 
 namespace ecore::impl
 {
 
-    template <typename I, typename S, bool unique >
-    class AbstractArrayEList : public AbstractEList<I, unique >
+    template <typename I, typename S, bool unique>
+    class AbstractArrayEList : public AbstractEList<I, unique>
     {
     public:
         typedef typename I InterfaceType;
         typedef typename I::ValueType ValueType;
         typedef typename S StorageType;
 
-        template <typename = std::enable_if< std::is_same<ValueType, StorageType>::value>::type>
+        template <typename = std::enable_if<std::is_same<ValueType, StorageType>::value>::type>
         AbstractArrayEList()
-            : AbstractEList<I, unique >()
+            : AbstractEList<I, unique>()
             , from_( identity() )
             , to_( identity() )
             , v_()
         {
         }
 
-        template <typename = std::enable_if< std::is_same<ValueType, StorageType>::value>::type>
-        AbstractArrayEList( const std::vector<ValueType>&& v)
-            : AbstractEList<I, unique >()
+        template <typename = std::enable_if<std::is_same<ValueType, StorageType>::value>::type>
+        AbstractArrayEList( const std::vector<ValueType>&& v )
+            : AbstractEList<I, unique>()
             , from_( identity() )
             , to_( identity() )
-            , v_(v)
+            , v_( v )
         {
         }
 
-        template <typename = std::enable_if< std::is_same<ValueType, StorageType>::value>::type>
+        template <typename = std::enable_if<std::is_same<ValueType, StorageType>::value>::type>
         AbstractArrayEList( const std::initializer_list<ValueType>& init )
-            : AbstractEList<I, unique >()
+            : AbstractEList<I, unique>()
             , from_( identity() )
             , to_( identity() )
             , v_( init )
         {
         }
 
-        template <typename = std::enable_if< !std::is_same<ValueType, StorageType>::value>::type>
+        template <typename = std::enable_if<!std::is_same<ValueType, StorageType>::value>::type>
         AbstractArrayEList( std::function<ValueType( std::size_t, const StorageType& )> from,
                             std::function<StorageType( std::size_t, const ValueType& )> to )
-            : AbstractEList<I, unique >()
+            : AbstractEList<I, unique>()
             , from_( from )
             , to_( to )
             , v_()
@@ -65,7 +65,7 @@ namespace ecore::impl
         }
 
         AbstractArrayEList( const AbstractArrayEList<I, S, unique>& o )
-            : AbstractEList<I, S, unique >( o )
+            : AbstractEList<I, S, unique>( o )
             , from_( o.from_ )
             , to_( o.to_ )
             , v_( o.v_ )
@@ -111,17 +111,11 @@ namespace ecore::impl
             return v_.empty();
         }
 
-        virtual void clear()
-        {
-            doClear();
-        }
-
-protected:
-
+    protected:
         virtual void doAdd( const ValueType& e )
         {
             std::size_t pos = size();
-            v_.push_back( to_(pos, e ) );
+            v_.push_back( to_( pos, e ) );
             didAdd( pos, e );
             didChange();
         }
@@ -155,12 +149,12 @@ protected:
             std::size_t oldSize = v_.size();
             v_.resize( oldSize + growth );
             for( int i = (int)oldSize - 1; i >= (int)pos; --i )
-                v_[ i + growth ] = v_[ i ];
+                v_[i + growth] = v_[i];
             for( int i = 0; i < growth; ++i )
             {
                 auto v = l.get( i );
                 auto n = i + pos;
-                v_[n] = to_( n,  v );
+                v_[n] = to_( n, v );
                 didAdd( n, v );
                 didChange();
             }
@@ -169,8 +163,8 @@ protected:
 
         virtual ValueType doSet( std::size_t pos, const ValueType& e )
         {
-            auto old = from_( pos, v_[ pos ] );
-            v_[ pos ] = to_(pos, e );
+            auto old = from_( pos, v_[pos] );
+            v_[pos] = to_( pos, e );
             didSet( pos, e, old );
             didChange();
             return old;
@@ -178,7 +172,16 @@ protected:
 
         virtual ValueType doGet( std::size_t pos ) const
         {
-            return from_( pos, v_[ pos ] );
+            return from_( pos, v_[pos] );
+        }
+
+        virtual void doClear()
+        {
+            std::vector<ValueType> oldObjects( v_.size() );
+            for( int i = 0; i < v_.size() ; ++i )
+                oldObjects[i] = from_( i , v_[i] );
+            v_.clear();
+            didClear( oldObjects );
         }
 
         std::vector<StorageType>& data()
@@ -189,34 +192,19 @@ protected:
     private:
         struct identity
         {
-            template<typename U>
-            constexpr auto operator()( std::size_t,  U&& v ) const noexcept
-                -> decltype(std::forward<U>( v ))
+            template <typename U>
+            constexpr auto operator()( std::size_t, U&& v ) const noexcept -> decltype( std::forward<U>( v ) )
             {
                 return std::forward<U>( v );
             }
         };
 
-        template <typename T = ValueType>
-        typename std::enable_if< std::is_same<T, StorageType>::value >::type doClear()
-        {
-            auto oldObjects = std::move( v_ );
-            v_.clear();
-            didClear( oldObjects );
-        }
-
-        template <typename T = ValueType>
-        typename std::enable_if< !std::is_same<T, StorageType>::value >::type doClear()
-        {
-            v_.clear();
-        }
-
     private:
-        std::function< StorageType( std::size_t, const ValueType& )> to_;
+        std::function<StorageType( std::size_t, const ValueType& )> to_;
         std::function<ValueType( std::size_t, const StorageType& )> from_;
         std::vector<StorageType> v_;
     };
 
-}
+} // namespace ecore::impl
 
 #endif /* ECORE_ABSTRACTARRAYELIST_HPP_ */
