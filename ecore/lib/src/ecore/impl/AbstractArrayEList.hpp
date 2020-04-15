@@ -111,6 +111,16 @@ namespace ecore::impl
             return v_.empty();
         }
 
+        virtual void clear()
+        {
+            std::vector<ValueType> oldObjects( v_.size() );
+            for( int i = 0; i < v_.size(); ++i )
+                oldObjects[i] = from_( i, v_[i] );
+            v_.clear();
+            didClear( oldObjects );
+        }
+
+
     protected:
         virtual void doAdd( const ValueType& e )
         {
@@ -173,15 +183,6 @@ namespace ecore::impl
         virtual ValueType doGet( std::size_t pos ) const
         {
             return from_( pos, v_[pos] );
-        }
-
-        virtual void doClear()
-        {
-            std::vector<ValueType> oldObjects( v_.size() );
-            for( int i = 0; i < v_.size() ; ++i )
-                oldObjects[i] = from_( i , v_[i] );
-            v_.clear();
-            didClear( oldObjects );
         }
 
         std::vector<StorageType>& data()
