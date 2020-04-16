@@ -13,14 +13,14 @@
 #include "ecore/Exports.hpp"
 #include "ecore/EResourceSet.hpp"
 #include "ecore/URI.hpp"
-#include "ecore/impl/AbstractNotifier.hpp"
+#include "ecore/impl/BasicNotifier.hpp"
 #include "ecore/impl/Lazy.hpp"
 
 #include <optional>
 
 namespace ecore::impl
 {
-    class ECORE_API ResourceSet : public virtual AbstractNotifier< EResourceSet >
+    class ECORE_API ResourceSet : public virtual BasicNotifier<EResourceSet>
     {
     public:
         ResourceSet();

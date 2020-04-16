@@ -13,7 +13,7 @@
 #include "ecore/Exports.hpp"
 #include "ecore/EResource.hpp"
 #include "ecore/URI.hpp"
-#include "ecore/impl/AbstractNotifier.hpp"
+#include "ecore/impl/BasicNotifier.hpp"
 #include "ecore/impl/Lazy.hpp"
 
 #include <memory>
@@ -28,7 +28,7 @@ namespace ecore
 
 namespace ecore::impl
 {
-    class ECORE_API AbstractResource : public virtual AbstractNotifier<EResource>
+    class ECORE_API AbstractResource : public virtual BasicNotifier<EResource>
     {
     public:
         AbstractResource();

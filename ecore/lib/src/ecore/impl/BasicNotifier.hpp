@@ -7,8 +7,8 @@
 //
 // *****************************************************************************
 
-#ifndef ECORE_ABSTRACT_NOTIFIER_HPP_
-#define ECORE_ABSTRACT_NOTIFIER_HPP_
+#ifndef ECORE_BASIC_NOTIFIER_HPP_
+#define ECORE_BASIC_NOTIFIER_HPP_
 
 #include <memory>
 #include "ecore/EAdapter.hpp"
@@ -18,10 +18,10 @@ namespace ecore::impl
 {
 
     template <typename... I>
-    class AbstractNotifier : public I...
+    class BasicNotifier : public I...
     {
     public:
-        virtual ~AbstractNotifier() = default;
+        virtual ~BasicNotifier() = default;
 
         virtual EList<EAdapter*>& eAdapters() const
         {
@@ -49,12 +49,12 @@ namespace ecore::impl
             return eDeliver_ && eAdapters_->size() > 0;
         }
 
-        inline void setThisPtr( const std::shared_ptr<AbstractNotifier>& thisPtr )
+        inline void setThisPtr( const std::shared_ptr<BasicNotifier>& thisPtr )
         {
             thisPtr_ = thisPtr;
         }
         
-        inline std::shared_ptr<AbstractNotifier> getThisPtr() const
+        inline std::shared_ptr<BasicNotifier> getThisPtr() const
         {
             return thisPtr_.lock();
         }
@@ -64,7 +64,7 @@ namespace ecore::impl
         class AdapterList : public BasicEList<EAdapter*>
         {
         public:
-            AdapterList( AbstractNotifier& notifier )
+            AdapterList( BasicNotifier& notifier )
                 : notifier_( notifier )
             {
 
@@ -84,11 +84,11 @@ namespace ecore::impl
             }
 
         private:
-            AbstractNotifier& notifier_;
+            BasicNotifier& notifier_;
         };
 
     protected:
-        std::weak_ptr<AbstractNotifier> thisPtr_;
+        std::weak_ptr<BasicNotifier> thisPtr_;
         std::unique_ptr<EList<EAdapter*>> eAdapters_{new AdapterList(*this)};
         bool eDeliver_{ true };
     };
