@@ -46,13 +46,13 @@ set(HEADER_ECORE_IMPL_FILES
     src/ecore/impl/AbstractEList.hpp
     src/ecore/impl/AbstractEListBase.hpp
     src/ecore/impl/AbstractENotifyingList.hpp
-    src/ecore/impl/AbstractEObject.hpp
-    src/ecore/impl/AbstractEObject.inl
     src/ecore/impl/AbstractNotification.hpp
     src/ecore/impl/AbstractNotifier.hpp
     src/ecore/impl/AbstractResource.hpp
     src/ecore/impl/BasicEList.hpp
     src/ecore/impl/BasicENotifyingList.hpp
+    src/ecore/impl/BasicEObject.hpp
+    src/ecore/impl/BasicEObject.inl
     src/ecore/impl/Diagnostic.hpp
     src/ecore/impl/DynamicEObjectImpl.hpp
     src/ecore/impl/DynamicEObjectImpl.inl

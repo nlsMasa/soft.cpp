@@ -7,7 +7,7 @@
 //
 // *****************************************************************************
 
-#ifndef ECORE_ABSTRACTEOBJECT_HPP_
+#ifndef ECORE_DYNAMIC_EOBJECT_HPP_
 #error This file may only be included from DynamicEObjectBase.hpp
 #endif
 
