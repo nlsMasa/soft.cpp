@@ -47,15 +47,7 @@ namespace ecore::impl
 
         virtual bool addAll( const EList<ValueType>& l )
         {
-            if constexpr( unique )
-            {
-                auto nonDuplicates = getNonDuplicates( l );
-                return doAddAll( *nonDuplicates );
-            }
-            else
-            {
-                return doAddAll( l );
-            }
+            return addAll( size(), l );
         }
 
         virtual bool add( std::size_t index, const ValueType& e )
@@ -81,7 +73,12 @@ namespace ecore::impl
                 return doAddAll( index, l );
         }
 
-        using EList::move;
+        virtual ValueType move( std::size_t newIndex, std::size_t oldIndex )
+        {
+            VERIFY( newIndex <= size(), "out of range" );
+            VERIFY( oldIndex <= size(), "out of range" );
+            return doMove( newIndex, oldIndex );
+        }
 
         virtual void move( std::size_t newIndex, const ValueType& e )
         {
@@ -144,6 +141,8 @@ namespace ecore::impl
         virtual bool doAddAll( std::size_t index, const EList<ValueType>& l ) = 0;
 
         virtual ValueType doRemove( std::size_t index ) = 0;
+
+        virtual doMove( std::size_t newIndex, std::size_t oldIndex ) = 0;
 
     protected:
         virtual void didSet( std::size_t index, const ValueType& newObject, const ValueType& oldObject )
