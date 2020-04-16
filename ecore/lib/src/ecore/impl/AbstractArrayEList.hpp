@@ -11,201 +11,237 @@
 #define ECORE_ABSTRACTARRAYELIST_HPP_
 
 #include "ecore/impl/AbstractEList.hpp"
+#include "ecore/impl/Proxy.hpp"
 
-#include <functional>
-#include <type_traits>
 #include <vector>
 
-namespace ecore::impl
+namespace ecore
 {
-
-    template <typename I, typename S, bool unique>
-    class AbstractArrayEList : public AbstractEList<I, unique>
+    namespace impl
     {
-    public:
-        typedef typename I InterfaceType;
-        typedef typename I::ValueType ValueType;
-        typedef typename S StorageType;
-
-        template <typename = std::enable_if<std::is_same<ValueType, StorageType>::value>::type>
-        AbstractArrayEList()
-            : AbstractEList<I, unique>()
-            , from_( identity() )
-            , to_( identity() )
-            , v_()
+        template <typename L, typename T>
+        class AbstractArrayEList : public L
         {
-        }
-
-        template <typename = std::enable_if<std::is_same<ValueType, StorageType>::value>::type>
-        AbstractArrayEList( const std::vector<ValueType>&& v )
-            : AbstractEList<I, unique>()
-            , from_( identity() )
-            , to_( identity() )
-            , v_( v )
-        {
-        }
-
-        template <typename = std::enable_if<std::is_same<ValueType, StorageType>::value>::type>
-        AbstractArrayEList( const std::initializer_list<ValueType>& init )
-            : AbstractEList<I, unique>()
-            , from_( identity() )
-            , to_( identity() )
-            , v_( init )
-        {
-        }
-
-        template <typename = std::enable_if<!std::is_same<ValueType, StorageType>::value>::type>
-        AbstractArrayEList( std::function<ValueType( std::size_t, const StorageType& )> from,
-                            std::function<StorageType( std::size_t, const ValueType& )> to )
-            : AbstractEList<I, unique>()
-            , from_( from )
-            , to_( to )
-            , v_()
-        {
-        }
-
-        AbstractArrayEList( const AbstractArrayEList<I, S, unique>& o )
-            : AbstractEList<I, S, unique>( o )
-            , from_( o.from_ )
-            , to_( o.to_ )
-            , v_( o.v_ )
-        {
-        }
-
-        virtual ~AbstractArrayEList()
-        {
-        }
-
-        virtual ValueType move( std::size_t newPos, std::size_t oldPos )
-        {
-            VERIFY( newPos < size(), "newPos : out of range" );
-            VERIFY( oldPos < size(), "oldPos : out of range" );
-            auto it = v_.begin() + oldPos;
-            auto element = std::move( *it );
-            auto object = from_( newPos, element );
-            v_.erase( it );
-            v_.insert( v_.begin() + newPos, element );
-            didMove( newPos, object, oldPos );
-            didChange();
-            return object;
-        }
-
-        virtual ValueType remove( std::size_t pos )
-        {
-            VERIFY( pos < size(), "out of range" );
-            auto it = v_.begin() + pos;
-            auto oldObject = from_( pos, std::move( *it ) );
-            v_.erase( it );
-            didRemove( pos, oldObject );
-            didChange();
-            return oldObject;
-        }
-
-        virtual std::size_t size() const
-        {
-            return v_.size();
-        }
-
-        virtual bool empty() const
-        {
-            return v_.empty();
-        }
-
-        virtual void clear()
-        {
-            std::vector<ValueType> oldObjects( v_.size() );
-            for( int i = 0; i < v_.size(); ++i )
-                oldObjects[i] = from_( i, v_[i] );
-            v_.clear();
-            didClear( oldObjects );
-        }
-
-
-    protected:
-        virtual void doAdd( const ValueType& e )
-        {
-            std::size_t pos = size();
-            v_.push_back( to_( pos, e ) );
-            didAdd( pos, e );
-            didChange();
-        }
-
-        virtual void doAdd( std::size_t pos, const ValueType& e )
-        {
-            v_.insert( v_.begin() + pos, to_( pos, e ) );
-            didAdd( pos, e );
-            didChange();
-        }
-
-        virtual bool doAddAll( const EList<ValueType>& l )
-        {
-            std::size_t growth = l.size();
-            std::size_t oldSize = v_.size();
-            v_.resize( oldSize + growth );
-            for( int i = 0; i < growth; ++i )
+        public:
+            AbstractArrayEList()
+                : L()
+                , v_()
             {
-                auto v = l.get( i );
-                std::size_t pos = i + oldSize;
-                v_[pos] = to_( pos, v );
-                didAdd( pos, v );
+            }
+
+            AbstractArrayEList( const std::vector<T>&& v )
+                : L()
+                , v_( v )
+            {
+            }
+
+            AbstractArrayEList( const std::initializer_list<T>& init )
+                : L()
+                , v_( init )
+            {
+            }
+
+            AbstractArrayEList( const AbstractArrayEList& o )
+                : L( o )
+                , v_( o.v_ )
+            {
+            }
+
+            virtual ~AbstractArrayEList()
+            {
+            }
+
+        protected:
+            virtual T doGet( std::size_t index ) const
+            {
+                return v_[index];
+            }
+
+            virtual T doSet( std::size_t index, const T& e )
+            {
+                auto old = v_[index];
+                v_[index] = e;
+                didSet( index, e, old );
+                didChange();
+                return old;
+            }
+
+            virtual void doAdd( const T& e )
+            {
+                auto index = size();
+                v_.push_back( e );
+                didAdd( index, e );
                 didChange();
             }
-            return growth != 0;
-        }
 
-        virtual bool doAddAll( std::size_t pos, const EList<ValueType>& l )
-        {
-            std::size_t growth = l.size();
-            std::size_t oldSize = v_.size();
-            v_.resize( oldSize + growth );
-            for( int i = (int)oldSize - 1; i >= (int)pos; --i )
-                v_[i + growth] = v_[i];
-            for( int i = 0; i < growth; ++i )
+            virtual void doAdd( std::size_t index, const T& e )
             {
-                auto v = l.get( i );
-                auto n = i + pos;
-                v_[n] = to_( n, v );
-                didAdd( n, v );
+                v_.insert( std::next( v_.begin(), index ), e );
+                didAdd( index, e );
                 didChange();
             }
-            return growth != 0;
-        }
 
-        virtual ValueType doSet( std::size_t pos, const ValueType& e )
-        {
-            auto old = from_( pos, v_[pos] );
-            v_[pos] = to_( pos, e );
-            didSet( pos, e, old );
-            didChange();
-            return old;
-        }
-
-        virtual ValueType doGet( std::size_t pos ) const
-        {
-            return from_( pos, v_[pos] );
-        }
-
-        std::vector<StorageType>& data()
-        {
-            return v_;
-        }
-
-    private:
-        struct identity
-        {
-            template <typename U>
-            constexpr auto operator()( std::size_t, U&& v ) const noexcept -> decltype( std::forward<U>( v ) )
+            virtual bool doAddAll( std::size_t index, const EList<T>& l )
             {
-                return std::forward<U>( v );
+                std::size_t growth = l.size();
+                std::size_t oldSize = v_.size();
+                v_.resize( oldSize + growth );
+                for( int i = (int)oldSize - 1; i >= (int)pos; --i )
+                    v_[i + growth] = v_[i];
+                for( int i = 0; i < growth; ++i )
+                {
+                    auto v = l.get( i );
+                    auto n = i + pos;
+                    v_[n] = v;
+                    didAdd( n, v );
+                    didChange();
+                }
+                return growth != 0;
             }
+
+            virtual T doRemove( std::size_t index )
+            {
+                auto it = std::next( v_.begin(), index );
+                auto element = std::move( *it );
+                v_.erase( it );
+                didRemove( pos, element );
+                didChange();
+                return element;
+            }
+
+            virtual T doMove( std::size_t newIndex, std::size_t oldIndex )
+            {
+                auto it = std::next( v_.begin(), oldIndex );
+                auto element = std::move( *it );
+                v_.erase( it );
+                v_.insert( std::next( v_.begin(), newIndex ), element );
+                didMove( newIndex, element, oldIndex );
+                didChange();
+                return element;
+            }
+
+            virtual std::shared_ptr<EList<T>> doClear()
+            {
+                auto l = std::make_shared<ImmutableEList<T>>( std::move( v_ ) );
+                v_.clear();
+                return l;
+            }
+
+        private:
+            std::vector<T> v_;
         };
 
-    private:
-        std::function<StorageType( std::size_t, const ValueType& )> to_;
-        std::function<ValueType( std::size_t, const StorageType& )> from_;
-        std::vector<StorageType> v_;
-    };
+        template <typename L, typename T>
+        class AbstractArrayEList<L, Proxy<T>> : public L
+        {
+        public:
+            AbstractArrayEList()
+                : L()
+                , v_()
+            {
+            }
 
-} // namespace ecore::impl
+            AbstractArrayEList( const AbstractArrayEList& o )
+                : L( o )
+                , v_( o.v_ )
+            {
+            }
+
+            virtual ~AbstractArrayEList()
+            {
+            }
+
+        protected:
+
+            virtual T doGet( std::size_t index ) const
+            {
+                return resolve( index, v_[index] );
+            }
+
+            virtual T doSet( std::size_t index, const T& e )
+            {
+                auto old = v_[index].get();
+                v_[index].set( e );
+                didSet( index, e, old );
+                didChange();
+                return old;
+            }
+
+            virtual void doAdd( const T& e )
+            {
+                auto index = size();
+                v_.push_back( e );
+                didAdd( index, e );
+                didChange();
+            }
+
+            virtual void doAdd( std::size_t index, const T& e )
+            {
+                v_.insert( std::next( v_.begin(), index ), e );
+                didAdd( index, e );
+                didChange();
+            }
+
+            virtual bool doAddAll( std::size_t index, const EList<T>& l )
+            {
+                std::size_t growth = l.size();
+                std::size_t oldSize = v_.size();
+                v_.resize( oldSize + growth );
+                for( int i = (int)oldSize - 1; i >= (int)pos; --i )
+                    v_[i + growth] = v_[i];
+                for( int i = 0; i < growth; ++i )
+                {
+                    auto e = l.get( i );
+                    auto n = i + pos;
+                    v_[n] = e;
+                    didAdd( n, e );
+                    didChange();
+                }
+                return growth != 0;
+            }
+
+            virtual T doRemove( std::size_t index )
+            {
+                auto it = std::next( v_.begin(), index );
+                auto element = std::move( *it.get() );
+                v_.erase( it );
+                didRemove( pos, element );
+                didChange();
+                return element;
+            }
+
+            virtual T doMove( std::size_t newIndex, std::size_t oldIndex )
+            {
+                auto it = std::next( v_.begin(), oldIndex );
+                auto element = std::move( *it.get() );
+                v_.erase( it );
+                v_.insert( std::next( v_.begin(), newIndex ), element );
+                didMove( newIndex, element, oldIndex );
+                didChange();
+                return element;
+            }
+
+            virtual std::shared_ptr<EList<T>> doClear()
+            {
+                std::vector<T> result;
+                std::transform( v_.begin(), v_.end(), result.end(), []( const Proxy<T>& p ) )
+                {
+                    return p.get();
+                });
+                auto l = std::make_shared<ImmutableEList<T>>( std::move( result ) );
+                v_.clear();
+                return l;
+            }
+
+        protected:
+            virtual T resolve( std::size_t index, const Proxy<T>& e ) const = 0;
+
+        private:
+            std::vector<Proxy<T>> v_;
+        };
+
+    } // namespace impl
+
+} // namespace ecore
 
 #endif /* ECORE_ABSTRACTARRAYELIST_HPP_ */
