@@ -51,6 +51,16 @@ namespace ecore
             {
             }
 
+            virtual std::size_t size() const
+            {
+                return v_.size();
+            }
+
+            virtual bool empty() const
+            {
+                return v_.empty();
+            }
+
         protected:
             virtual T doGet( std::size_t index ) const
             {
@@ -86,12 +96,12 @@ namespace ecore
                 std::size_t growth = l.size();
                 std::size_t oldSize = v_.size();
                 v_.resize( oldSize + growth );
-                for( int i = (int)oldSize - 1; i >= (int)pos; --i )
+                for( int i = (int)oldSize - 1; i >= (int)index; --i )
                     v_[i + growth] = v_[i];
                 for( int i = 0; i < growth; ++i )
                 {
                     auto v = l.get( i );
-                    auto n = i + pos;
+                    auto n = i + index;
                     v_[n] = v;
                     didAdd( n, v );
                     didChange();
@@ -104,7 +114,7 @@ namespace ecore
                 auto it = std::next( v_.begin(), index );
                 auto element = std::move( *it );
                 v_.erase( it );
-                didRemove( pos, element );
+                didRemove( index, element );
                 didChange();
                 return element;
             }
@@ -151,8 +161,17 @@ namespace ecore
             {
             }
 
-        protected:
+            virtual std::size_t size() const
+            {
+                return v_.size();
+            }
 
+            virtual bool empty() const
+            {
+                return v_.empty();
+            }
+
+        protected:
             virtual T doGet( std::size_t index ) const
             {
                 return resolve( index, v_[index] );
@@ -187,12 +206,12 @@ namespace ecore
                 std::size_t growth = l.size();
                 std::size_t oldSize = v_.size();
                 v_.resize( oldSize + growth );
-                for( int i = (int)oldSize - 1; i >= (int)pos; --i )
+                for( int i = (int)oldSize - 1; i >= (int)index; --i )
                     v_[i + growth] = v_[i];
                 for( int i = 0; i < growth; ++i )
                 {
                     auto e = l.get( i );
-                    auto n = i + pos;
+                    auto n = i + index;
                     v_[n] = e;
                     didAdd( n, e );
                     didChange();
@@ -203,9 +222,9 @@ namespace ecore
             virtual T doRemove( std::size_t index )
             {
                 auto it = std::next( v_.begin(), index );
-                auto element = std::move( *it.get() );
+                auto element = std::move( (*it).get() );
                 v_.erase( it );
-                didRemove( pos, element );
+                didRemove( index, element );
                 didChange();
                 return element;
             }
@@ -213,7 +232,7 @@ namespace ecore
             virtual T doMove( std::size_t newIndex, std::size_t oldIndex )
             {
                 auto it = std::next( v_.begin(), oldIndex );
-                auto element = std::move( *it.get() );
+                auto element = std::move( (*it).get() );
                 v_.erase( it );
                 v_.insert( std::next( v_.begin(), newIndex ), element );
                 didMove( newIndex, element, oldIndex );
@@ -224,10 +243,7 @@ namespace ecore
             virtual std::shared_ptr<EList<T>> doClear()
             {
                 std::vector<T> result;
-                std::transform( v_.begin(), v_.end(), result.end(), []( const Proxy<T>& p ) )
-                {
-                    return p.get();
-                });
+                std::transform( v_.begin(), v_.end(), result.end(), []( const Proxy<T>& p ) { return p.get(); } );
                 auto l = std::make_shared<ImmutableEList<T>>( std::move( result ) );
                 v_.clear();
                 return l;

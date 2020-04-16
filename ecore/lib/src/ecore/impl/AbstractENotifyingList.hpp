@@ -126,11 +126,11 @@ namespace ecore::impl
 
         virtual ValueType set( std::size_t index, const ValueType& newElement )
         {
-            auto oldElement = Super::set( index, e );
+            auto oldElement = Super::set( index, newElement );
             if( newElement != oldElement )
             {
-                auto n = inverseRemove( oldObject, nullptr );
-                n = inverseAdd( newObject, n );
+                auto n = inverseRemove( oldElement, nullptr );
+                n = inverseAdd( newElement, n );
                 createAndDispatchNotification( n, ENotification::SET, oldElement, newElement, index );
             }
             return oldElement;
@@ -140,7 +140,7 @@ namespace ecore::impl
                                                          const ValueType& newElement,
                                                          const std::shared_ptr<ENotificationChain>& notifications )
         {
-            auto oldElement = Super::set( index, e );
+            auto oldElement = Super::set( index, newElement );
             if( newElement != oldElement )
             {
                 auto n = notifications;
@@ -155,6 +155,7 @@ namespace ecore::impl
         {
             auto element = Super::move( newPos, oldPos );
             createAndDispatchNotification( nullptr, ENotification::MOVE, oldPos, element, newPos );
+            return element;
         }
 
         virtual void clear()
@@ -163,7 +164,7 @@ namespace ecore::impl
             if( l )
             {
                 if( l->empty() )
-                    createAndDispatchNotification( nullptr, ENotification::REMOVE_MANY, l->asListOf<Any>(), NO_VALUE, -1 );
+                    createAndDispatchNotification( nullptr, ENotification::REMOVE_MANY, l->asEListOf<Any>(), NO_VALUE, -1 );
                 else
                 {
                     auto notifications = createNotificationChain();
@@ -172,8 +173,8 @@ namespace ecore::impl
                         notifications = inverseRemove( e, notifications );
 
                     createAndDispatchNotification( notifications, [&]() {
-                        return l.size() == 1 ? createNotification( ENotification::REMOVE, l->get( 0 ), NO_VALUE, 0 )
-                                             : createNotification( ENotification::ADD_MANY, l->asListOf<Any>, NO_VALUE, -1 );
+                        return l->size() == 1 ? createNotification( ENotification::REMOVE, l->get( 0 ), NO_VALUE, 0 )
+                                              : createNotification( ENotification::ADD_MANY, l->asEListOf<Any>(), NO_VALUE, -1 );
                     } );
                 }
             }
