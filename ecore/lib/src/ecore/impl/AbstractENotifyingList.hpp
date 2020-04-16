@@ -13,6 +13,7 @@
 #include "ecore/Constants.hpp"
 #include "ecore/ENotifier.hpp"
 #include "ecore/impl/AbstractNotification.hpp"
+#include "ecore/impl/AbstractEList.hpp"
 #include "ecore/impl/NotificationChain.hpp"
 
 #include <algorithm>
@@ -29,7 +30,7 @@ namespace ecore::impl
         typedef typename I::ValueType ValueType;
 
         AbstractENotifyingList()
-            : AbstractEList<I, true>()
+            : Super()
         {
         }
 

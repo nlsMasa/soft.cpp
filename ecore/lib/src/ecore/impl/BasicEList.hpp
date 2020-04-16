@@ -11,15 +11,15 @@
 #define ECORE_BASIC_ELIST_HPP_
 
 #include "ecore/impl/AbstractEList.hpp"
-#include "ecore/impl/AbstractEListBase.hpp"
+#include "ecore/impl/ArrayEList.hpp"
 
 namespace ecore::impl
 {
 
     template <typename T, bool unique = false>
-    class BasicEList : public AbstractEListBase<AbstractEList<EList<T>, unique>>
+    class BasicEList : public ArrayEList<AbstractEList<EList<T>, unique>>
     {
-        typedef typename AbstractEListBase<AbstractEList<EList<T>, unique>> Super;
+        typedef typename ArrayEList<AbstractEList<EList<T>, unique>> Super;
     public:
         BasicEList()
             : Super()
