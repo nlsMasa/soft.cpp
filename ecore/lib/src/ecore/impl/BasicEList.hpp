@@ -13,8 +13,6 @@
 #include "ecore/impl/AbstractEList.hpp"
 #include "ecore/impl/AbstractEListBase.hpp"
 
-#include <vector>
-
 namespace ecore::impl
 {
 

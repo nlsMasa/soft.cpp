@@ -105,7 +105,7 @@ namespace ecore::impl
         virtual bool remove( const ValueType& e )
         {
             std::size_t index = indexOf( e );
-            if( index >= 0 )
+            if( index != -1 )
             {
                 remove( index );
                 return true;

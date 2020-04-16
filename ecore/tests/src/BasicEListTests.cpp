@@ -237,14 +237,14 @@ BOOST_AUTO_TEST_CASE( Unique_AddAll_Index )
 BOOST_AUTO_TEST_CASE( Remove_InvalidIndex, *boost::unit_test::precondition( no_debugger() ) )
 {
     BasicEList<int> list;
-    BOOST_REQUIRE_THROW( list.remove( 0 ), boost::execution_exception );
+    BOOST_REQUIRE_THROW( list.remove( std::size_t{0} ), boost::execution_exception );
 }
 #endif
 
 BOOST_AUTO_TEST_CASE( Remove_Index )
 {
     BasicEList<int> list = {1, 2};
-    int old = list.remove( 0 );
+    int old = list.remove( std::size_t{0} );
     BOOST_CHECK_EQUAL( old, 1 );
     BOOST_CHECK_EQUAL( list.size(), 1 );
 }
@@ -290,7 +290,7 @@ BOOST_AUTO_TEST_CASE( Clear )
 BOOST_AUTO_TEST_CASE( Move )
 {
     BasicEList<int> list = {1, 2, 3, 4, 5};
-    list.move( 3, 2 );
+    list.move( std::size_t{3}, std::size_t{2} );
     BOOST_CHECK_EQUAL( list, std::vector<int>( {1, 2, 4, 3, 5} ) );
 }
 
