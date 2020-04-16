@@ -12,7 +12,7 @@
 
 #include <memory>
 #include "ecore/EAdapter.hpp"
-#include "ecore/impl/ArrayEList.hpp"
+#include "ecore/impl/BasicEList.hpp"
 
 namespace ecore::impl
 {
@@ -61,7 +61,7 @@ namespace ecore::impl
 
     private:
 
-        class AdapterList : public ArrayEList<EAdapter*>
+        class AdapterList : public BasicEList<EAdapter*>
         {
         public:
             AdapterList( AbstractNotifier& notifier )

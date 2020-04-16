@@ -12,7 +12,6 @@
 
 #include "ecore/Constants.hpp"
 #include "ecore/ENotifier.hpp"
-#include "ecore/impl/AbstractArrayEList.hpp"
 #include "ecore/impl/AbstractNotification.hpp"
 #include "ecore/impl/NotificationChain.hpp"
 

@@ -7,8 +7,8 @@
 //
 // *****************************************************************************
 
-#ifndef ECORE_ABSTRACTARRAYELIST_HPP_
-#define ECORE_ABSTRACTARRAYELIST_HPP_
+#ifndef ECORE_ABSTRACTELISTBASE_HPP_
+#define ECORE_ABSTRACTELISTBASE_HPP_
 
 #include "ecore/impl/AbstractEList.hpp"
 #include "ecore/impl/Proxy.hpp"
@@ -19,35 +19,35 @@ namespace ecore
 {
     namespace impl
     {
-        template <typename L, typename T>
-        class AbstractArrayEList : public L
+        template <typename L, typename T = typename L::ValueType >
+        class AbstractEListBase : public L
         {
         public:
-            AbstractArrayEList()
+            AbstractEListBase()
                 : L()
                 , v_()
             {
             }
 
-            AbstractArrayEList( const std::vector<T>&& v )
+            AbstractEListBase( const std::vector<T>&& v )
                 : L()
                 , v_( v )
             {
             }
 
-            AbstractArrayEList( const std::initializer_list<T>& init )
+            AbstractEListBase( const std::initializer_list<T>& init )
                 : L()
                 , v_( init )
             {
             }
 
-            AbstractArrayEList( const AbstractArrayEList& o )
+            AbstractEListBase( const AbstractEListBase& o )
                 : L( o )
                 , v_( o.v_ )
             {
             }
 
-            virtual ~AbstractArrayEList()
+            virtual ~AbstractEListBase()
             {
             }
 
@@ -142,22 +142,22 @@ namespace ecore
         };
 
         template <typename L, typename T>
-        class AbstractArrayEList<L, Proxy<T>> : public L
+        class AbstractEListBase<L, Proxy<T>> : public L
         {
         public:
-            AbstractArrayEList()
+            AbstractEListBase()
                 : L()
                 , v_()
             {
             }
 
-            AbstractArrayEList( const AbstractArrayEList& o )
+            AbstractEListBase( const AbstractEListBase& o )
                 : L( o )
                 , v_( o.v_ )
             {
             }
 
-            virtual ~AbstractArrayEList()
+            virtual ~AbstractEListBase()
             {
             }
 

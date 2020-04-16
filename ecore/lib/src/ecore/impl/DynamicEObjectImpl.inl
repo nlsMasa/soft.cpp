@@ -21,7 +21,7 @@
 #include "ecore/EcorePackage.hpp"
 #include "ecore/Stream.hpp"
 #include "ecore/impl/AbstractAdapter.hpp"
-#include "ecore/impl/ArrayEList.hpp"
+#include "ecore/impl/BasicEList.hpp"
 #include "ecore/impl/EObjectEList.hpp"
 #include "ecore/impl/Proxy.hpp"
 
@@ -459,9 +459,9 @@ namespace ecore::impl
         if( auto eAttribute = std::dynamic_pointer_cast<EAttribute>( eStructuralFeature ) )
         {
             if( eAttribute->isUnique() )
-                return std::make_shared<ArrayEList<std::shared_ptr<EObject>, true>>();
+                return std::make_shared<BasicEList<std::shared_ptr<EObject>, true>>();
             else
-                return std::make_shared<ArrayEList<std::shared_ptr<EObject>, false>>();
+                return std::make_shared<BasicEList<std::shared_ptr<EObject>, false>>();
         }
         else if( auto eReference = std::dynamic_pointer_cast<EReference>( eStructuralFeature ) )
         {
