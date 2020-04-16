@@ -159,19 +159,23 @@ namespace ecore::impl
 
         virtual void clear()
         {
-            if( empty() )
-                createAndDispatchNotification( nullptr, ENotification::REMOVE_MANY, asListOf<Any>(), NO_VALUE, -1 );
-            else
+            auto l = doClear();
+            if( l )
             {
-                auto notifications = createNotificationChain();
+                if( l->empty() )
+                    createAndDispatchNotification( nullptr, ENotification::REMOVE_MANY, l->asListOf<Any>(), NO_VALUE, -1 );
+                else
+                {
+                    auto notifications = createNotificationChain();
 
-                for( auto e : *this )
-                    notifications = inverseRemove( e, notifications );
-                
-                createAndDispatchNotification( notifications, [&]() {
-                    return l.size() == 1 ? createNotification( ENotification::REMOVE, get( 0 ), NO_VALUE , 0 )
-                                         : createNotification( ENotification::ADD_MANY, asListOf<Any>, NO_VALUE, -1 );
-                } );
+                    for( const auto& e : *l )
+                        notifications = inverseRemove( e, notifications );
+
+                    createAndDispatchNotification( notifications, [&]() {
+                        return l.size() == 1 ? createNotification( ENotification::REMOVE, l->get( 0 ), NO_VALUE, 0 )
+                                             : createNotification( ENotification::ADD_MANY, l->asListOf<Any>, NO_VALUE, -1 );
+                    } );
+                }
             }
         }
 

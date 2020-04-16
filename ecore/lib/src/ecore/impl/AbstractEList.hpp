@@ -127,6 +127,11 @@ namespace ecore::impl
             return size() == 0;
         }
 
+        virtual void clear()
+        {
+            doClear();
+        }
+
     protected:
         virtual ValueType doGet( std::size_t index ) const = 0;
 
@@ -136,13 +141,13 @@ namespace ecore::impl
 
         virtual void doAdd( std::size_t index, const ValueType& e ) = 0;
 
-        virtual bool doAddAll( const EList<ValueType>& l ) = 0;
-
         virtual bool doAddAll( std::size_t index, const EList<ValueType>& l ) = 0;
 
         virtual ValueType doRemove( std::size_t index ) = 0;
 
-        virtual doMove( std::size_t newIndex, std::size_t oldIndex ) = 0;
+        virtual ValueType doMove( std::size_t newIndex, std::size_t oldIndex ) = 0;
+
+        virtual std::shared_ptr<EList<ValueType>> doClear() = 0;
 
     protected:
         virtual void didSet( std::size_t index, const ValueType& newObject, const ValueType& oldObject )
