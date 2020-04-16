@@ -9,8 +9,9 @@
 #include "ecore/EcoreUtils.hpp"
 #include "ecore/Stream.hpp"
 #include "ecore/URIConverter.hpp"
-#include "ecore/impl/AbstractENotifyingList.hpp"
 #include "ecore/impl/AbstractNotification.hpp"
+#include "ecore/impl/BasicEList.hpp"
+#include "ecore/impl/BasicENotifyingList.hpp"
 #include "ecore/impl/EObjectInternal.hpp"
 #include "ecore/impl/ResourceURIConverter.hpp"
 #include "ecore/impl/StringUtils.hpp"
@@ -329,7 +330,7 @@ std::shared_ptr<URIConverter> AbstractResource::getURIConverter() const
 
 std::shared_ptr<EList<std::shared_ptr<EObject>>> AbstractResource::initContents()
 {
-    class ContentsEList : public AbstractENotifyingList<ENotifyingList<std::shared_ptr<EObject>>, std::shared_ptr<EObject>>
+    class ContentsEList : public BasicENotifyingList<std::shared_ptr<EObject>>
     {
     public:
         ContentsEList( AbstractResource& resource )
@@ -379,5 +380,5 @@ std::shared_ptr<EList<std::shared_ptr<EObject>>> AbstractResource::initContents(
 
 std::shared_ptr<EList<std::shared_ptr<EDiagnostic>>> AbstractResource::initDiagnostics()
 {
-    return std::make_shared<ArrayEList<std::shared_ptr<EDiagnostic>>>();
+    return std::make_shared<BasicEList<std::shared_ptr<EDiagnostic>>>();
 }

@@ -52,6 +52,7 @@ set(HEADER_ECORE_IMPL_FILES
     src/ecore/impl/AbstractNotifier.hpp
     src/ecore/impl/AbstractResource.hpp
     src/ecore/impl/BasicEList.hpp
+    src/ecore/impl/BasicENotifyingList.hpp
     src/ecore/impl/Diagnostic.hpp
     src/ecore/impl/DynamicEObjectImpl.hpp
     src/ecore/impl/DynamicEObjectImpl.inl

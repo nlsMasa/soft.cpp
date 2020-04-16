@@ -31,6 +31,7 @@ namespace ecore::impl
             : owner_( owner )
             , featureID_( featureID )
             , inverseFeatureID_( inverseFeatureID )
+            , isSet_( false )
         {
         }
 
