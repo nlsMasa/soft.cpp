@@ -295,7 +295,7 @@ std::shared_ptr<ENotificationChain> AbstractResource::basicSetResourceSet( const
     if( oldAbstractResourceSet )
     {
         auto list = std::static_pointer_cast<ENotifyingList<std::shared_ptr<EResource>>>( oldAbstractResourceSet->getResources() );
-        notifications = list->add( thisPtr_.lock(), notifications );
+        notifications = list->remove( thisPtr_.lock(), notifications );
     }
     resourceSet_ = resourceSet;
     if( eNotificationRequired() )
