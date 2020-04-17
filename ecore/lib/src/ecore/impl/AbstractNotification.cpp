@@ -36,8 +36,10 @@ bool AbstractNotification::merge( const std::shared_ptr<ENotification>& notifica
                             eventType_ = SET;
                         return true;
                     }
+                    break;
                 }
             }
+            break;
         }
         case REMOVE:
         {

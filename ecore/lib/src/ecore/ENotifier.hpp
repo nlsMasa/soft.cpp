@@ -53,7 +53,7 @@ namespace ecore
         * via {@link Adapter#notifyChanged Adapter.notifyChanged}.
         * @param notification a description of the change.
         */
-        virtual void eNotify( const std::shared_ptr<ENotification>& notification ) = 0;
+        virtual void eNotify( const std::shared_ptr<ENotification>& notification ) const = 0;
     };
 
 }

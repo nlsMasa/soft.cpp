@@ -51,6 +51,7 @@ BOOST_AUTO_TEST_CASE( Resources_NoMock )
     resourceSet->setThisPtr( resourceSet );
 
     auto resource = std::make_shared<Resource>();
+    resource->setThisPtr( resource );
     auto resources = resourceSet->getResources();
     resources->add( resource );
     BOOST_CHECK_EQUAL( resource->getResourceSet(), resourceSet );

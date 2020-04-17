@@ -41,78 +41,71 @@ namespace ecore::impl
                 if( contains( e ) )
                     return false;
             }
-            addUnique( e );
+            doAdd( e );
             return true;
         }
 
         virtual bool addAll( const EList<ValueType>& l )
         {
-            if constexpr( unique )
-            {
-                auto nonDuplicates = getNonDuplicates( l );
-                return addAllUnique( *nonDuplicates );
-            }
-            else
-            {
-                return addAllUnique( l );
-            }
+            return addAll( size(), l );
         }
 
-        virtual bool add( std::size_t pos, const ValueType& e )
+        virtual bool add( std::size_t index, const ValueType& e )
         {
-            VERIFY( pos <= size(), "out of range" );
+            VERIFY( index <= size(), "out of range" );
             if constexpr( unique )
             {
                 VERIFY( !contains( e ), "element already in list : uniqueness constraint is violated" );
             }
-            addUnique( pos, e );
+            doAdd( index, e );
             return true;
         }
 
-        virtual bool addAll( std::size_t pos, const EList<ValueType>& l )
+        virtual bool addAll( std::size_t index, const EList<ValueType>& l )
         {
-            VERIFY( pos <= size(), "out of range" );
+            VERIFY( index <= size(), "out of range" );
             if constexpr( unique )
             {
                 auto nonDuplicates = getNonDuplicates( l );
-                return addAllUnique( pos, *nonDuplicates );
+                return doAddAll( index, *nonDuplicates );
             }
             else
-                return addAllUnique( pos, l );
+                return doAddAll( index, l );
         }
 
-        virtual void addUnique( const ValueType& e ) = 0;
-
-        virtual void addUnique( std::size_t pos, const ValueType& e ) = 0;
-
-        virtual bool addAllUnique( const EList<ValueType>& l ) = 0;
-
-        virtual bool addAllUnique( std::size_t pos, const EList<ValueType>& l ) = 0;
-
-        using EList::move;
-
-        virtual void move( std::size_t newPos, const ValueType& e )
+        virtual ValueType move( std::size_t newIndex, std::size_t oldIndex )
         {
-            move( newPos, indexOf( e ) );
+            VERIFY( newIndex <= size(), "out of range" );
+            VERIFY( oldIndex <= size(), "out of range" );
+            return doMove( newIndex, oldIndex );
         }
 
-        virtual ValueType set( std::size_t pos, const ValueType& e )
+        virtual void move( std::size_t newIndex, const ValueType& e )
         {
-            VERIFY( pos < size(), "out of range" );
-            if constexpr ( unique )
+            move( newIndex, indexOf( e ) );
+        }
+
+        virtual ValueType get( std::size_t index ) const
+        {
+            VERIFY( index < size(), "out of range" );
+            return doGet( index );
+        }
+
+        virtual ValueType set( std::size_t index, const ValueType& e )
+        {
+            VERIFY( index < size(), "out of range" );
+            if constexpr( unique )
             {
                 std::size_t currentIndex = indexOf( e );
-                VERIFY( currentIndex == -1 || currentIndex == pos, "element already in list : uniqueness constraint is violated" );
+                VERIFY( currentIndex == -1 || currentIndex == index, "element already in list : uniqueness constraint is violated" );
             }
-            return setUnique( pos, e );
+            return doSet( index, e );
         }
-
-        virtual ValueType setUnique( std::size_t pos, const ValueType& e ) = 0;
 
         virtual bool remove( const ValueType& e )
         {
             std::size_t index = indexOf( e );
-            if( index >= 0 )
+            if( index != -1 )
             {
                 remove( index );
                 return true;
@@ -123,25 +116,51 @@ namespace ecore::impl
             }
         }
 
-        virtual ValueType remove( std::size_t index ) = 0;
+        virtual ValueType remove( std::size_t index )
+        {
+            VERIFY( index < size(), "out of range" );
+            return doRemove( index );
+        }
 
         virtual bool empty() const
         {
             return size() == 0;
         }
 
+        virtual void clear()
+        {
+            doClear();
+        }
+
     protected:
-        virtual void didSet( std::size_t pos, const ValueType& newObject, const ValueType& oldObject )
+        virtual ValueType doGet( std::size_t index ) const = 0;
+
+        virtual ValueType doSet( std::size_t index, const ValueType& e ) = 0;
+
+        virtual void doAdd( const ValueType& e ) = 0;
+
+        virtual void doAdd( std::size_t index, const ValueType& e ) = 0;
+
+        virtual bool doAddAll( std::size_t index, const EList<ValueType>& l ) = 0;
+
+        virtual ValueType doRemove( std::size_t index ) = 0;
+
+        virtual ValueType doMove( std::size_t newIndex, std::size_t oldIndex ) = 0;
+
+        virtual std::shared_ptr<EList<ValueType>> doClear() = 0;
+
+    protected:
+        virtual void didSet( std::size_t index, const ValueType& newObject, const ValueType& oldObject )
         {
             // Do nothing.
         }
 
-        virtual void didAdd( std::size_t pos, const ValueType& newObject )
+        virtual void didAdd( std::size_t index, const ValueType& newObject )
         {
             // Do nothing.
         }
 
-        virtual void didRemove( std::size_t pos, const ValueType& oldObject )
+        virtual void didRemove( std::size_t index, const ValueType& oldObject )
         {
             // Do nothing.
         }
@@ -152,7 +171,7 @@ namespace ecore::impl
                 didRemove( i, oldObjects[i] );
         }
 
-        virtual void didMove( std::size_t pos, const ValueType& movedObject, std::size_t oldIndex )
+        virtual void didMove( std::size_t index, const ValueType& movedObject, std::size_t oldIndex )
         {
             // Do nothing.
         }

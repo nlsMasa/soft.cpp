@@ -1,7 +1,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "ecore/ENotifier.hpp"
-#include "ecore/impl/AbstractNotifier.hpp"
+#include "ecore/impl/BasicNotifier.hpp"
 #include "ecore/tests/MockAdapter.hpp"
 
 
@@ -9,20 +9,7 @@ using namespace ecore;
 using namespace ecore::impl;
 using namespace ecore::tests;
 
-namespace
-{
-    class Notifier : public AbstractNotifier<ENotifier>
-    {
-    public:
-        Notifier() = default;
-        virtual ~Notifier() = default;
-
-        void setThisPtr( const std::shared_ptr<Notifier>& notifier )
-        {
-            AbstractNotifier<ENotifier>::setThisPtr( notifier );
-        }
-    };
-}
+using Notifier = BasicNotifier<ENotifier>;
 
 BOOST_AUTO_TEST_SUITE( NotifierTests )
 

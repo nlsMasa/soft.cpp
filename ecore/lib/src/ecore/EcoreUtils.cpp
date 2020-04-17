@@ -88,7 +88,7 @@ std::string EcoreUtils::getRelativeURIFragmentPath( const std::shared_ptr<EObjec
     std::unordered_set<std::shared_ptr<EObject>> visited;
     std::deque<std::string> fragmentURIPath;
     auto eObject = descendant;
-    for( auto eContainer = eObject->eContainer(); eContainer && visited.insert( eContainer ).second; eContainer = eObject->eContainer() )
+    for( auto eContainer = eObject->getInternal().eInternalContainer(); eContainer && visited.insert( eContainer ).second; eContainer = eObject->getInternal().eInternalContainer() )
     {
         fragmentURIPath.push_front( eContainer->getInternal().eURIFragmentSegment( eObject->eContainingFeature(), eObject ) );
         eObject = eContainer;

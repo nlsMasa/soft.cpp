@@ -3,7 +3,8 @@
 set(SOURCE_FILES
     src/main.cpp
     src/AnyTests.cpp
-    src/ArrayEListTests.cpp
+    src/BasicEListTests.cpp
+    src/BasicNotifierTests.cpp
     src/DiamondVsMixinsTests.cpp
     src/DynamicEObjectTests.cpp
     src/EcoreFactoryTests.cpp
@@ -22,7 +23,6 @@ set(SOURCE_FILES
     src/Memory.cpp
     src/NotificationTests.cpp
     src/NotificationChainTests.cpp
-    src/NotifierTests.cpp
     src/ProxyTests.cpp
     src/ResourceTests.cpp
     src/ResourceSetTests.cpp

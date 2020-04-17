@@ -12,7 +12,7 @@
 
 #include "ecore/EObject.hpp"
 #include "ecore/Exports.hpp"
-#include "ecore/impl/AbstractNotifier.hpp"
+#include "ecore/impl/BasicNotifier.hpp"
 #include "ecore/impl/EObjectInternal.hpp"
 
 #include <optional>
@@ -26,7 +26,7 @@ namespace ecore::impl
 {
 
     template <typename... I>
-    class BasicEObject : public AbstractNotifier<I...>
+    class BasicEObject : public BasicNotifier<I...>
     {
     public:
         BasicEObject();

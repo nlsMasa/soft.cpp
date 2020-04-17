@@ -9,27 +9,29 @@
 #ifndef ECORE_EOBJECT_MOCKOBJECTINTERNAL_HPP
 #define ECORE_EOBJECT_MOCKOBJECTINTERNAL_HPP
 
-#include "turtle/mock.hpp"
 #include "ecore/impl/EObjectInternal.hpp"
+#include "turtle/mock.hpp"
 
 namespace ecore::tests
 {
 
-    MOCK_BASE_CLASS(MockObjectInternal, impl::EObjectInternal )
+    MOCK_BASE_CLASS( MockObjectInternal, impl::EObjectInternal )
     {
-        MOCK_METHOD(eDirectResource, 0);
-        MOCK_METHOD(eSetResource, 2);
+        MOCK_METHOD( eInternalResource, 0 );
+        MOCK_METHOD( eSetInternalResource, 2 );
 
-        MOCK_METHOD(eObjectForFragmentSegment, 1);
-        MOCK_METHOD(eURIFragmentSegment, 2);
+        MOCK_METHOD( eInternalContainer, 0 );
 
-        MOCK_METHOD(eInverseAdd, 3);
-        MOCK_METHOD(eInverseRemove, 3);
+        MOCK_METHOD( eObjectForFragmentSegment, 1 );
+        MOCK_METHOD( eURIFragmentSegment, 2 );
 
-        MOCK_METHOD(eProxyURI, 0);
-        MOCK_METHOD(eSetProxyURI, 1);
-        MOCK_METHOD(eResolveProxy, 1);
+        MOCK_METHOD( eInverseAdd, 3 );
+        MOCK_METHOD( eInverseRemove, 3 );
+
+        MOCK_METHOD( eProxyURI, 0 );
+        MOCK_METHOD( eSetProxyURI, 1 );
+        MOCK_METHOD( eResolveProxy, 1 );
     };
-}
+} // namespace ecore::tests
 
 #endif /* ECORE_EOBJECT_MOCKOBJECTINTERNAL_HPP */

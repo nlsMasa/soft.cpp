@@ -7,8 +7,8 @@
 //
 // *****************************************************************************
 
-#ifndef ECORE_ABSTRACTEOBJECT_HPP_
-#error This file may only be included from AbstractEObject.hpp
+#ifndef ECORE_BASICEOBJECT_HPP_
+#error This file may only be included from BasicEObject.hpp
 #endif
 
 #include "ecore/Any.hpp"
@@ -27,19 +27,18 @@
 #include "ecore/impl/AbstractAdapter.hpp"
 #include "ecore/impl/Notification.hpp"
 
-#include "AbstractEObject.hpp"
 #include <sstream>
 #include <string>
 
 namespace ecore::impl
 {
     template <typename... I>
-    class AbstractEObject<I...>::EContentsEList : public AbstractAdapter
+    class BasicEObject<I...>::EContentsEList : public AbstractAdapter
     {
         typedef std::shared_ptr<const EList<std::shared_ptr<ecore::EReference>>> ( EClass::*T_RefsGetter )() const;
 
     public:
-        EContentsEList( AbstractEObject<I...>& obj, T_RefsGetter refsGetter )
+        EContentsEList( BasicEObject<I...>& obj, T_RefsGetter refsGetter )
             : obj_( obj )
             , refsGetter_( refsGetter )
         {
@@ -94,31 +93,31 @@ namespace ecore::impl
         }
 
     private:
-        AbstractEObject<I...>& obj_;
+        BasicEObject<I...>& obj_;
         T_RefsGetter refsGetter_;
         std::shared_ptr<const EList<std::shared_ptr<EObject>>> l_;
     };
 
     template <typename... I>
-    AbstractEObject<I...>::AbstractEObject()
+    BasicEObject<I...>::BasicEObject()
         : eContainer_()
         , eContainerFeatureID_( -1 )
     {
     }
 
     template <typename... I>
-    AbstractEObject<I...>::~AbstractEObject()
+    BasicEObject<I...>::~BasicEObject()
     {
     }
 
     template <typename... I>
-    const EObjectInternal& AbstractEObject<I...>::getInternal() const
+    const EObjectInternal& BasicEObject<I...>::getInternal() const
     {
-        return const_cast<AbstractEObject<I...>*>( this )->getInternal();
+        return const_cast<BasicEObject<I...>*>( this )->getInternal();
     }
 
     template <typename... I>
-    EObjectInternal& AbstractEObject<I...>::getInternal()
+    EObjectInternal& BasicEObject<I...>::getInternal()
     {
         if( !internal_ )
             internal_ = std::move( createInternal() );
@@ -126,25 +125,25 @@ namespace ecore::impl
     }
 
     template <typename... I>
-    std::shared_ptr<const ECollectionView<std::shared_ptr<ecore::EObject>>> AbstractEObject<I...>::eAllContents() const
+    std::shared_ptr<const ECollectionView<std::shared_ptr<ecore::EObject>>> BasicEObject<I...>::eAllContents() const
     {
         return std::make_shared<ECollectionView<std::shared_ptr<ecore::EObject>>>( eContents() );
     }
 
     template <typename... I>
-    std::shared_ptr<const EList<std::shared_ptr<ecore::EObject>>> AbstractEObject<I...>::eContents() const
+    std::shared_ptr<const EList<std::shared_ptr<ecore::EObject>>> BasicEObject<I...>::eContents() const
     {
-        return const_cast<AbstractEObject<I...>*>( this )->eContentsList();
+        return const_cast<BasicEObject<I...>*>( this )->eContentsList();
     }
 
     template <typename... I>
-    std::shared_ptr<const EList<std::shared_ptr<ecore::EObject>>> AbstractEObject<I...>::eCrossReferences() const
+    std::shared_ptr<const EList<std::shared_ptr<ecore::EObject>>> BasicEObject<I...>::eCrossReferences() const
     {
-        return const_cast<AbstractEObject<I...>*>( this )->eCrossReferencesList();
+        return const_cast<BasicEObject<I...>*>( this )->eCrossReferencesList();
     }
 
     template <typename... I>
-    typename std::shared_ptr<const EList<std::shared_ptr<EObject>>> AbstractEObject<I...>::eContentsList()
+    typename std::shared_ptr<const EList<std::shared_ptr<EObject>>> BasicEObject<I...>::eContentsList()
     {
         if( !eContents_ )
             eContents_ = std::make_unique<EContentsEList>( *this, &EClass::getEContainments );
@@ -152,7 +151,7 @@ namespace ecore::impl
     }
 
     template <typename... I>
-    typename std::shared_ptr<const EList<std::shared_ptr<EObject>>> AbstractEObject<I...>::eCrossReferencesList()
+    typename std::shared_ptr<const EList<std::shared_ptr<EObject>>> BasicEObject<I...>::eCrossReferencesList()
     {
         if( !eCrossReferences_ )
             eCrossReferences_ = std::make_unique<EContentsEList>( *this, &EClass::getECrossReferences );
@@ -160,31 +159,19 @@ namespace ecore::impl
     }
 
     template <typename... I>
-    std::shared_ptr<ecore::EClass> AbstractEObject<I...>::eClass() const
+    std::shared_ptr<ecore::EClass> BasicEObject<I...>::eClass() const
     {
         return eStaticClass();
     }
 
     template <typename... I>
-    std::shared_ptr<EClass> AbstractEObject<I...>::eStaticClass() const
+    std::shared_ptr<EClass> BasicEObject<I...>::eStaticClass() const
     {
         return EcorePackage::eInstance()->getEObject();
     }
 
     template <typename... I>
-    std::shared_ptr<ecore::EObject> AbstractEObject<I...>::eContainer() const
-    {
-        return eContainer_.lock();
-    }
-
-    template <typename... I>
-    int AbstractEObject<I...>::eContainerFeatureID() const
-    {
-        return eContainerFeatureID_;
-    }
-
-    template <typename... I>
-    std::shared_ptr<EObject> AbstractEObject<I...>::eObjectForFragmentSegment( const std::string& uriSegment ) const
+    std::shared_ptr<EObject> BasicEObject<I...>::eObjectForFragmentSegment( const std::string& uriSegment ) const
     {
         std::size_t index = std::string::npos;
         if( !uriSegment.empty() && std::isdigit( uriSegment.back() ) )
@@ -193,7 +180,7 @@ namespace ecore::impl
             if( index != std::string::npos )
             {
                 auto position = std::stoi( uriSegment.substr( index + 1 ) );
-                auto eFeatureName = uriSegment.substr( 1, index - 1);
+                auto eFeatureName = uriSegment.substr( 1, index - 1 );
                 auto eFeature = eStructuralFeature( eFeatureName );
                 auto value = eGet( eFeature );
                 auto list = anyListCast<std::shared_ptr<EObject>>( value );
@@ -203,7 +190,7 @@ namespace ecore::impl
         }
         if( index == std::string::npos )
         {
-            auto eFeature = eStructuralFeature( uriSegment.substr(1) );
+            auto eFeature = eStructuralFeature( uriSegment.substr( 1 ) );
             auto value = eGet( eFeature );
             return anyCast<std::shared_ptr<EObject>>( value );
         }
@@ -211,7 +198,7 @@ namespace ecore::impl
     }
 
     template <typename... I>
-    std::string AbstractEObject<I...>::eURIFragmentSegment( const std::shared_ptr<EStructuralFeature>& eFeature,
+    std::string BasicEObject<I...>::eURIFragmentSegment( const std::shared_ptr<EStructuralFeature>& eFeature,
                                                             const std::shared_ptr<EObject>& eObject ) const
     {
         std::stringstream s;
@@ -229,13 +216,13 @@ namespace ecore::impl
     }
 
     template <typename... I>
-    inline std::shared_ptr<EObject> AbstractEObject<I...>::getThisAsEObject() const
+    inline std::shared_ptr<EObject> BasicEObject<I...>::getThisAsEObject() const
     {
         return std::static_pointer_cast<EObject>( getThisPtr() );
     }
 
     template <typename... I>
-    std::shared_ptr<EStructuralFeature> AbstractEObject<I...>::eStructuralFeature( const std::string& name ) const
+    std::shared_ptr<EStructuralFeature> BasicEObject<I...>::eStructuralFeature( const std::string& name ) const
     {
         auto eFeature = eClass()->getEStructuralFeature( name );
         if( !eFeature )
@@ -244,7 +231,7 @@ namespace ecore::impl
     }
 
     template <typename... I>
-    std::shared_ptr<ecore::EStructuralFeature> AbstractEObject<I...>::eContainingFeature() const
+    std::shared_ptr<ecore::EStructuralFeature> BasicEObject<I...>::eContainingFeature() const
     {
         auto eContainer = eContainer_.lock();
         if( eContainer )
@@ -257,13 +244,13 @@ namespace ecore::impl
     }
 
     template <typename... I>
-    std::shared_ptr<ecore::EReference> AbstractEObject<I...>::eContainmentFeature() const
+    std::shared_ptr<ecore::EReference> BasicEObject<I...>::eContainmentFeature() const
     {
         return eContainmentFeature( getThisAsEObject(), eContainer_.lock(), eContainerFeatureID_ );
     }
 
     template <typename... I>
-    std::shared_ptr<EReference> AbstractEObject<I...>::eContainmentFeature( const std::shared_ptr<EObject>& eObject,
+    std::shared_ptr<EReference> BasicEObject<I...>::eContainmentFeature( const std::shared_ptr<EObject>& eObject,
                                                                             const std::shared_ptr<EObject>& eContainer,
                                                                             int eContainerFeatureID )
     {
@@ -287,13 +274,13 @@ namespace ecore::impl
     }
 
     template <typename... I>
-    bool AbstractEObject<I...>::eIsProxy() const
+    bool BasicEObject<I...>::eIsProxy() const
     {
         return static_cast<bool>( eProxyURI_ );
     }
 
     template <typename... I>
-    std::shared_ptr<EResource> AbstractEObject<I...>::eResource() const
+    std::shared_ptr<EResource> BasicEObject<I...>::eResource() const
     {
         auto eResource = eResource_.lock();
         if( !eResource )
@@ -306,20 +293,20 @@ namespace ecore::impl
     }
 
     template <typename... I>
-    std::shared_ptr<EResource> AbstractEObject<I...>::eDirectResource() const
+    std::shared_ptr<EResource> BasicEObject<I...>::eInternalResource() const
     {
         return eResource_.lock();
     }
 
     template <typename... I>
-    void AbstractEObject<I...>::eSetDirectResource( const std::shared_ptr<EResource>& resource )
+    void BasicEObject<I...>::eSetInternalResource( const std::shared_ptr<EResource>& resource )
     {
         eResource_ = resource;
     }
 
     template <typename... I>
-    std::shared_ptr<ENotificationChain> AbstractEObject<I...>::eSetResource( const std::shared_ptr<EResource>& newResource,
-                                                                             const std::shared_ptr<ENotificationChain>& n )
+    std::shared_ptr<ENotificationChain> BasicEObject<I...>::eSetInternalResource( const std::shared_ptr<EResource>& newResource,
+                                                                                     const std::shared_ptr<ENotificationChain>& n )
     {
         auto notifications = n;
         auto oldResource = eResource_.lock();
@@ -354,24 +341,24 @@ namespace ecore::impl
                 notifications = eBasicSetContainer( nullptr, -1, notifications );
             }
         }
-        eSetDirectResource( newResource );
+        eSetInternalResource( newResource );
         return notifications;
     }
 
     template <typename... I>
-    Any AbstractEObject<I...>::eGet( const std::shared_ptr<EStructuralFeature>& feature ) const
+    Any BasicEObject<I...>::eGet( const std::shared_ptr<EStructuralFeature>& feature ) const
     {
         return eGet( feature, true );
     }
 
     template <typename... I>
-    Any AbstractEObject<I...>::eGet( const std::shared_ptr<EStructuralFeature>& feature, bool resolve ) const
+    Any BasicEObject<I...>::eGet( const std::shared_ptr<EStructuralFeature>& feature, bool resolve ) const
     {
         return eGet( feature, resolve, true );
     }
 
     template <typename... I>
-    int AbstractEObject<I...>::eStructuralFeatureID( const std::shared_ptr<EStructuralFeature>& eStructuralFeature ) const
+    int BasicEObject<I...>::eStructuralFeatureID( const std::shared_ptr<EStructuralFeature>& eStructuralFeature ) const
     {
         VERIFYN( eClass()->getEAllStructuralFeatures()->contains( eStructuralFeature ),
                  "The feature '%s' is not a valid feature",
@@ -380,28 +367,28 @@ namespace ecore::impl
     }
 
     template <typename... I>
-    int AbstractEObject<I...>::eStructuralFeatureID( const std::shared_ptr<EObject>& eContainer, int featureID ) const
+    int BasicEObject<I...>::eStructuralFeatureID( const std::shared_ptr<EObject>& eContainer, int featureID ) const
     {
         return featureID;
     }
 
     template <typename... I>
-    int AbstractEObject<I...>::eOperationID( const std::shared_ptr<EOperation>& eOperation ) const
+    int BasicEObject<I...>::eOperationID( const std::shared_ptr<EOperation>& eOperation ) const
     {
         VERIFYN( eClass()->getEAllOperations()->contains( eOperation ),
                  "The operation '%s' is not a valid operation",
                  eOperation->getName().c_str() );
-        return eOperationID( eOperation->eContainer() , eOperation->getOperationID() );
+        return eOperationID( eOperation->eContainer(), eOperation->getOperationID() );
     }
 
     template <typename... I>
-    int AbstractEObject<I...>::eOperationID( const std::shared_ptr<EObject>& eContainer, int operationID ) const
+    int BasicEObject<I...>::eOperationID( const std::shared_ptr<EObject>& eContainer, int operationID ) const
     {
         return operationID;
     }
 
     template <typename... I>
-    Any AbstractEObject<I...>::eGet( const std::shared_ptr<EStructuralFeature>& eFeature, bool resolve, bool coreType ) const
+    Any BasicEObject<I...>::eGet( const std::shared_ptr<EStructuralFeature>& eFeature, bool resolve, bool coreType ) const
     {
         int featureID = eStructuralFeatureID( eFeature );
         if( featureID >= 0 )
@@ -410,7 +397,7 @@ namespace ecore::impl
     }
 
     template <typename... I>
-    Any AbstractEObject<I...>::eGet( int featureID, bool resolve, bool coreType ) const
+    Any BasicEObject<I...>::eGet( int featureID, bool resolve, bool coreType ) const
     {
         std::shared_ptr<EStructuralFeature> eFeature = eClass()->getEStructuralFeature( featureID );
         VERIFYN( eFeature, "Invalid featureID: %i ", featureID );
@@ -418,7 +405,7 @@ namespace ecore::impl
     }
 
     template <typename... I>
-    bool AbstractEObject<I...>::eIsSet( const std::shared_ptr<EStructuralFeature>& eFeature ) const
+    bool BasicEObject<I...>::eIsSet( const std::shared_ptr<EStructuralFeature>& eFeature ) const
     {
         int featureID = eStructuralFeatureID( eFeature );
         if( featureID >= 0 )
@@ -427,7 +414,7 @@ namespace ecore::impl
     }
 
     template <typename... I>
-    bool AbstractEObject<I...>::eIsSet( int featureID ) const
+    bool BasicEObject<I...>::eIsSet( int featureID ) const
     {
         std::shared_ptr<EStructuralFeature> eFeature = eClass()->getEStructuralFeature( featureID );
         VERIFYN( eFeature, "Invalid featureID: %i ", featureID );
@@ -435,7 +422,7 @@ namespace ecore::impl
     }
 
     template <typename... I>
-    void AbstractEObject<I...>::eSet( const std::shared_ptr<EStructuralFeature>& eFeature, const Any& newValue )
+    void BasicEObject<I...>::eSet( const std::shared_ptr<EStructuralFeature>& eFeature, const Any& newValue )
     {
         int featureID = eStructuralFeatureID( eFeature );
         if( featureID >= 0 )
@@ -445,14 +432,14 @@ namespace ecore::impl
     }
 
     template <typename... I>
-    void AbstractEObject<I...>::eSet( int featureID, const Any& newValue )
+    void BasicEObject<I...>::eSet( int featureID, const Any& newValue )
     {
         std::shared_ptr<EStructuralFeature> eFeature = eClass()->getEStructuralFeature( featureID );
         VERIFYN( eFeature, "Invalid featureID: %i ", featureID );
     }
 
     template <typename... I>
-    void AbstractEObject<I...>::eUnset( const std::shared_ptr<EStructuralFeature>& eFeature )
+    void BasicEObject<I...>::eUnset( const std::shared_ptr<EStructuralFeature>& eFeature )
     {
         int featureID = eStructuralFeatureID( eFeature );
         if( featureID >= 0 )
@@ -462,14 +449,14 @@ namespace ecore::impl
     }
 
     template <typename... I>
-    void AbstractEObject<I...>::eUnset( int featureID )
+    void BasicEObject<I...>::eUnset( int featureID )
     {
         std::shared_ptr<EStructuralFeature> eFeature = eClass()->getEStructuralFeature( featureID );
         VERIFYN( eFeature, "Invalid featureID: %i ", featureID );
     }
 
     template <typename... I>
-    Any AbstractEObject<I...>::eInvoke( const std::shared_ptr<EOperation>& eOperation, const std::shared_ptr<EList<Any>>& arguments )
+    Any BasicEObject<I...>::eInvoke( const std::shared_ptr<EOperation>& eOperation, const std::shared_ptr<EList<Any>>& arguments )
     {
         int operationID = eOperationID( eOperation );
         if( operationID >= 0 )
@@ -478,7 +465,7 @@ namespace ecore::impl
     }
 
     template <typename... I>
-    Any AbstractEObject<I...>::eInvoke( int operationID, const std::shared_ptr<EList<Any>>& arguments )
+    Any BasicEObject<I...>::eInvoke( int operationID, const std::shared_ptr<EList<Any>>& arguments )
     {
         std::shared_ptr<EOperation> eOperation = eClass()->getEOperation( operationID );
         VERIFYN( eOperation, "Invalid operationID: %i ", operationID );
@@ -486,7 +473,7 @@ namespace ecore::impl
     }
 
     template <typename... I>
-    std::shared_ptr<ENotificationChain> AbstractEObject<I...>::eBasicInverseAdd( const std::shared_ptr<EObject>& otherEnd,
+    std::shared_ptr<ENotificationChain> BasicEObject<I...>::eBasicInverseAdd( const std::shared_ptr<EObject>& otherEnd,
                                                                                  int featureID,
                                                                                  const std::shared_ptr<ENotificationChain>& notifications )
     {
@@ -494,14 +481,14 @@ namespace ecore::impl
     }
 
     template <typename... I>
-    std::shared_ptr<ENotificationChain> AbstractEObject<I...>::eBasicInverseRemove(
+    std::shared_ptr<ENotificationChain> BasicEObject<I...>::eBasicInverseRemove(
         const std::shared_ptr<EObject>& otherEnd, int featureID, const std::shared_ptr<ENotificationChain>& notifications )
     {
         return notifications;
     }
 
     template <typename... I>
-    std::shared_ptr<ENotificationChain> AbstractEObject<I...>::eInverseAdd( const std::shared_ptr<EObject>& otherEnd,
+    std::shared_ptr<ENotificationChain> BasicEObject<I...>::eInverseAdd( const std::shared_ptr<EObject>& otherEnd,
                                                                             int featureID,
                                                                             const std::shared_ptr<ENotificationChain>& n )
     {
@@ -516,7 +503,7 @@ namespace ecore::impl
     }
 
     template <typename... I>
-    std::shared_ptr<ENotificationChain> AbstractEObject<I...>::eInverseRemove( const std::shared_ptr<EObject>& otherEnd,
+    std::shared_ptr<ENotificationChain> BasicEObject<I...>::eInverseRemove( const std::shared_ptr<EObject>& otherEnd,
                                                                                int featureID,
                                                                                const std::shared_ptr<ENotificationChain>& notifications )
     {
@@ -527,31 +514,78 @@ namespace ecore::impl
     }
 
     template <typename... I>
-    URI AbstractEObject<I...>::eProxyURI() const
+    URI BasicEObject<I...>::eProxyURI() const
     {
         return eProxyURI_.value_or( URI() );
     }
 
     template <typename... I>
-    void AbstractEObject<I...>::eSetProxyURI( const URI& uri )
+    void BasicEObject<I...>::eSetProxyURI( const URI& uri )
     {
         eProxyURI_ = uri;
     }
 
     template <typename... I>
-    std::shared_ptr<EObject> AbstractEObject<I...>::eResolveProxy( const std::shared_ptr<EObject>& proxy ) const
+    std::shared_ptr<EObject> BasicEObject<I...>::eResolveProxy( const std::shared_ptr<EObject>& proxy ) const
     {
         return EcoreUtils::resolve( proxy, getThisAsEObject() );
     }
 
     template <typename... I>
-    std::shared_ptr<ENotificationChain> AbstractEObject<I...>::eBasicSetContainer( const std::shared_ptr<EObject>& newContainer,
+    std::shared_ptr<ecore::EObject> BasicEObject<I...>::eContainer() const
+    {
+        return const_cast<BasicEObject<I...>*>( this )->eContainer();
+    }
+
+    template <typename... I>
+    std::shared_ptr<EObject> BasicEObject<I...>::eContainer()
+    {
+        auto eContainer = eContainer_.lock();
+        if( eContainer && eContainer->eIsProxy() )
+        {
+            auto resolved = eResolveProxy( eContainer );
+            if( resolved != eContainer )
+            {
+                auto notifications = eBasicRemoveFromContainer( nullptr );
+                eBasicSetContainer( resolved, eContainerFeatureID_ );
+                if( notifications )
+                    notifications->dispatch();
+                if( eNotificationRequired() && eContainerFeatureID_ >= EOPPOSITE_FEATURE_BASE )
+                    eNotify( std::make_shared<Notification>(
+                        getThisAsEObject(), Notification::RESOLVE, eContainerFeatureID_, eContainer, resolved ) );
+            }
+            return resolved;
+        }
+        return eContainer;
+    }
+
+    template <typename... I>
+    std::shared_ptr<EObject> BasicEObject<I...>::eInternalContainer() const
+    {
+        return eContainer_.lock();
+    }
+
+    template <typename... I>
+    int BasicEObject<I...>::eContainerFeatureID() const
+    {
+        return eContainerFeatureID_;
+    }
+
+    template <typename... I>
+    inline void BasicEObject<I...>::eBasicSetContainer( const std::shared_ptr<EObject>& newContainer, int newContainerFeatureID )
+    {
+        eContainer_ = newContainer;
+        eContainerFeatureID_ = newContainerFeatureID;
+    }
+
+    template <typename... I>
+    std::shared_ptr<ENotificationChain> BasicEObject<I...>::eBasicSetContainer( const std::shared_ptr<EObject>& newContainer,
                                                                                    int newContainerFeatureID,
                                                                                    const std::shared_ptr<ENotificationChain>& n )
     {
         auto notifications = n;
         auto oldContainer = eContainer_.lock();
-        auto oldResource = eDirectResource();
+        auto oldResource = eResource_.lock();
         auto thisObject = getThisAsEObject();
 
         // resource
@@ -562,7 +596,7 @@ namespace ecore::impl
             {
                 auto list = std::static_pointer_cast<ENotifyingList<std::shared_ptr<EObject>>>( oldResource->getContents() );
                 notifications = list->remove( thisObject, notifications );
-                eSetDirectResource( nullptr );
+                eSetInternalResource( nullptr );
                 newResource = newContainer->eResource();
             }
             else
@@ -585,8 +619,7 @@ namespace ecore::impl
 
         // basic set
         int oldContainerFeatureID = eContainerFeatureID_;
-        eContainer_ = newContainer;
-        eContainerFeatureID_ = newContainerFeatureID;
+        eBasicSetContainer( newContainer, newContainerFeatureID );
 
         // notification
         if( eNotificationRequired() )
@@ -618,7 +651,7 @@ namespace ecore::impl
     }
 
     template <typename... I>
-    std::shared_ptr<ENotificationChain> AbstractEObject<I...>::eBasicRemoveFromContainer(
+    std::shared_ptr<ENotificationChain> BasicEObject<I...>::eBasicRemoveFromContainer(
         const std::shared_ptr<ENotificationChain>& notifications )
     {
         if( eContainerFeatureID_ >= 0 )
@@ -634,7 +667,7 @@ namespace ecore::impl
     }
 
     template <typename... I>
-    std::shared_ptr<ENotificationChain> AbstractEObject<I...>::eBasicRemoveFromContainerFeature(
+    std::shared_ptr<ENotificationChain> BasicEObject<I...>::eBasicRemoveFromContainerFeature(
         const std::shared_ptr<ENotificationChain>& notifications )
     {
         auto reference = std::dynamic_pointer_cast<EReference>( eClass()->getEStructuralFeature( eContainerFeatureID_ ) );
@@ -650,23 +683,27 @@ namespace ecore::impl
 
     template <typename... I>
     template <typename U>
-    class AbstractEObject<I...>::EObjectInternalAdapter : public U
+    class BasicEObject<I...>::EObjectInternalAdapter : public U
     {
     public:
-        EObjectInternalAdapter( AbstractEObject<I...>& obj )
+        EObjectInternalAdapter( BasicEObject<I...>& obj )
             : obj_( obj )
         {
         }
 
         // Inherited via EObjectInternal
-        virtual std::shared_ptr<EResource> eDirectResource() const override
+        virtual std::shared_ptr<EResource> eInternalResource() const override
         {
-            return getObject().eDirectResource();
+            return getObject().eInternalResource();
         }
-        virtual std::shared_ptr<ENotificationChain> eSetResource( const std::shared_ptr<EResource>& resource,
-                                                                  const std::shared_ptr<ENotificationChain>& notifications ) override
+        virtual std::shared_ptr<ENotificationChain> eSetInternalResource(
+            const std::shared_ptr<EResource>& resource, const std::shared_ptr<ENotificationChain>& notifications ) override
         {
-            return getObject().eSetResource( resource, notifications );
+            return getObject().eSetInternalResource( resource, notifications );
+        }
+        virtual std::shared_ptr<EObject> eInternalContainer() const
+        {
+            return getObject().eInternalContainer();
         }
         virtual std::shared_ptr<EObject> eObjectForFragmentSegment( const std::string& uriSegment ) const override
         {
@@ -702,22 +739,22 @@ namespace ecore::impl
             return getObject().eResolveProxy( proxy );
         }
 
-        inline AbstractEObject<I...>& getObject()
+        inline BasicEObject<I...>& getObject()
         {
             return obj_;
         }
 
-        inline const AbstractEObject<I...>& getObject() const
+        inline const BasicEObject<I...>& getObject() const
         {
             return obj_;
         }
 
     private:
-        AbstractEObject<I...>& obj_;
+        BasicEObject<I...>& obj_;
     };
 
     template <typename... I>
-    std::unique_ptr<EObjectInternal> AbstractEObject<I...>::createInternal()
+    std::unique_ptr<EObjectInternal> BasicEObject<I...>::createInternal()
     {
         return std::move( std::make_unique<EObjectInternalAdapter<EObjectInternal>>( *this ) );
     }

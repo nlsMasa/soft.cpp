@@ -161,6 +161,7 @@ BOOST_FIXTURE_TEST_CASE(Proxies, AddFixture)
     auto resolved = std::make_shared<MockObject>();
 
     MOCK_EXPECT(proxy->eIsProxy).returns(true);
+    MOCK_EXPECT(resolved->eIsProxy ).returns( false );
     BOOST_CHECK(list.add(proxy));
     MOCK_EXPECT(mockInternal->eResolveProxy).once().with(proxy).returns(proxy);
     BOOST_CHECK_EQUAL(list.get(0), proxy);

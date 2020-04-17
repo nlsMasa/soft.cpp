@@ -9,8 +9,9 @@
 #include "ecore/EcoreUtils.hpp"
 #include "ecore/Stream.hpp"
 #include "ecore/URIConverter.hpp"
-#include "ecore/impl/AbstractENotifyingList.hpp"
 #include "ecore/impl/AbstractNotification.hpp"
+#include "ecore/impl/BasicEList.hpp"
+#include "ecore/impl/BasicENotifyingList.hpp"
 #include "ecore/impl/EObjectInternal.hpp"
 #include "ecore/impl/ResourceURIConverter.hpp"
 #include "ecore/impl/StringUtils.hpp"
@@ -125,7 +126,7 @@ std::string AbstractResource::getURIFragment( const std::shared_ptr<EObject>& eO
     if( id.empty() )
     {
         auto eCurrent = eObject;
-        if(eCurrent->getInternal().eDirectResource() == getThisPtr() )
+        if(eCurrent->getInternal().eInternalResource() == getThisPtr() )
             return "/" + getURIFragmentRootSegment( eObject );
         else
         {
@@ -141,7 +142,7 @@ std::string AbstractResource::getURIFragment( const std::shared_ptr<EObject>& eO
 
                 eCurrent = eContainer;
 
-                if( eContainer->getInternal().eDirectResource() == getThisPtr() )
+                if( eContainer->getInternal().eInternalResource() == getThisPtr() )
                 {
                     isContained = true;
                     break;
@@ -294,7 +295,7 @@ std::shared_ptr<ENotificationChain> AbstractResource::basicSetResourceSet( const
     if( oldAbstractResourceSet )
     {
         auto list = std::static_pointer_cast<ENotifyingList<std::shared_ptr<EResource>>>( oldAbstractResourceSet->getResources() );
-        notifications = list->add( thisPtr_.lock(), notifications );
+        notifications = list->remove( thisPtr_.lock(), notifications );
     }
     resourceSet_ = resourceSet;
     if( eNotificationRequired() )
@@ -329,7 +330,7 @@ std::shared_ptr<URIConverter> AbstractResource::getURIConverter() const
 
 std::shared_ptr<EList<std::shared_ptr<EObject>>> AbstractResource::initContents()
 {
-    class ContentsEList : public AbstractENotifyingList<ENotifyingList<std::shared_ptr<EObject>>, std::shared_ptr<EObject>>
+    class ContentsEList : public BasicENotifyingList<std::shared_ptr<EObject>>
     {
     public:
         ContentsEList( AbstractResource& resource )
@@ -356,7 +357,7 @@ std::shared_ptr<EList<std::shared_ptr<EObject>>> AbstractResource::initContents(
                                                                 const std::shared_ptr<ENotificationChain>& n ) const
         {
             auto notifications = n;
-            notifications = eObject->getInternal().eSetResource( resource_.getThisPtr(), notifications );
+            notifications = eObject->getInternal().eSetInternalResource( resource_.getThisPtr(), notifications );
             resource_.attached( eObject );
             return notifications;
         }
@@ -366,7 +367,7 @@ std::shared_ptr<EList<std::shared_ptr<EObject>>> AbstractResource::initContents(
         {
             auto notifications = n;
             resource_.detached( eObject );
-            notifications = eObject->getInternal().eSetResource( nullptr, notifications );
+            notifications = eObject->getInternal().eSetInternalResource( nullptr, notifications );
             return notifications;
         }
 
@@ -379,5 +380,5 @@ std::shared_ptr<EList<std::shared_ptr<EObject>>> AbstractResource::initContents(
 
 std::shared_ptr<EList<std::shared_ptr<EDiagnostic>>> AbstractResource::initDiagnostics()
 {
-    return std::make_shared<ArrayEList<std::shared_ptr<EDiagnostic>>>();
+    return std::make_shared<BasicEList<std::shared_ptr<EDiagnostic>>>();
 }

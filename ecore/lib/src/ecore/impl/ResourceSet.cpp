@@ -1,6 +1,6 @@
 #include "ecore/impl/ResourceSet.hpp"
 #include "ecore/impl/AbstractResource.hpp"
-#include "ecore/impl/AbstractENotifyingList.hpp"
+#include "ecore/impl/BasicENotifyingList.hpp"
 #include "ecore/impl/PackageRegistry.hpp"
 #include "ecore/impl/ResourceFactoryRegistry.hpp"
 #include "ecore/impl/ResourceURIConverter.hpp"
@@ -119,7 +119,7 @@ std::unordered_map<URI, std::shared_ptr<EResource>> ecore::impl::ResourceSet::ge
 
 std::shared_ptr<EList<std::shared_ptr<EResource>>> ResourceSet::initResources()
 {
-    class ResourcesEList : public AbstractENotifyingList<ENotifyingList<std::shared_ptr<EResource>>, std::shared_ptr<EResource>>
+    class ResourcesEList : public BasicENotifyingList<std::shared_ptr<EResource>>
     {
     public:
         ResourcesEList( ResourceSet& resourceSet )
