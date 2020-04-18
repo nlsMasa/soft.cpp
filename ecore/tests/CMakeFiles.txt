@@ -7,6 +7,7 @@ set(SOURCE_FILES
     src/BasicNotifierTests.cpp
     src/DiamondVsMixinsTests.cpp
     src/DynamicEObjectTests.cpp
+    src/EContentAdapterTests.cpp
     src/EcoreFactoryTests.cpp
     src/EcorePackageTests.cpp
     src/EcoreUtilsTests.cpp

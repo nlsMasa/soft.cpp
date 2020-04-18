@@ -6,6 +6,7 @@ set(SOURCE_ECORE_FILES
     src/ecore/EResourceFactoryRegistry.cpp
     src/ecore/URI.cpp
     src/ecore/EcoreUtils.cpp
+    src/ecore/EContentAdapter.cpp
 )
 
 set(HEADER_ECORE_FILES
@@ -16,6 +17,7 @@ set(HEADER_ECORE_FILES
     src/ecore/EList.inl
     src/ecore/Constants.hpp
     src/ecore/EAdapter.hpp
+    src/ecore/EContentAdapter.hpp
     src/ecore/EcoreUtils.hpp
     src/ecore/ECollectionView.hpp
     src/ecore/EDiagnostic.hpp
