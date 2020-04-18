@@ -170,7 +170,7 @@ BOOST_AUTO_TEST_CASE( NotifyChanged_AddMany )
     EContentAdapter adapter;
     auto notification = std::make_shared<MockNotification>();
     
-    std::vector<std::shared_ptr<EObject>> mockObjects;
+    std::vector<Any> mockObjects;
     std::uniform_int_distribution<int> d( 1, nb_objects );
     auto nb = d( generator );
     for( int i = 0; i < nb; ++i )
@@ -180,11 +180,11 @@ BOOST_AUTO_TEST_CASE( NotifyChanged_AddMany )
         MOCK_EXPECT( mockObject->eAdapters ).returns( *mockAdapters );
         MOCK_EXPECT( mockAdapters->contains ).with( &adapter ).returns( false );
         MOCK_EXPECT( mockAdapters->add ).with( &adapter ).returns( true );
-        mockObjects.push_back( mockObject );
+        mockObjects.push_back( std::static_pointer_cast<EObject>(mockObject) );
     }
 
     MOCK_EXPECT( notification->getEventType ).returns( ENotification::ADD_MANY );
-    MOCK_EXPECT( notification->getNewValue ).returns( Any( mockObjects ) );
+    MOCK_EXPECT( notification->getNewValue ).returns( Any(mockObjects) );
 
     adapter.notifyChanged( notification );
 }
@@ -211,7 +211,7 @@ BOOST_AUTO_TEST_CASE( NotifyChanged_RemoveMany )
     EContentAdapter adapter;
     auto notification = std::make_shared<MockNotification>();
 
-    std::vector<std::shared_ptr<EObject>> mockObjects;
+    std::vector<Any> mockObjects;
     std::uniform_int_distribution<int> d( 1, nb_objects );
     auto nb = d( generator );
     for( int i = 0; i < nb; ++i )
@@ -221,11 +221,11 @@ BOOST_AUTO_TEST_CASE( NotifyChanged_RemoveMany )
         MOCK_EXPECT( mockObject->eAdapters ).returns( *mockAdapters );
         MOCK_EXPECT( mockAdapters->contains ).with( &adapter ).returns( false );
         MOCK_EXPECT( mockAdapters->removeObject ).with( &adapter ).returns( true );
-        mockObjects.push_back( mockObject );
+        mockObjects.push_back( std::static_pointer_cast<EObject>(mockObject) );
     }
 
     MOCK_EXPECT( notification->getEventType ).returns( ENotification::REMOVE_MANY );
-    MOCK_EXPECT( notification->getOldValue ).returns( Any( mockObjects ) );
+    MOCK_EXPECT( notification->getOldValue ).returns( Any(mockObjects) );
 
     adapter.notifyChanged( notification );
 }

@@ -103,9 +103,12 @@ void EContentAdapter::selfAdapt( const std::shared_ptr<ENotification>& notificat
     }
     case ENotification::ADD_MANY:
     {
-        std::vector<std::shared_ptr<EObject>> notifiers = anyCast<std::vector<std::shared_ptr<EObject>>>( notification->getNewValue() );
-        for( auto& notifier : notifiers )
+        std::vector<Any> newValues = anyCast<std::vector<Any>>( notification->getNewValue() );
+        for( auto& newValue : newValues )
+        {
+            auto notifier = anyCast<std::shared_ptr<EObject>>( newValue );
             addAdapter( notifier );
+        }
         break;
     }
     case ENotification::REMOVE:
@@ -115,9 +118,12 @@ void EContentAdapter::selfAdapt( const std::shared_ptr<ENotification>& notificat
     }
     case ENotification::REMOVE_MANY:
     {
-        std::vector<std::shared_ptr<EObject>> notifiers = anyCast<std::vector<std::shared_ptr<EObject>>>( notification->getOldValue() );
-        for( auto& notifier : notifiers )
+        std::vector<Any> oldValues = anyCast<std::vector<Any>>( notification->getOldValue() );
+        for( auto& oldValue : oldValues )
+        {
+            auto notifier = anyCast<std::shared_ptr<EObject>>( oldValue );
             removeAdapter( notifier );
+        }
         break;
     }
     }
