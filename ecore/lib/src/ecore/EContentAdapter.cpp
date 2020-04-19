@@ -3,6 +3,7 @@
 #include "ecore/EList.hpp"
 #include "ecore/ENotification.hpp"
 #include "ecore/EObject.hpp"
+#include "ecore/EReference.hpp"
 #include "ecore/Stream.hpp"
 #include "ecore/impl/EObjectInternal.hpp"
 
@@ -61,6 +62,14 @@ void EContentAdapter::removeAdapter( const std::shared_ptr<EObject>& eObject, bo
 }
 
 void EContentAdapter::selfAdapt( const std::shared_ptr<ENotification>& notification )
+{
+    auto feature = notification->getFeature();
+    auto reference = std::dynamic_pointer_cast<EReference>( feature );
+    if( reference && reference->isContainment() )
+        handleContainment( notification );
+}
+
+void ecore::EContentAdapter::handleContainment( const std::shared_ptr<ENotification>& notification )
 {
     switch( notification->getEventType() )
     {

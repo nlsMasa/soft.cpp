@@ -38,6 +38,8 @@ namespace ecore
     private:
         void selfAdapt( const std::shared_ptr<ENotification>& notification );
 
+        void handleContainment( const std::shared_ptr<ENotification>& notification );
+
         void addAdapter( const std::shared_ptr<EObject>& eObject );
 
         void removeAdapter( const std::shared_ptr<EObject>& eObject , bool checkContainer = false );

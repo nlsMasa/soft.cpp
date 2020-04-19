@@ -6,6 +6,9 @@
 #include "ecore/tests/MockList.hpp"
 #include "ecore/tests/MockNotification.hpp"
 #include "ecore/tests/MockObject.hpp"
+#include "ecore/tests/MockObjectInternal.hpp"
+#include "ecore/tests/MockAttribute.hpp"
+#include "ecore/tests/MockReference.hpp"
 
 #include <chrono>
 #include <random>
@@ -57,30 +60,46 @@ BOOST_AUTO_TEST_CASE( SetTarget )
     adapter.setTarget( nullptr );
 }
 
-BOOST_AUTO_TEST_CASE( NotifyChanged_Resolve )
+BOOST_AUTO_TEST_CASE( NotifyChanged_Attribute )
 {
     EContentAdapter adapter;
-    auto notification = std::make_shared<MockNotification>();
+    auto mockNotification = std::make_shared<MockNotification>();
+    auto mockAttribute = std::make_shared<MockAttribute>();
+    MOCK_EXPECT( mockNotification->getFeature ).once().returns( mockAttribute );
+    adapter.notifyChanged( mockNotification );
+}
+
+BOOST_AUTO_TEST_CASE( NotifyChanged_Rereference_Resolve )
+{
+    EContentAdapter adapter;
+    auto mockNotification = std::make_shared<MockNotification>();
+    auto mockReference = std::make_shared<MockReference>();
     auto mockOldObject = std::make_shared<MockObject>();
     auto mockOldAdapters = std::make_shared<MockList<EAdapter*>>();
+
+    MOCK_EXPECT( mockReference->isContainment ).once().returns( true );
 
     MOCK_EXPECT( mockOldObject->eAdapters ).returns( *mockOldAdapters );
     MOCK_EXPECT( mockOldAdapters->contains ).with( &adapter ).returns( false );
 
-    MOCK_EXPECT( notification->getEventType ).returns( ENotification::RESOLVE );
-    MOCK_EXPECT( notification->getOldValue ).returns( Any( std::static_pointer_cast<EObject>( mockOldObject ) ) );
+    MOCK_EXPECT( mockNotification->getFeature ).returns( mockReference );
+    MOCK_EXPECT( mockNotification->getEventType ).returns( ENotification::RESOLVE );
+    MOCK_EXPECT( mockNotification->getOldValue ).returns( Any( std::static_pointer_cast<EObject>( mockOldObject ) ) );
 
-    adapter.notifyChanged( notification );
+    adapter.notifyChanged( mockNotification );
 }
 
 BOOST_AUTO_TEST_CASE( NotifyChanged_Resolve_Contains )
 {
     EContentAdapter adapter;
-    auto notification = std::make_shared<MockNotification>();
+    auto mockNotification = std::make_shared<MockNotification>();
+    auto mockReference = std::make_shared<MockReference>();
     auto mockOldObject = std::make_shared<MockObject>();
     auto mockOldAdapters = std::make_shared<MockList<EAdapter*>>();
     auto mockNewObject = std::make_shared<MockObject>();
     auto mockNewAdapters = std::make_shared<MockList<EAdapter*>>();
+
+    MOCK_EXPECT( mockReference->isContainment ).once().returns( true );
 
     MOCK_EXPECT( mockOldObject->eAdapters ).returns( *mockOldAdapters );
     MOCK_EXPECT( mockOldAdapters->contains ).with( &adapter ).returns( true );
@@ -90,46 +109,58 @@ BOOST_AUTO_TEST_CASE( NotifyChanged_Resolve_Contains )
     MOCK_EXPECT( mockNewAdapters->contains ).with( &adapter ).returns( false );
     MOCK_EXPECT( mockNewAdapters->add ).with( &adapter ).returns( true );
 
-    MOCK_EXPECT( notification->getEventType ).returns( ENotification::RESOLVE );
-    MOCK_EXPECT( notification->getOldValue ).returns( Any( std::static_pointer_cast<EObject>( mockOldObject ) ) );
-    MOCK_EXPECT( notification->getNewValue ).returns( Any( std::static_pointer_cast<EObject>( mockNewObject ) ) );
+    MOCK_EXPECT( mockNotification->getFeature ).returns( mockReference );
+    MOCK_EXPECT( mockNotification->getEventType ).returns( ENotification::RESOLVE );
+    MOCK_EXPECT( mockNotification->getOldValue ).returns( Any( std::static_pointer_cast<EObject>( mockOldObject ) ) );
+    MOCK_EXPECT( mockNotification->getNewValue ).returns( Any( std::static_pointer_cast<EObject>( mockNewObject ) ) );
 
-    adapter.notifyChanged( notification );
+    adapter.notifyChanged( mockNotification );
 }
 
 
 BOOST_AUTO_TEST_CASE( NotifyChanged_UnSet )
 {
     EContentAdapter adapter;
-    auto notification = std::make_shared<MockNotification>();
+    auto mockNotification = std::make_shared<MockNotification>();
+    auto mockReference = std::make_shared<MockReference>();
     auto mockOldObject = std::make_shared<MockObject>();
+    auto mockOldObjectInternal = std::make_shared<MockObjectInternal>();
     auto mockOldAdapters = std::make_shared<MockList<EAdapter*>>();
     auto mockNewObject = std::make_shared<MockObject>();
     auto mockNewAdapters = std::make_shared<MockList<EAdapter*>>();
 
+    MOCK_EXPECT( mockReference->isContainment ).once().returns( true );
+
     MOCK_EXPECT( mockOldObject->eAdapters ).returns( *mockOldAdapters );
+    MOCK_EXPECT( mockOldObject->getInternal ).returns( *mockOldObjectInternal );
+    MOCK_EXPECT( mockOldObjectInternal->eInternalContainer ).returns( std::shared_ptr<EObject>() );
     MOCK_EXPECT( mockOldAdapters->contains ).with( &adapter ).returns( true );
     MOCK_EXPECT( mockOldAdapters->removeObject ).with( &adapter ).returns( true );
+    
 
     MOCK_EXPECT( mockNewObject->eAdapters ).returns( *mockNewAdapters );
     MOCK_EXPECT( mockNewAdapters->contains ).with( &adapter ).returns( false );
     MOCK_EXPECT( mockNewAdapters->add ).with( &adapter ).returns( true );
 
-    MOCK_EXPECT( notification->getEventType ).returns( ENotification::SET );
-    MOCK_EXPECT( notification->getOldValue ).returns( Any( std::static_pointer_cast<EObject>( mockOldObject ) ) );
-    MOCK_EXPECT( notification->getNewValue ).returns( Any( std::static_pointer_cast<EObject>( mockNewObject ) ) );
+    MOCK_EXPECT( mockNotification->getFeature ).returns( mockReference );
+    MOCK_EXPECT( mockNotification->getEventType ).returns( ENotification::UNSET );
+    MOCK_EXPECT( mockNotification->getOldValue ).returns( Any( std::static_pointer_cast<EObject>( mockOldObject ) ) );
+    MOCK_EXPECT( mockNotification->getNewValue ).returns( Any( std::static_pointer_cast<EObject>( mockNewObject ) ) );
 
-    adapter.notifyChanged( notification );
+    adapter.notifyChanged( mockNotification );
 }
 
 BOOST_AUTO_TEST_CASE( NotifyChanged_Set )
 {
     EContentAdapter adapter;
-    auto notification = std::make_shared<MockNotification>();
+    auto mockNotification = std::make_shared<MockNotification>();
+    auto mockReference = std::make_shared<MockReference>();
     auto mockOldObject = std::make_shared<MockObject>();
     auto mockOldAdapters = std::make_shared<MockList<EAdapter*>>();
     auto mockNewObject = std::make_shared<MockObject>();
     auto mockNewAdapters = std::make_shared<MockList<EAdapter*>>();
+
+    MOCK_EXPECT( mockReference->isContainment ).once().returns( true );
 
     MOCK_EXPECT( mockOldObject->eAdapters ).returns( *mockOldAdapters );
     MOCK_EXPECT( mockOldAdapters->contains ).with( &adapter ).returns( true );
@@ -139,37 +170,45 @@ BOOST_AUTO_TEST_CASE( NotifyChanged_Set )
     MOCK_EXPECT( mockNewAdapters->contains ).with( &adapter ).returns( false );
     MOCK_EXPECT( mockNewAdapters->add ).with( &adapter ).returns( true );
 
-    MOCK_EXPECT( notification->getEventType ).returns( ENotification::SET );
-    MOCK_EXPECT( notification->getOldValue ).returns( Any( std::static_pointer_cast<EObject>( mockOldObject ) ) );
-    MOCK_EXPECT( notification->getNewValue ).returns( Any( std::static_pointer_cast<EObject>( mockNewObject ) ) );
+    MOCK_EXPECT( mockNotification->getFeature ).returns( mockReference );
+    MOCK_EXPECT( mockNotification->getEventType ).returns( ENotification::SET );
+    MOCK_EXPECT( mockNotification->getOldValue ).returns( Any( std::static_pointer_cast<EObject>( mockOldObject ) ) );
+    MOCK_EXPECT( mockNotification->getNewValue ).returns( Any( std::static_pointer_cast<EObject>( mockNewObject ) ) );
 
-    adapter.notifyChanged( notification );
+    adapter.notifyChanged( mockNotification );
 }
 
 
 BOOST_AUTO_TEST_CASE( NotifyChanged_Add )
 {
     EContentAdapter adapter;
-    auto notification = std::make_shared<MockNotification>();
+    auto mockNotification = std::make_shared<MockNotification>();
+    auto mockReference = std::make_shared<MockReference>();
     auto mockNewObject = std::make_shared<MockObject>();
     auto mockNewAdapters = std::make_shared<MockList<EAdapter*>>();
+
+    MOCK_EXPECT( mockReference->isContainment ).once().returns( true );
 
     MOCK_EXPECT( mockNewObject->eAdapters ).returns( *mockNewAdapters );
     MOCK_EXPECT( mockNewAdapters->contains ).with( &adapter ).returns( false );
     MOCK_EXPECT( mockNewAdapters->add ).with( &adapter ).returns( true );
 
-    MOCK_EXPECT( notification->getEventType ).returns( ENotification::ADD );
-    MOCK_EXPECT( notification->getNewValue ).returns( Any( std::static_pointer_cast<EObject>( mockNewObject ) ) );
+    MOCK_EXPECT( mockNotification->getFeature ).returns( mockReference );
+    MOCK_EXPECT( mockNotification->getEventType ).returns( ENotification::ADD );
+    MOCK_EXPECT( mockNotification->getNewValue ).returns( Any( std::static_pointer_cast<EObject>( mockNewObject ) ) );
 
-    adapter.notifyChanged( notification );
+    adapter.notifyChanged( mockNotification );
 }
 
 
 BOOST_AUTO_TEST_CASE( NotifyChanged_AddMany )
 {
     EContentAdapter adapter;
-    auto notification = std::make_shared<MockNotification>();
-    
+    auto mockNotification = std::make_shared<MockNotification>();
+    auto mockReference = std::make_shared<MockReference>();
+
+    MOCK_EXPECT( mockReference->isContainment ).once().returns( true );
+
     std::vector<Any> mockObjects;
     std::uniform_int_distribution<int> d( 1, nb_objects );
     auto nb = d( generator );
@@ -183,33 +222,41 @@ BOOST_AUTO_TEST_CASE( NotifyChanged_AddMany )
         mockObjects.push_back( std::static_pointer_cast<EObject>(mockObject) );
     }
 
-    MOCK_EXPECT( notification->getEventType ).returns( ENotification::ADD_MANY );
-    MOCK_EXPECT( notification->getNewValue ).returns( Any(mockObjects) );
+    MOCK_EXPECT( mockNotification->getFeature ).returns( mockReference );
+    MOCK_EXPECT( mockNotification->getEventType ).returns( ENotification::ADD_MANY );
+    MOCK_EXPECT( mockNotification->getNewValue ).returns( Any(mockObjects) );
 
-    adapter.notifyChanged( notification );
+    adapter.notifyChanged( mockNotification );
 }
 
 BOOST_AUTO_TEST_CASE( NotifyChanged_Remove )
 {
     EContentAdapter adapter;
-    auto notification = std::make_shared<MockNotification>();
+    auto mockNotification = std::make_shared<MockNotification>();
+    auto mockReference = std::make_shared<MockReference>();
     auto mockOldObject = std::make_shared<MockObject>();
     auto mockOldAdapters = std::make_shared<MockList<EAdapter*>>();
    
+    MOCK_EXPECT( mockReference->isContainment ).once().returns( true );
+
     MOCK_EXPECT( mockOldObject->eAdapters ).returns( *mockOldAdapters );
     MOCK_EXPECT( mockOldAdapters->contains ).with( &adapter ).returns( true );
     MOCK_EXPECT( mockOldAdapters->removeObject ).with( &adapter ).returns( true );
 
-    MOCK_EXPECT( notification->getEventType ).returns( ENotification::REMOVE );
-    MOCK_EXPECT( notification->getOldValue ).returns( Any( std::static_pointer_cast<EObject>( mockOldObject ) ) );
+    MOCK_EXPECT( mockNotification->getFeature ).returns( mockReference );
+    MOCK_EXPECT( mockNotification->getEventType ).returns( ENotification::REMOVE );
+    MOCK_EXPECT( mockNotification->getOldValue ).returns( Any( std::static_pointer_cast<EObject>( mockOldObject ) ) );
 
-    adapter.notifyChanged( notification );
+    adapter.notifyChanged( mockNotification );
 }
 
 BOOST_AUTO_TEST_CASE( NotifyChanged_RemoveMany )
 {
     EContentAdapter adapter;
-    auto notification = std::make_shared<MockNotification>();
+    auto mockNotification = std::make_shared<MockNotification>();
+    auto mockReference = std::make_shared<MockReference>();
+
+    MOCK_EXPECT( mockReference->isContainment ).once().returns( true );
 
     std::vector<Any> mockObjects;
     std::uniform_int_distribution<int> d( 1, nb_objects );
@@ -224,10 +271,11 @@ BOOST_AUTO_TEST_CASE( NotifyChanged_RemoveMany )
         mockObjects.push_back( std::static_pointer_cast<EObject>(mockObject) );
     }
 
-    MOCK_EXPECT( notification->getEventType ).returns( ENotification::REMOVE_MANY );
-    MOCK_EXPECT( notification->getOldValue ).returns( Any(mockObjects) );
+    MOCK_EXPECT( mockNotification->getFeature ).returns( mockReference );
+    MOCK_EXPECT( mockNotification->getEventType ).returns( ENotification::REMOVE_MANY );
+    MOCK_EXPECT( mockNotification->getOldValue ).returns( Any(mockObjects) );
 
-    adapter.notifyChanged( notification );
+    adapter.notifyChanged( mockNotification );
 }
 
 BOOST_AUTO_TEST_SUITE_END()
