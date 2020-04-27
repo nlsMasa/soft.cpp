@@ -1,5 +1,7 @@
 ---
 AccessModifierOffset: -4
+AlignAfterOpenBracket: Align
+AlignOperands: true
 AllowShortFunctionsOnASingleLine: None
 AlwaysBreakTemplateDeclarations: true
 BinPackParameters: false
@@ -7,6 +9,7 @@ BinPackArguments: false
 BreakBeforeBinaryOperators: true
 BreakBeforeBraces: Allman
 BreakConstructorInitializersBeforeComma: true
+BreakBeforeTernaryOperators: true
 ColumnLimit: 140
 IndentCaseLabels: false
 IndentWidth: 4
