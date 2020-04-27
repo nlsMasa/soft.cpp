@@ -53,8 +53,8 @@ BOOST_AUTO_TEST_CASE( DeepChanged )
     l->eAdapters().add( &mockAdapter );
 
     MOCK_EXPECT( mockAdapter.changed ).with( [=]( const std::shared_ptr<ENotification>& n ) {
-        return n->getNotifier() == e && n->getFeatureID() == LibraryPackage::EMPLOYEE__FIRST_NAME && n->getOldValue() == "First Name 0"
-               && n->getNewValue() == "test" && n->getPosition() == -1;
+        return n->getNotifier() == e && n->getFeatureID() == LibraryPackage::EMPLOYEE__FIRST_NAME
+               && n->getOldValue() == std::string( "First Name 0" ) && n->getNewValue() == std::string( "test" ) && n->getPosition() == -1;
     } );
 
     e->setFirstName( "test" );
