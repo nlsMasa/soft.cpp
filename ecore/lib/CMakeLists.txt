@@ -19,6 +19,7 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(XercesC REQUIRED)
 find_package(Threads REQUIRED)
 find_package(Boost REQUIRED regex)
+find_package(Date REQUIRED)
 
 #cmake files
 include( CMakeFiles.txt OPTIONAL)
@@ -63,7 +64,7 @@ target_include_directories(ecore
 target_compile_options(ecore PRIVATE /MP /wd4250 /wd4251 /bigobj)
 target_compile_definitions( ecore PRIVATE ECORE_EXPORTS)
 target_compile_definitions( ecore PRIVATE _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING)
-target_link_libraries(ecore PUBLIC XercesC::XercesC Boost::regex)
+target_link_libraries(ecore PUBLIC XercesC::XercesC Boost::regex date::date)
 
 # static library
 add_library(ecore.static STATIC ${PROJECT_SOURCES})
@@ -77,7 +78,7 @@ target_include_directories(ecore.static
 target_compile_options(ecore.static PRIVATE /MP /wd4250 /bigobj)
 target_compile_definitions(ecore.static PUBLIC ECORE_STATIC_LIB)
 target_compile_definitions(ecore.static PRIVATE _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING)
-target_link_libraries(ecore.static PRIVATE XercesC::XercesC Boost::regex)
+target_link_libraries(ecore.static PRIVATE XercesC::XercesC Boost::regex date::date)
 
 # libraries names
 set_target_properties(ecore.static PROPERTIES PREFIX lib)

@@ -11,8 +11,8 @@
 #error This file may only be included from EFactoryBaseExt.hpp
 #endif
 
-#include <ctime>
 #include <sstream>
+#include <date/date.h>
 
 namespace ecore::ext {
 
@@ -55,19 +55,18 @@ namespace ecore::ext {
     template <typename... I>
     Any EcoreFactoryBaseExt<I...>::createEDateFromString(const std::shared_ptr<EDataType>& eDataType, const std::string& literalValue) const
     {
-        std::istringstream stream(literalValue);
-        std::time_t t;
-        stream >> t;
-        return t;
+        std::istringstream s( literalValue );
+        std::chrono::system_clock::time_point tp;
+        s >> date::parse( "%FT%T", tp );
+        return std::chrono::system_clock::to_time_t(tp);
     }
 
     template <typename... I>
     std::string EcoreFactoryBaseExt<I...>::convertEDateToString(const std::shared_ptr<EDataType>& eDataType, const Any& instanceValue) const
     {
-        auto value = anyCast<std::time_t>(instanceValue);
-        std::ostringstream stream;
-        stream << value;
-        return stream.str();
+        auto t = anyCast<std::time_t>(instanceValue);
+        auto tp = std::chrono::system_clock::from_time_t( t );
+        return date::format( "%FT%T", std::chrono::floor<std::chrono::milliseconds>( tp ) );
     }
 
     template <typename... I>
