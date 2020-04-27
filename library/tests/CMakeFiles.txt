@@ -2,7 +2,12 @@
 
 set(SOURCE_FILES
     src/main.cpp
+    src/ContentAdapterTests.cpp
+    src/LibraryFactory.cpp
     src/SerializationTests.cpp
     src/MetaModelTests.cpp
 )
 
+set(HEADER_FILES
+    src/LibraryFactory.hpp
+)
