@@ -12,8 +12,9 @@
 
 #include "ecore/Constants.hpp"
 #include "ecore/ENotifier.hpp"
-#include "ecore/impl/AbstractNotification.hpp"
+#include "ecore/TypeTraits.hpp"
 #include "ecore/impl/AbstractEList.hpp"
+#include "ecore/impl/AbstractNotification.hpp"
 #include "ecore/impl/NotificationChain.hpp"
 
 #include <algorithm>
@@ -60,7 +61,7 @@ namespace ecore::impl
             if( result )
             {
                 auto notifications = inverseAdd( e, nullptr );
-                createAndDispatchNotification( notifications, ENotification::ADD, NO_VALUE, e, index );
+                createAndDispatchNotification( notifications, ENotification::ADD, NO_VALUE, toAny( e ), index );
             }
             return result;
         }
@@ -71,7 +72,7 @@ namespace ecore::impl
             if( result )
             {
                 auto notifications = inverseAdd( e, nullptr );
-                createAndDispatchNotification( notifications, ENotification::ADD, NO_VALUE, e, index );
+                createAndDispatchNotification( notifications, ENotification::ADD, NO_VALUE, toAny( e ), index );
             }
             return result;
         }
@@ -83,7 +84,7 @@ namespace ecore::impl
             if( result )
             {
                 auto n = inverseAdd( e, notifications );
-                return createAndAddNotification( n, ENotification::ADD, NO_VALUE, e, index );
+                return createAndAddNotification( n, ENotification::ADD, NO_VALUE, toAny( e ), index );
             }
             return notifications;
         }
@@ -98,7 +99,7 @@ namespace ecore::impl
                 notifications = inverseAdd( object, notifications );
             }
             createAndDispatchNotification( notifications, [&]() {
-                return l.size() == 1 ? createNotification( ENotification::ADD, NO_VALUE, l.get( 0 ), index )
+                return l.size() == 1 ? createNotification( ENotification::ADD, NO_VALUE, toAny( l.get( 0 ) ), index )
                                      : createNotification( ENotification::ADD_MANY, NO_VALUE, toAny( l ), index );
             } );
             return result;
@@ -108,7 +109,7 @@ namespace ecore::impl
         {
             auto oldElement = Super::remove( index );
             auto notifications = inverseRemove( oldElement, nullptr );
-            createAndDispatchNotification( notifications, ENotification::REMOVE, oldElement, NO_VALUE, index );
+            createAndDispatchNotification( notifications, ENotification::REMOVE, toAny( oldElement ), NO_VALUE, index );
             return oldElement;
         }
 
@@ -119,7 +120,7 @@ namespace ecore::impl
             {
                 auto oldElement = Super::remove( index );
                 auto n = inverseRemove( oldElement, notifications );
-                return createAndAddNotification( n, ENotification::REMOVE, oldElement, NO_VALUE, index );
+                return createAndAddNotification( n, ENotification::REMOVE, toAny( oldElement ), NO_VALUE, index );
             }
             return notifications;
         }
@@ -131,7 +132,7 @@ namespace ecore::impl
             {
                 auto n = inverseRemove( oldElement, nullptr );
                 n = inverseAdd( newElement, n );
-                createAndDispatchNotification( n, ENotification::SET, oldElement, newElement, index );
+                createAndDispatchNotification( n, ENotification::SET, toAny( oldElement ), toAny( newElement ), index );
             }
             return oldElement;
         }
@@ -146,7 +147,7 @@ namespace ecore::impl
                 auto n = notifications;
                 n = inverseRemove( oldElement, n );
                 n = inverseAdd( newElement, n );
-                return createAndAddNotification( n, ENotification::SET, oldElement, newElement, index );
+                return createAndAddNotification( n, ENotification::SET, toAny( oldElement ), toAny( newElement ), index );
             }
             return notifications;
         }
@@ -154,7 +155,7 @@ namespace ecore::impl
         virtual ValueType move( std::size_t newPos, std::size_t oldPos )
         {
             auto element = Super::move( newPos, oldPos );
-            createAndDispatchNotification( nullptr, ENotification::MOVE, oldPos, element, newPos );
+            createAndDispatchNotification( nullptr, ENotification::MOVE, oldPos, toAny( element ), newPos );
             return element;
         }
 
@@ -173,8 +174,8 @@ namespace ecore::impl
                         notifications = inverseRemove( e, notifications );
 
                     createAndDispatchNotification( notifications, [&]() {
-                        return l->size() == 1 ? createNotification( ENotification::REMOVE, l->get( 0 ), NO_VALUE, 0 )
-                                              : createNotification( ENotification::ADD_MANY, l->asEListOf<Any>(), NO_VALUE, -1 );
+                        return l->size() == 1 ? createNotification( ENotification::REMOVE, toAny( l->get( 0 ) ), NO_VALUE, 0 )
+                                              : createNotification( ENotification::ADD_MANY, toAny( *l ), NO_VALUE, -1 );
                     } );
                 }
             }
@@ -287,10 +288,19 @@ namespace ecore::impl
         }
 
     private:
+        static Any toAny( const ValueType& v )
+        {
+            if constexpr( is_shared_ptr<ValueType>::value && !std::is_same<ecore::EObject, typename ValueType::element_type>::value
+                          && std::is_base_of<ecore::EObject, typename ValueType::element_type>::value )
+                return Any( std::static_pointer_cast<EObject>( v ) );
+            else
+                return Any( v );
+        }
+
         static Any toAny( const EList<ValueType>& l )
         {
             std::vector<Any> v;
-            std::transform( l.begin(), l.end(), v.end(), []( const ValueType& i ) { return i; } );
+            std::transform( l.begin(), l.end(), v.end(), []( const ValueType& i ) { return toAny( i ); } );
             return v;
         }
     };

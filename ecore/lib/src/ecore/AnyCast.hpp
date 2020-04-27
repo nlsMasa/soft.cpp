@@ -11,8 +11,9 @@
 #define ECORE_ANYCAST_HPP_
 
 #include "ecore/Any.hpp"
-#include "ecore/EObject.hpp"
 #include "ecore/EList.hpp"
+#include "ecore/EObject.hpp"
+#include "ecore/SmartPtr.hpp"
 #include "ecore/TypeTraits.hpp"
 
 namespace ecore
@@ -24,7 +25,7 @@ namespace ecore
         if( id == &typeid( std::shared_ptr<EObject> ) )
         {
             auto object = anyCast<std::shared_ptr<EObject>>( any );
-            return std::dynamic_pointer_cast<typename T::element_type>( object );
+            return derived_pointer_cast<typename T::element_type>( object );
         }
         else if( id == &typeid( T ) )
             return anyCast<T>( any );
