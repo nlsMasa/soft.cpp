@@ -27,7 +27,8 @@ namespace
 
         ~AttributeNotificationsFixture()
         {
-            MOCK_EXPECT( eAdapter->setTarget ).with( nullptr ).once();
+            MOCK_EXPECT( eAdapter->unsetTarget ).with( eAttribute ).once();
+            eAttribute->eSetDeliver( false );
             eAttribute->eAdapters().remove( eAdapter.get() );
         }
 

@@ -10,22 +10,26 @@
 #ifndef ECORE_ELIST_HPP_
 #define ECORE_ELIST_HPP_
 
-#include <memory>
 #include "ecore/Assert.hpp"
+#include <memory>
 
-namespace ecore {
+namespace ecore
+{
 
     template <typename T>
-    class EList : public std::enable_shared_from_this< EList<T> >{
+    class EList : public std::enable_shared_from_this<EList<T>>
+    {
     public:
         typedef typename T ValueType;
 
-        virtual ~EList() {}
+        virtual ~EList()
+        {
+        }
 
         virtual bool add( const T& e ) = 0;
 
         virtual bool addAll( const EList<T>& l ) = 0;
-        
+
         virtual bool add( std::size_t pos, const T& e ) = 0;
 
         virtual bool addAll( std::size_t pos, const EList<T>& l ) = 0;
@@ -48,78 +52,87 @@ namespace ecore {
 
         virtual bool empty() const = 0;
 
-        virtual bool contains(const T& e) const {
-            return std::find(begin(), end(), e) != end();
+        virtual bool contains( const T& e ) const
+        {
+            return std::find( begin(), end(), e ) != end();
         }
 
-        std::size_t indexOf( const T& e ) const {
-            std::size_t index = std::distance( begin() , std::find( begin() , end(), e ) );
+        std::size_t indexOf( const T& e ) const
+        {
+            std::size_t index = std::distance( begin(), std::find( begin(), end(), e ) );
             return index == size() ? -1 : index;
         }
 
         /** Iterator interfaces for an EList<T>. */
-        template <typename ListType >
-        class EListIterator {
+        template <typename ListType>
+        class EListIterator
+        {
         public:
             using iterator_category = std::random_access_iterator_tag;
-            using difference_type   = std::ptrdiff_t;
-            using value_type        = typename ListType::ValueType;
-            using pointer           = typename ListType::ValueType*;
-            using reference         = typename ListType::ValueType&;
-            
+            using difference_type = std::ptrdiff_t;
+            using value_type = typename ListType::ValueType;
+            using pointer = typename ListType::ValueType*;
+            using reference = typename ListType::ValueType&;
+
         public:
             EListIterator( ListType* eList, std::size_t index )
                 : eList_( eList )
-                , index_( index ) {
+                , index_( index )
+            {
             }
 
-            T operator*() const {
+            T operator*() const
+            {
                 return eList_->get( index_ );
             }
 
-            EListIterator& operator--() {
+            EListIterator& operator--()
+            {
                 --index_;
                 return *this;
             }
 
-            EListIterator operator--( int ) {
+            EListIterator operator--( int )
+            {
                 EListIterator old( *this );
-                --(*this);
+                --( *this );
                 return old;
             }
 
-            EListIterator& operator++() {
+            EListIterator& operator++()
+            {
                 ++index_;
                 return *this;
             }
 
-            EListIterator operator++( int ) {
+            EListIterator operator++( int )
+            {
                 EListIterator old( *this );
-                ++(*this);
+                ++( *this );
                 return old;
             }
 
             EListIterator& operator+=( difference_type offset )
             {
                 index_ += offset;
-                return (*this);
+                return ( *this );
             }
 
             EListIterator& operator-=( difference_type offset )
             {
-                return (*this += -offset);
+                return ( *this += -offset );
             }
 
             EListIterator operator+( const difference_type& offset ) const
             {
                 EListIterator tmp = *this;
-                return (tmp += offset);
+                return ( tmp += offset );
             }
 
             EListIterator operator-( const difference_type& rhs ) const
             {
                 EListIterator tmp = *this;
-                return (tmp -= offset);
+                return ( tmp -= offset );
             }
 
             difference_type operator-( const EListIterator& rhs ) const
@@ -128,13 +141,15 @@ namespace ecore {
                 return index_ - rhs.index_;
             }
 
-            bool operator==( const EListIterator& rhs ) const {
+            bool operator==( const EListIterator& rhs ) const
+            {
                 _Compat( rhs );
-                return (index_ == rhs.index_);
+                return ( index_ == rhs.index_ );
             }
 
-            bool operator!=( const EListIterator& rhs ) const {
-                return !(*this == rhs);
+            bool operator!=( const EListIterator& rhs ) const
+            {
+                return !( *this == rhs );
             }
 
             bool operator<( const EListIterator& rhs )
@@ -145,28 +160,31 @@ namespace ecore {
 
             bool operator>( const EListIterator& rhs )
             {
-                return (rhs < *this);
+                return ( rhs < *this );
             }
 
             bool operator<=( const EListIterator& rhs )
             {
-                return (!(rhs < *this));
+                return ( !( rhs < *this ) );
             }
 
             bool operator>=( const EListIterator& rhs )
             {
-                return (!(*this < rhs));
+                return ( !( *this < rhs ) );
             }
 
-            bool hasNext() const {
-                return ((int64_t)index_ < (int64_t)eList_->size() - 1);
+            bool hasNext() const
+            {
+                return ( (int64_t)index_ < (int64_t)eList_->size() - 1 );
             }
 
-            const ListType* getEList() const {
+            const ListType* getEList() const
+            {
                 return eList_;
             }
 
-            std::size_t getIndex() const {
+            std::size_t getIndex() const
+            {
                 return index_;
             }
 
@@ -188,45 +206,50 @@ namespace ecore {
         typedef EListIterator<EList<T>> iterator;
         typedef EListIterator<const EList<T>> const_iterator;
 
-        iterator begin() {
+        iterator begin()
+        {
             return iterator( this, 0 );
         }
 
-        const_iterator begin() const {
+        const_iterator begin() const
+        {
             return const_iterator( this, 0 );
         }
 
-        iterator end() {
+        iterator end()
+        {
             return iterator( this, size() );
         }
 
-        const_iterator end() const {
+        const_iterator end() const
+        {
             return const_iterator( this, size() );
         }
 
-        const_iterator cbegin() const {
+        const_iterator cbegin() const
+        {
             return begin();
         }
 
-        const_iterator cend() const {
+        const_iterator cend() const
+        {
             return end();
         }
 
         /**
          * Allows treating an EList<T> as an EList<Q> (if T can be casted to Q dynamically)
          */
-        template< typename Q >
-        inline std::shared_ptr<EList< Q >> asEListOf()
+        template <typename Q>
+        inline std::shared_ptr<EList<Q>> asEListOf()
         {
             return std::make_shared<detail::DelegateEList<Q, T>>( shared_from_this() );
         }
 
-        template< typename Q >
-        inline std::shared_ptr<const EList< Q >> asEListOf() const
+        template <typename Q>
+        inline std::shared_ptr<const EList<Q>> asEListOf() const
         {
             return std::make_shared<detail::ConstDelegateEList<Q, T>>( shared_from_this() );
         }
-
     };
 
     template <typename T>
@@ -235,7 +258,7 @@ namespace ecore {
     template <typename T>
     bool operator!=( const EList<T>& lhs, const EList<T>& rhs );
 
-}
+} // namespace ecore
 
 #include "ecore/EList.inl"
 

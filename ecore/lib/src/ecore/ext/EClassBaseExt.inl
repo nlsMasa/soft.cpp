@@ -11,18 +11,18 @@
 #error This file may only be included from EClassBaseExt.hpp
 #endif
 
+#include "ecore/AnyCast.hpp"
 #include "ecore/EAdapter.hpp"
 #include "ecore/EAttribute.hpp"
 #include "ecore/EOperation.hpp"
 #include "ecore/EReference.hpp"
 #include "ecore/EcorePackage.hpp"
+#include "ecore/ext/EClassInternal.hpp"
 #include "ecore/impl/AbstractAdapter.hpp"
 #include "ecore/impl/EOperationImpl.hpp"
 #include "ecore/impl/EOperationInternal.hpp"
 #include "ecore/impl/EStructuralFeatureImpl.hpp"
 #include "ecore/impl/ImmutableHashEList.hpp"
-#include "ecore/ext/EClassInternal.hpp"
-
 
 #include "EClassBaseExt.hpp"
 #include <algorithm>
@@ -65,7 +65,7 @@ namespace ecore::ext
                         Any oldValue = notification->getOldValue();
                         if( !oldValue.empty() )
                         {
-                            auto eClass = anyCast<std::shared_ptr<EClass>>( oldValue );
+                            auto eClass = anyObjectCast<std::shared_ptr<EClass>>( oldValue );
                             auto eClassImpl = std::static_pointer_cast<EClassBaseExt>( eClass );
                             auto& subClasses = eClassImpl->eSuperAdapter_->getSubClasses();
                             auto it = std::find_if(
@@ -76,7 +76,7 @@ namespace ecore::ext
                         Any newValue = notification->getNewValue();
                         if( !newValue.empty() )
                         {
-                            auto eClass = anyCast<std::shared_ptr<EClass>>( newValue );
+                            auto eClass = anyObjectCast<std::shared_ptr<EClass>>( newValue );
                             auto eClassImpl = std::static_pointer_cast<EClassBaseExt>( eClass );
                             auto& subClasses = eClassImpl->eSuperAdapter_->getSubClasses();
                             subClasses.push_back( eNotifier );
@@ -88,7 +88,7 @@ namespace ecore::ext
                         Any newValue = notification->getNewValue();
                         if( !newValue.empty() )
                         {
-                            auto eClass = anyCast<std::shared_ptr<EClass>>( newValue );
+                            auto eClass = anyObjectCast<std::shared_ptr<EClass>>( newValue );
                             auto eClassImpl = std::static_pointer_cast<EClassBaseExt>( eClass );
                             auto& subClasses = eClassImpl->eSuperAdapter_->getSubClasses();
                             subClasses.push_back( eNotifier );
@@ -100,7 +100,7 @@ namespace ecore::ext
                         Any newValue = notification->getNewValue();
                         if( !newValue.empty() )
                         {
-                            auto eCollection = anyCast<std::shared_ptr<EList<std::shared_ptr<EClass>>>>( newValue );
+                            auto eCollection = anyListCast<std::shared_ptr<EClass>>( newValue );
                             for( const auto& eClass : *eCollection )
                             {
                                 auto eClassImpl = std::static_pointer_cast<EClassBaseExt>( eClass );
@@ -115,7 +115,7 @@ namespace ecore::ext
                         Any oldValue = notification->getOldValue();
                         if( !oldValue.empty() )
                         {
-                            auto eClass = anyCast<std::shared_ptr<EClass>>( oldValue );
+                            auto eClass = anyObjectCast<std::shared_ptr<EClass>>( oldValue );
                             auto eClassImpl = std::static_pointer_cast<EClassBaseExt>( eClass );
                             auto& subClasses = eClassImpl->eSuperAdapter_->getSubClasses();
                             auto it = std::find_if(
@@ -130,7 +130,7 @@ namespace ecore::ext
                         Any oldValue = notification->getOldValue();
                         if( !oldValue.empty() )
                         {
-                            auto eCollection = anyCast<std::shared_ptr<EList<std::shared_ptr<EClass>>>>( oldValue );
+                            auto eCollection = anyListCast<std::shared_ptr<EClass>>( oldValue );
                             for( const auto& eClass : *eCollection )
                             {
                                 auto eClassImpl = std::static_pointer_cast<EClassBaseExt>( eClass );
@@ -563,8 +563,7 @@ namespace ecore::ext
 
         inline EClassBaseExt<I...>& getObject()
         {
-            return static_cast<EClassBaseExt<I...>&>(
-                ecore::impl::EClassBase<I...>::EObjectInternalAdapter<typename U>::getObject() );
+            return static_cast<EClassBaseExt<I...>&>( ecore::impl::EClassBase<I...>::EObjectInternalAdapter<typename U>::getObject() );
         }
 
         inline const EClassBaseExt<I...>& getObject() const

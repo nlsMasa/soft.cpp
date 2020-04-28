@@ -10,6 +10,8 @@
 #ifndef ECORE_IMMUTABLE_ELIST_HPP_
 #define ECORE_IMMUTABLE_ELIST_HPP_
 
+#include "ecore/EList.hpp"
+
 #include <vector>
 
 namespace ecore::impl

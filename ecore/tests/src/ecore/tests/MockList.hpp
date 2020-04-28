@@ -28,6 +28,7 @@ namespace ecore::tests
         MOCK_METHOD_TPL( set, 2, T( std::size_t, const T& ));
         MOCK_METHOD_TPL( remove, 1, T( std::size_t ), removeIndex );
         MOCK_METHOD_TPL( remove, 1, bool( const T& ), removeObject );
+        MOCK_CONST_METHOD_TPL( contains, 1, bool(const T&) );
         MOCK_CONST_METHOD_TPL( size, 0, std::size_t());
         MOCK_METHOD_TPL( clear, 0, void());
         MOCK_CONST_METHOD_TPL( empty, 0, bool());

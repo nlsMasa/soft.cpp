@@ -15,3 +15,9 @@ void AbstractAdapter::setTarget( const std::shared_ptr<ENotifier>& notifier )
 {
     target_ = notifier;
 }
+
+void AbstractAdapter::unsetTarget( const std::shared_ptr<ENotifier>& target )
+{
+    if( target == target_.lock() )
+        setTarget( nullptr );
+}

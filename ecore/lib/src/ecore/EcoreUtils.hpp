@@ -13,8 +13,8 @@
 #include "ecore/Exports.hpp"
 #include "ecore/Uri.hpp"
 
-#include <string>
 #include <memory>
+#include <string>
 
 namespace ecore
 {
@@ -24,7 +24,6 @@ namespace ecore
     class EDataType;
     class EResource;
     class EResourceSet;
-
 
     class ECORE_API EcoreUtils
     {
@@ -37,27 +36,28 @@ namespace ecore
 
         static Any createFromString( const std::shared_ptr<EDataType>& eDataType, const std::string& literal );
 
-        static URI getURI(const std::shared_ptr<EObject>& eObject);
+        static URI getURI( const std::shared_ptr<EObject>& eObject );
 
-        static std::shared_ptr<EObject> getEObject(const std::shared_ptr<EObject>& rootEObject, const std::string& relativeFragmentPath);
-        
-        static std::shared_ptr<EObject> resolve(const std::shared_ptr<EObject>& proxy, const std::shared_ptr<EObject>& context );
+        static std::shared_ptr<EObject> getEObject( const std::shared_ptr<EObject>& rootEObject, const std::string& relativeFragmentPath );
+
+        static std::shared_ptr<EObject> resolve( const std::shared_ptr<EObject>& proxy, const std::shared_ptr<EObject>& context );
 
         static std::shared_ptr<EObject> resolve( const std::shared_ptr<EObject>& proxy, const std::shared_ptr<EResource>& context );
 
         static std::shared_ptr<EObject> resolve( const std::shared_ptr<EObject>& proxy, const std::shared_ptr<EResourceSet>& context );
 
         static bool isAncestor( const std::shared_ptr<EObject>& ancestor, const std::shared_ptr<EObject>& object );
-        
-        // Determines if the class represented by eSuper object is either the same as, or is a superclass of, the class represented by the specified eClass parameter. 
-        // It returns true if so; otherwise it returns false.
+
+        // Determines if the class represented by eSuper object is either the same as, or is a superclass of, the class represented by the
+        // specified eClass parameter. It returns true if so; otherwise it returns false.
         static bool isAssignableFrom( const std::shared_ptr<EClass>& eSuper, const std::shared_ptr<EClass>& eClass );
 
     private:
-
-        static std::string getRelativeURIFragmentPath(const std::shared_ptr<EObject>& ancestor, const std::shared_ptr<EObject>& descendant, bool resolve);
+        static std::string getRelativeURIFragmentPath( const std::shared_ptr<EObject>& ancestor,
+                                                       const std::shared_ptr<EObject>& descendant,
+                                                       bool resolve );
     };
 
-} // namespace ecore::impl
+} // namespace ecore
 
 #endif
