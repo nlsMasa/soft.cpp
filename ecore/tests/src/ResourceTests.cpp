@@ -46,7 +46,8 @@ namespace
 
         ~NotificationsFixture()
         {
-            MOCK_EXPECT( eAdapter->setTarget ).with( nullptr ).once();
+            MOCK_EXPECT( eAdapter->unsetTarget ).with( resource ).once();
+            resource->eSetDeliver( false );
             resource->eAdapters().remove( eAdapter.get() );
         }
 

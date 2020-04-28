@@ -4,7 +4,6 @@
 #include "ecore/impl/BasicNotifier.hpp"
 #include "ecore/tests/MockAdapter.hpp"
 
-
 using namespace ecore;
 using namespace ecore::impl;
 using namespace ecore::tests;
@@ -26,23 +25,35 @@ BOOST_AUTO_TEST_CASE( NoTarget )
     notifier->eAdapters().add( adapter.get() );
 }
 
-
 BOOST_AUTO_TEST_CASE( Target )
 {
     auto notifier = std::make_shared<Notifier>();
     notifier->setThisPtr( notifier );
     auto adapter = std::make_unique<MockAdapter>();
-    
+
     MOCK_EXPECT( adapter->setTarget ).with( notifier ).once();
     notifier->eAdapters().add( adapter.get() );
 
     MOCK_EXPECT( adapter->notifyChanged )
         .with( [&]( const std::shared_ptr<ENotification>& n ) {
-            return n->getNotifier() == notifier && n->getFeatureID() == -1
-                   && n->getOldValue() == static_cast<EAdapter*>(adapter.get()) && n->getNewValue() == NO_VALUE
-                   && n->getPosition() == 0;
+            return n->getNotifier() == notifier && n->getEventType() == ENotification::REMOVING_ADAPTER && n->getFeatureID() == -1
+                   && n->getOldValue() == static_cast<EAdapter*>( adapter.get() ) && n->getNewValue() == NO_VALUE && n->getPosition() == 0;
         } )
         .once();
+    MOCK_EXPECT( adapter->unsetTarget ).with( notifier ).once();
+    notifier->eAdapters().remove( adapter.get() );
+}
+
+BOOST_AUTO_TEST_CASE( Target_NoDeliver )
+{
+    auto notifier = std::make_shared<Notifier>();
+    notifier->eSetDeliver( false );
+    notifier->setThisPtr( notifier );
+    auto adapter = std::make_unique<MockAdapter>();
+
+    MOCK_EXPECT( adapter->setTarget ).with( notifier ).once();
+    notifier->eAdapters().add( adapter.get() );
+
     MOCK_EXPECT( adapter->unsetTarget ).with( notifier ).once();
     notifier->eAdapters().remove( adapter.get() );
 }
