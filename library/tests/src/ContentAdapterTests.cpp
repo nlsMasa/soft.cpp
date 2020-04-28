@@ -49,15 +49,26 @@ BOOST_AUTO_TEST_CASE( DeepChanged )
     auto l = library::tests::LibraryFactory::createLibrary( 2, 5, 20, 5 );
     auto e = l->getEmployees()->get( 0 );
 
+    // register adapter on top library
     MockContentAdapter mockAdapter;
     l->eAdapters().add( &mockAdapter );
 
+    // modify a property of an element in library
+    // check that event is raised in the top adapter
     MOCK_EXPECT( mockAdapter.changed ).with( [=]( const std::shared_ptr<ENotification>& n ) {
         return n->getNotifier() == e && n->getFeatureID() == LibraryPackage::EMPLOYEE__FIRST_NAME
                && n->getOldValue() == std::string( "First Name 0" ) && n->getNewValue() == std::string( "test" ) && n->getPosition() == -1;
     } );
-
     e->setFirstName( "test" );
+
+    // remove top adapter - check that it is recursively removed
+    MOCK_EXPECT( mockAdapter.changed ).with( [=]( const std::shared_ptr<ENotification>& n ) {
+        return n->getEventType() == ENotification::REMOVING_ADAPTER;
+    } );
+    l->eAdapters().remove( &mockAdapter );
+
+    // check that no event is raised
+    e->setFirstName( "test2" );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

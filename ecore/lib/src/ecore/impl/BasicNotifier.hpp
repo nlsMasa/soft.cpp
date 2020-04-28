@@ -78,9 +78,10 @@ namespace ecore::impl
 
             virtual void didRemove( std::size_t pos, const ValueType& adapter ) override
             {
-                //  notify removing adapter
                 auto notifier = notifier_.thisPtr_.lock();
                 auto eAdapter = const_cast<EAdapter*>( adapter );
+                
+                //  notify removing adapter
                 if( notifier_.eDeliver_ )
                     eAdapter->notifyChanged(
                         std::make_shared<Notification>( *this, Notification::REMOVING_ADAPTER, eAdapter, NO_VALUE, pos ) );

@@ -34,6 +34,8 @@ namespace ecore
         virtual void notifyChanged( const std::shared_ptr<ENotification>& notification );
 
         virtual void setTarget( const std::shared_ptr<ENotifier>& target );
+        
+        virtual void unsetTarget( const std::shared_ptr<ENotifier>& target );
 
     private:
         void selfAdapt( const std::shared_ptr<ENotification>& notification );

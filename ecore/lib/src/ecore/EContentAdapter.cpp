@@ -19,14 +19,6 @@ void EContentAdapter::notifyChanged( const std::shared_ptr<ENotification>& notif
 
 void EContentAdapter::setTarget( const std::shared_ptr<ENotifier>& newTarget )
 {
-    auto oldTarget = AbstractAdapter::getTarget();
-    if( oldTarget )
-    {
-        auto eObject = std::static_pointer_cast<EObject>( oldTarget );
-        auto eContents = eObject->eContents();
-        for( auto& eContent : *eContents )
-            removeAdapter( eContent );
-    }
     AbstractAdapter::setTarget( newTarget );
     if( newTarget )
     {
@@ -35,6 +27,18 @@ void EContentAdapter::setTarget( const std::shared_ptr<ENotifier>& newTarget )
         for( auto& eContent : *eContents )
             addAdapter( eContent );
     }    
+}
+
+void EContentAdapter::unsetTarget( const std::shared_ptr<ENotifier>& oldTarget )
+{
+    AbstractAdapter::unsetTarget( oldTarget );
+    if( oldTarget )
+    {
+        auto eObject = std::static_pointer_cast<EObject>( oldTarget );
+        auto eContents = eObject->eContents();
+        for( auto& eContent : *eContents )
+            removeAdapter( eContent );
+    }
 }
 
 void EContentAdapter::addAdapter( const std::shared_ptr<EObject>& eObject )

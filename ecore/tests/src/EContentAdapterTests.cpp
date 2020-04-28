@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE( SetTarget )
     adapter.setTarget( mockObject );
 
     // unset adapter target -> this should recursively unregister adapter on all object children
-    adapter.setTarget( nullptr );
+    adapter.unsetTarget( mockObject );
 }
 
 BOOST_AUTO_TEST_CASE( NotifyChanged_Attribute )
