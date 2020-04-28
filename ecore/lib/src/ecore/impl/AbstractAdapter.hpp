@@ -29,6 +29,8 @@ namespace ecore::impl
 
         virtual void setTarget( const std::shared_ptr<ENotifier>& target );
 
+        virtual void unsetTarget( const std::shared_ptr<ENotifier>& target );
+
     protected:
         std::weak_ptr<ENotifier> target_;
     };

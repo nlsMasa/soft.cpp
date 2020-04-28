@@ -20,6 +20,7 @@ namespace ecore::tests
         MOCK_METHOD( notifyChanged, 1 );
         MOCK_METHOD( getTarget , 0 );
         MOCK_METHOD( setTarget, 1 );
+        MOCK_METHOD( unsetTarget, 1 );
     };
 }
 
