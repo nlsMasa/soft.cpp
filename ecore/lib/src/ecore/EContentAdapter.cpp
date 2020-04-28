@@ -98,7 +98,7 @@ void ecore::EContentAdapter::handleContainment( const std::shared_ptr<ENotificat
         auto oldValue = notification->getOldValue();
         if( oldValue.type() != typeid( bool ) )
         {
-            removeAdapter( anyCast<std::shared_ptr<EObject>>( notification->getOldValue() ), true );
+            removeAdapter( anyCast<std::shared_ptr<EObject>>( notification->getOldValue() ) );
             addAdapter( anyCast<std::shared_ptr<EObject>>( notification->getNewValue() ) );
         }
         break;

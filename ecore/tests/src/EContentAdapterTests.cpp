@@ -49,10 +49,8 @@ BOOST_AUTO_TEST_CASE( SetTarget )
 
     // create mock object
     auto mockObject = std::make_shared<MockObject>();
-    auto mockAdapters = std::make_shared<MockList<EAdapter*>>();
     MOCK_EXPECT( mockObject->eContents ).returns( mockChildren->asEListOf<std::shared_ptr<EObject>>() );
-    MOCK_EXPECT( mockObject->eAdapters ).returns( *mockAdapters );
-
+    
     // set adapter target -> this should recursively register adapter on all object children
     adapter.setTarget( mockObject );
 
@@ -124,7 +122,6 @@ BOOST_AUTO_TEST_CASE( NotifyChanged_UnSet )
     auto mockNotification = std::make_shared<MockNotification>();
     auto mockReference = std::make_shared<MockReference>();
     auto mockOldObject = std::make_shared<MockObject>();
-    auto mockOldObjectInternal = std::make_shared<MockObjectInternal>();
     auto mockOldAdapters = std::make_shared<MockList<EAdapter*>>();
     auto mockNewObject = std::make_shared<MockObject>();
     auto mockNewAdapters = std::make_shared<MockList<EAdapter*>>();
@@ -132,8 +129,6 @@ BOOST_AUTO_TEST_CASE( NotifyChanged_UnSet )
     MOCK_EXPECT( mockReference->isContainment ).once().returns( true );
 
     MOCK_EXPECT( mockOldObject->eAdapters ).returns( *mockOldAdapters );
-    MOCK_EXPECT( mockOldObject->getInternal ).returns( *mockOldObjectInternal );
-    MOCK_EXPECT( mockOldObjectInternal->eInternalContainer ).returns( std::shared_ptr<EObject>() );
     MOCK_EXPECT( mockOldAdapters->contains ).with( &adapter ).returns( true );
     MOCK_EXPECT( mockOldAdapters->removeObject ).with( &adapter ).returns( true );
     
