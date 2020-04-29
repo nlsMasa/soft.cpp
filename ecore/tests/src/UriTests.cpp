@@ -20,7 +20,7 @@ namespace std
     }
 } // namespace std
 
-BOOST_AUTO_TEST_SUITE(URITests )
+BOOST_AUTO_TEST_SUITE( URITests )
 
 BOOST_AUTO_TEST_CASE( Constructor )
 {
@@ -104,7 +104,6 @@ BOOST_AUTO_TEST_CASE( Constructor_Fragment )
         BOOST_CHECK_EQUAL( uri.getFragment(), "fragment" );
     }
 }
-
 
 BOOST_AUTO_TEST_CASE( Equals_Empty )
 {
@@ -215,6 +214,5 @@ BOOST_AUTO_TEST_CASE( TrimFragment )
         BOOST_CHECK_EQUAL( uri.trimFragment(), expected );
     }
 }
-
 
 BOOST_AUTO_TEST_SUITE_END()

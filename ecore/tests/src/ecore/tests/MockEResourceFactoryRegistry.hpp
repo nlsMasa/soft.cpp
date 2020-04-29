@@ -15,7 +15,7 @@
 
 namespace ecore::tests
 {
-    MOCK_BASE_CLASS(MockResourceFactoryRegistry, EResourceFactoryRegistry)
+    MOCK_BASE_CLASS(MockEResourceFactoryRegistry, EResourceFactoryRegistry)
     {
         MOCK_METHOD(getFactory, 1)
         MOCK_METHOD(getProtocolToFactoryMap, 0)

@@ -2,7 +2,7 @@
 
 #include "ecore/ENotifier.hpp"
 #include "ecore/impl/BasicNotifier.hpp"
-#include "ecore/tests/MockAdapter.hpp"
+#include "ecore/tests/MockEAdapter.hpp"
 
 using namespace ecore;
 using namespace ecore::impl;
@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_CASE( Constructor )
 BOOST_AUTO_TEST_CASE( NoTarget )
 {
     auto notifier = std::make_shared<Notifier>();
-    auto adapter = std::make_unique<MockAdapter>();
+    auto adapter = std::make_unique<MockEAdapter>();
     MOCK_EXPECT( adapter->setTarget ).with( nullptr ).once();
     notifier->eAdapters().add( adapter.get() );
 }
@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE( Target )
 {
     auto notifier = std::make_shared<Notifier>();
     notifier->setThisPtr( notifier );
-    auto adapter = std::make_unique<MockAdapter>();
+    auto adapter = std::make_unique<MockEAdapter>();
 
     MOCK_EXPECT( adapter->setTarget ).with( notifier ).once();
     notifier->eAdapters().add( adapter.get() );
@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE( Target_NoDeliver )
     auto notifier = std::make_shared<Notifier>();
     notifier->eSetDeliver( false );
     notifier->setThisPtr( notifier );
-    auto adapter = std::make_unique<MockAdapter>();
+    auto adapter = std::make_unique<MockEAdapter>();
 
     MOCK_EXPECT( adapter->setTarget ).with( notifier ).once();
     notifier->eAdapters().add( adapter.get() );

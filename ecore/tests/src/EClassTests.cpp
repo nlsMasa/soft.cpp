@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE( StructuralFeatures_Getters )
     BOOST_CHECK_EQUAL( eClass->getEAllAttributes(), std::vector<std::shared_ptr<EAttribute>>( {eAttribute1, eAttribute2, eAttribute3} ) );
 }
 
-BOOST_AUTO_TEST_CASE( StructuralFeatures_GetFromString)
+BOOST_AUTO_TEST_CASE( StructuralFeatures_GetFromString )
 {
 
     auto eClass = EcoreFactory::eInstance()->createEClass();
@@ -109,14 +109,13 @@ BOOST_AUTO_TEST_CASE( StructuralFeatures_GetFromString)
     eAttribute1->setName( "MyAttribute1" );
     auto eAttribute2 = EcoreFactory::eInstance()->createEAttribute();
     eAttribute2->setName( "MyAttribute2" );
-    
+
     eClass->getEStructuralFeatures()->add( eAttribute1 );
     eClass->getEStructuralFeatures()->add( eAttribute2 );
 
     BOOST_CHECK_EQUAL( eClass->getEStructuralFeature( "MyAttribute1" ), eAttribute1 );
     BOOST_CHECK_EQUAL( eClass->getEStructuralFeature( "MyAttribute2" ), eAttribute2 );
     BOOST_CHECK_EQUAL( eClass->getEStructuralFeature( "MyAttributeUnknown" ), nullptr );
-
 }
 
 BOOST_AUTO_TEST_CASE( AttributeID )
@@ -257,6 +256,5 @@ BOOST_AUTO_TEST_CASE( EClass )
     auto f = EcoreFactory::eInstance();
     BOOST_CHECK_EQUAL( f->createEClass()->eClass(), p->getEClass() );
 }
-
 
 BOOST_AUTO_TEST_SUITE_END()

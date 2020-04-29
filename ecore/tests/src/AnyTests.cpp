@@ -1,8 +1,8 @@
 #include <boost/test/unit_test.hpp>
 
-#include "ecore/Stream.hpp"
 #include "ecore/Any.hpp"
-#include "ecore/tests/MockObject.hpp"
+#include "ecore/Stream.hpp"
+#include "ecore/tests/MockEObject.hpp"
 
 using namespace ecore;
 using namespace ecore::tests;
@@ -20,21 +20,21 @@ BOOST_AUTO_TEST_CASE( Constructor_Value_Small )
 {
     Any a( 1 );
     BOOST_CHECK( !a.empty() );
-    BOOST_CHECK_EQUAL( &a.type() , &typeid(int) );
+    BOOST_CHECK_EQUAL( &a.type(), &typeid( int ) );
 }
 
 BOOST_AUTO_TEST_CASE( Constructor_Value_Big )
 {
-    Any a( std::make_shared<MockObject>() );
+    Any a( std::make_shared<MockEObject>() );
     BOOST_CHECK( !a.empty() );
-    BOOST_CHECK_EQUAL( &a.type(), &typeid( std::shared_ptr<MockObject>));
+    BOOST_CHECK_EQUAL( &a.type(), &typeid( std::shared_ptr<MockEObject> ) );
 }
 
 BOOST_AUTO_TEST_CASE( Constructor_Value_Move )
 {
-    Any a( std::make_shared<MockObject>() );
+    Any a( std::make_shared<MockEObject>() );
     BOOST_CHECK( !a.empty() );
-    BOOST_CHECK_EQUAL( &a.type(), &typeid( std::shared_ptr<MockObject> ) );
+    BOOST_CHECK_EQUAL( &a.type(), &typeid( std::shared_ptr<MockEObject> ) );
 }
 
 BOOST_AUTO_TEST_CASE( Constructor_Copy_Small )
@@ -47,10 +47,10 @@ BOOST_AUTO_TEST_CASE( Constructor_Copy_Small )
 
 BOOST_AUTO_TEST_CASE( Constructor_Copy_Big )
 {
-    Any a( std::make_shared<MockObject>() );
+    Any a( std::make_shared<MockEObject>() );
     Any b( a );
     BOOST_CHECK( !b.empty() );
-    BOOST_CHECK_EQUAL( &b.type(), &typeid( std::shared_ptr<MockObject> ) );
+    BOOST_CHECK_EQUAL( &b.type(), &typeid( std::shared_ptr<MockEObject> ) );
 }
 
 BOOST_AUTO_TEST_CASE( Constructor_Move_Small )
@@ -62,16 +62,14 @@ BOOST_AUTO_TEST_CASE( Constructor_Move_Small )
     BOOST_CHECK_EQUAL( &b.type(), &typeid( int ) );
 }
 
-
 BOOST_AUTO_TEST_CASE( Constructor_Move_Big )
 {
-    Any a( std::make_shared<MockObject>() );
+    Any a( std::make_shared<MockEObject>() );
     Any b( std::move( a ) );
     BOOST_CHECK( a.empty() );
     BOOST_CHECK( !b.empty() );
-    BOOST_CHECK_EQUAL( &b.type(), &typeid( std::shared_ptr<MockObject> ) );
+    BOOST_CHECK_EQUAL( &b.type(), &typeid( std::shared_ptr<MockEObject> ) );
 }
-
 
 BOOST_AUTO_TEST_CASE( AnyCast )
 {
@@ -80,9 +78,9 @@ BOOST_AUTO_TEST_CASE( AnyCast )
         BOOST_CHECK_EQUAL( anyCast<int>( a ), 1 );
     }
     {
-        auto m = std::make_shared<MockObject>();
+        auto m = std::make_shared<MockEObject>();
         Any a( m );
-        BOOST_CHECK_EQUAL( anyCast<std::shared_ptr<MockObject>>( a ), m );
+        BOOST_CHECK_EQUAL( anyCast<std::shared_ptr<MockEObject>>( a ), m );
     }
     {
         std::string w = "test";
@@ -113,9 +111,9 @@ BOOST_AUTO_TEST_CASE( Reset )
 BOOST_AUTO_TEST_CASE( Swap )
 {
     Any a( 1 );
-    Any b( std::make_shared<MockObject>() );
+    Any b( std::make_shared<MockEObject>() );
     swap( a, b );
-    BOOST_CHECK_EQUAL( &a.type(), &typeid( std::shared_ptr<MockObject> ) );
+    BOOST_CHECK_EQUAL( &a.type(), &typeid( std::shared_ptr<MockEObject> ) );
     BOOST_CHECK_EQUAL( &b.type(), &typeid( int ) );
     BOOST_CHECK_EQUAL( anyCast<int>( b ), 1 );
 }
@@ -123,13 +121,13 @@ BOOST_AUTO_TEST_CASE( Swap )
 BOOST_AUTO_TEST_CASE( Affectation )
 {
     {
-        Any a( std::make_shared<MockObject>() );
+        Any a( std::make_shared<MockEObject>() );
         Any b( 1 );
         a = b;
     }
     {
         Any a( 1 );
-        Any b( std::make_shared<MockObject>() );
+        Any b( std::make_shared<MockEObject>() );
         a = b;
     }
 }
@@ -137,11 +135,11 @@ BOOST_AUTO_TEST_CASE( Affectation )
 BOOST_AUTO_TEST_CASE( Affectation_Value )
 {
     {
-        Any a( std::make_shared<MockObject>() );
-        a = std::vector < std::size_t>{ 1, 2 };
+        Any a( std::make_shared<MockEObject>() );
+        a = std::vector<std::size_t>{1, 2};
     }
     {
-        Any a( std::make_shared<MockObject>() );
+        Any a( std::make_shared<MockEObject>() );
         a = 1;
     }
 }
@@ -154,7 +152,7 @@ BOOST_AUTO_TEST_CASE( Comparison )
         BOOST_CHECK( a == b );
     }
     {
-        Any a( std::make_shared<MockObject>() );
+        Any a( std::make_shared<MockEObject>() );
         Any b( 1 );
         BOOST_CHECK( a != b );
     }
@@ -163,10 +161,10 @@ BOOST_AUTO_TEST_CASE( Comparison )
 BOOST_AUTO_TEST_CASE( Serialization )
 {
     {
-        Any a(1);
+        Any a( 1 );
         std::ostringstream s;
         s << a;
-        BOOST_CHECK_EQUAL( s.str() , "1" );
+        BOOST_CHECK_EQUAL( s.str(), "1" );
     }
     {
         Any a;
@@ -175,13 +173,11 @@ BOOST_AUTO_TEST_CASE( Serialization )
         BOOST_CHECK_EQUAL( s.str(), "" );
     }
     {
-        Any a( std::vector<int>{ 1, 2} );
+        Any a( std::vector<int>{1, 2} );
         std::ostringstream s;
         s << a;
         BOOST_CHECK_EQUAL( s.str(), "[1,2]" );
     }
 }
-
-
 
 BOOST_AUTO_TEST_SUITE_END()

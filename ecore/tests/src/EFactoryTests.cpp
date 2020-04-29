@@ -2,8 +2,8 @@
 
 #include "ecore/EcoreFactory.hpp"
 #include "ecore/EcorePackage.hpp"
-#include "ecore/tests/MockObjectInternal.hpp"
-#include "ecore/tests/MockPackage.hpp"
+#include "ecore/tests/MockEObjectInternal.hpp"
+#include "ecore/tests/MockEPackage.hpp"
 
 using namespace ecore;
 using namespace ecore::tests;
@@ -25,8 +25,8 @@ BOOST_AUTO_TEST_CASE( Accessors_Package )
     auto ecoreFactory = EcoreFactory::eInstance();
 
     auto eFactory = ecoreFactory->createEFactory();
-    auto mockPackage = std::make_shared<MockPackage>();
-    auto mockInternal = std::make_shared<MockObjectInternal>();
+    auto mockPackage = std::make_shared<MockEPackage>();
+    auto mockInternal = std::make_shared<MockEObjectInternal>();
     MOCK_EXPECT( mockPackage->getInternal ).returns( *mockInternal );
 
     MOCK_EXPECT( mockPackage->eResource ).returns( nullptr );

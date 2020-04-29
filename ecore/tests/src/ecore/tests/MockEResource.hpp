@@ -11,13 +11,12 @@
 #define ECORE_MOCK_RESOURCE_HPP_
 
 #include "ecore/EResource.hpp"
-#include "ecore/tests/MockNotifier.hpp"
-#include "turtle/mock.hpp"
+#include "ecore/tests/MockENotifier.hpp"
 
 namespace ecore::tests
 {
     template <typename... I>
-    class MockResourceBase : public MockNotifierBase<I...>
+    class MockEResourceBase : public MockENotifierBase<I...>
     {
     public:
         typedef EResource base_type;
@@ -41,7 +40,7 @@ namespace ecore::tests
         MOCK_METHOD( getWarnings, 0 )
     };
 
-    typedef MockResourceBase<EResource> MockResource;
+    typedef MockEResourceBase<EResource> MockEResource;
 
 } // namespace ecore::tests
 

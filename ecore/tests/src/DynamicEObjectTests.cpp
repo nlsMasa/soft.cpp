@@ -1,12 +1,12 @@
 #include <boost/test/unit_test.hpp>
 
-#include "ecore/EcorePackage.hpp"
-#include "ecore/EcoreFactory.hpp"
-#include "ecore/EList.hpp"
 #include "ecore/EAttribute.hpp"
+#include "ecore/EList.hpp"
+#include "ecore/EcoreFactory.hpp"
+#include "ecore/EcorePackage.hpp"
 #include "ecore/impl/DynamicEObjectImpl.hpp"
-#include "ecore/tests/MockClass.hpp"
-#include "ecore/tests/MockList.hpp"
+#include "ecore/tests/MockEClass.hpp"
+#include "ecore/tests/MockEList.hpp"
 
 using namespace ecore;
 using namespace ecore::impl;
@@ -27,11 +27,11 @@ BOOST_AUTO_TEST_CASE( EClass_Mock )
     eObject->setThisPtr( eObject );
     BOOST_CHECK_EQUAL( EcorePackage::eInstance()->getEObject(), eObject->eClass() );
 
-    auto mockAdapters = std::make_shared<MockList<EAdapter*>>();
-    auto mockClass = std::make_shared<MockClass>();
+    auto mockAdapters = std::make_shared<MockEList<EAdapter*>>();
+    auto mockClass = std::make_shared<MockEClass>();
     MOCK_EXPECT( mockClass->getFeatureCount ).returns( 0 );
     MOCK_EXPECT( mockClass->eAdapters ).returns( *mockAdapters );
-    MOCK_EXPECT( mockAdapters->add ).with(mock::any).returns(true);
+    MOCK_EXPECT( mockAdapters->add ).with( mock::any ).returns( true );
 
     eObject->setEClass( mockClass );
     BOOST_CHECK_EQUAL( mockClass, eObject->eClass() );
@@ -41,12 +41,11 @@ BOOST_AUTO_TEST_CASE( EClass )
 {
     auto eObject = std::make_shared<DynamicEObjectImpl>();
     eObject->setThisPtr( eObject );
-    
+
     auto eClass = EcoreFactory::eInstance()->createEClass();
     eObject->setEClass( eClass );
     BOOST_CHECK_EQUAL( eClass, eObject->eClass() );
 }
-
 
 BOOST_AUTO_TEST_CASE( Attribute )
 {
@@ -64,6 +63,5 @@ BOOST_AUTO_TEST_CASE( Attribute )
     eObject->eSet( eFeature, 1 );
     BOOST_CHECK_EQUAL( eObject->eGet( eFeature ), 1 );
 }
-
 
 BOOST_AUTO_TEST_SUITE_END()
