@@ -3,9 +3,9 @@
 #include "ecore/EList.hpp"
 #include "ecore/EcoreFactory.hpp"
 #include "ecore/EcorePackage.hpp"
-#include "ecore/tests/MockClassifier.hpp"
-#include "ecore/tests/MockFactory.hpp"
-#include "ecore/tests/MockObjectInternal.hpp"
+#include "ecore/tests/MockEClassifier.hpp"
+#include "ecore/tests/MockEFactory.hpp"
+#include "ecore/tests/MockEObjectInternal.hpp"
 
 using namespace ecore;
 using namespace ecore::tests;
@@ -43,8 +43,8 @@ BOOST_AUTO_TEST_CASE( Accessors_FactoryInstance )
     auto ecorePackage = EcorePackage::eInstance();
 
     auto ePackage = ecoreFactory->createEPackage();
-    auto mockFactory = std::make_shared<MockFactory>();
-    auto mockInternal = std::make_shared<MockObjectInternal>();
+    auto mockFactory = std::make_shared<MockEFactory>();
+    auto mockInternal = std::make_shared<MockEObjectInternal>();
     MOCK_EXPECT( mockFactory->getInternal ).returns( *mockInternal );
     MOCK_EXPECT( mockInternal->eInverseAdd ).with( ePackage, EcorePackage::EFACTORY__EPACKAGE, nullptr ).returns( nullptr );
     ePackage->setEFactoryInstance( mockFactory );
@@ -59,10 +59,10 @@ BOOST_AUTO_TEST_CASE( Accessors_Classifiers )
     auto ePackage = ecoreFactory->createEPackage();
 
     // add classifiers in the package
-    auto eClassifier1 = std::make_shared<MockClassifier>();
-    auto eClassifier2 = std::make_shared<MockClassifier>();
-    auto eClassifier3 = std::make_shared<MockClassifier>();
-    auto mockInternal = std::make_shared<MockObjectInternal>();
+    auto eClassifier1 = std::make_shared<MockEClassifier>();
+    auto eClassifier2 = std::make_shared<MockEClassifier>();
+    auto eClassifier3 = std::make_shared<MockEClassifier>();
+    auto mockInternal = std::make_shared<MockEObjectInternal>();
 
     MOCK_EXPECT( eClassifier1->getName ).returns( "eClassifier1" );
     MOCK_EXPECT( eClassifier1->getInternal ).returns( *mockInternal );

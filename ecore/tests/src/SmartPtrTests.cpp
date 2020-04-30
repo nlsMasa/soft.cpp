@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE( DerivedPointerCast_Static )
 {
     auto b = std::make_shared<B>();
     auto a = std::static_pointer_cast<A>( b );
-    
+
     auto b1 = derived_pointer_cast<B>( b );
     BOOST_CHECK_EQUAL( b, b1 );
 
@@ -57,7 +57,5 @@ BOOST_AUTO_TEST_CASE( DerivedPointerCast_Dynamic )
     auto a2 = derived_pointer_cast<A>( c );
     BOOST_CHECK_EQUAL( a, a2 );
 }
-
-
 
 BOOST_AUTO_TEST_SUITE_END()

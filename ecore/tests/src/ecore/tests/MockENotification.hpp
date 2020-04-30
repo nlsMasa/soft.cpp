@@ -15,7 +15,7 @@
 
 namespace ecore::tests
 {
-    MOCK_BASE_CLASS( MockNotification , ENotification )
+    MOCK_BASE_CLASS( MockENotification , ENotification )
     {
         MOCK_METHOD( getEventType, 0 );
         MOCK_METHOD( getNotifier, 0 );

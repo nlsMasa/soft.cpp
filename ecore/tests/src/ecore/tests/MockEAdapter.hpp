@@ -15,7 +15,7 @@
 
 namespace ecore::tests
 {
-    MOCK_BASE_CLASS( MockAdapter , EAdapter )
+    MOCK_BASE_CLASS( MockEAdapter , EAdapter )
     {
         MOCK_METHOD( notifyChanged, 1 );
         MOCK_METHOD( getTarget , 0 );

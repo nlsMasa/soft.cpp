@@ -6,7 +6,7 @@
 #include "ecore/ENotification.hpp"
 #include "ecore/EcoreFactory.hpp"
 #include "ecore/EcorePackage.hpp"
-#include "ecore/tests/MockAdapter.hpp"
+#include "ecore/tests/MockEAdapter.hpp"
 
 using namespace ecore;
 using namespace ecore::tests;
@@ -18,7 +18,7 @@ namespace
     public:
         AttributeNotificationsFixture()
             : eAttribute( EcoreFactory::eInstance()->createEAttribute() )
-            , eAdapter( std::make_unique<MockAdapter>() )
+            , eAdapter( std::make_unique<MockEAdapter>() )
         {
             BOOST_CHECK( eAttribute );
             MOCK_EXPECT( eAdapter->setTarget ).with( eAttribute ).once();
@@ -34,7 +34,7 @@ namespace
 
     protected:
         std::shared_ptr<EAttribute> eAttribute;
-        std::unique_ptr<MockAdapter> eAdapter;
+        std::unique_ptr<MockEAdapter> eAdapter;
     };
 } // namespace
 

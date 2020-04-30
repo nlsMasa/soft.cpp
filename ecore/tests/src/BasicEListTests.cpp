@@ -269,13 +269,12 @@ BOOST_AUTO_TEST_CASE( Set_Unique )
     BasicEList<int, true> list = {1, 2};
     BOOST_CHECK_EQUAL( list.set( 0, 3 ), 1 );
     BOOST_CHECK_EQUAL( list.set( 0, 3 ), 3 );
-    
 }
 
 #ifdef _DEBUG
 BOOST_AUTO_TEST_CASE( Set_UniqueInvalid, *boost::unit_test::precondition( no_debugger() ) )
 {
-    BasicEList<int,true> list = {1, 2};
+    BasicEList<int, true> list = {1, 2};
     BOOST_CHECK_THROW( list.set( 1, 1 ), boost::execution_exception );
 }
 #endif

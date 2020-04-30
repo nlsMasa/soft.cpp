@@ -6,8 +6,8 @@
 // Copyright (c) 2020 MASA Group
 //
 // *****************************************************************************
-#ifndef ECORE_EOBJECT_MOCKOBJECTINTERNAL_HPP
-#define ECORE_EOBJECT_MOCKOBJECTINTERNAL_HPP
+#ifndef ECORE_EOBJECT_MockEObjectINTERNAL_HPP
+#define ECORE_EOBJECT_MockEObjectINTERNAL_HPP
 
 #include "ecore/impl/EObjectInternal.hpp"
 #include "turtle/mock.hpp"
@@ -15,7 +15,7 @@
 namespace ecore::tests
 {
 
-    MOCK_BASE_CLASS( MockObjectInternal, impl::EObjectInternal )
+    MOCK_BASE_CLASS( MockEObjectInternal, impl::EObjectInternal )
     {
         MOCK_METHOD( eInternalResource, 0 );
         MOCK_METHOD( eSetInternalResource, 2 );
@@ -34,4 +34,4 @@ namespace ecore::tests
     };
 } // namespace ecore::tests
 
-#endif /* ECORE_EOBJECT_MOCKOBJECTINTERNAL_HPP */
+#endif /* ECORE_EOBJECT_MockEObjectINTERNAL_HPP */

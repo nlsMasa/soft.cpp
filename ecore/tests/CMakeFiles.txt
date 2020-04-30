@@ -40,13 +40,13 @@ set(HEADER_FILES
 )
 
 set(SOURCE_ECORE_TESTS_FILES
-    src/ecore/tests/MockAdapter.hpp
-    src/ecore/tests/MockList.hpp
-    src/ecore/tests/MockNotifier.hpp
-    src/ecore/tests/MockNotification.hpp
-    src/ecore/tests/MockObjectInternal.hpp
-    src/ecore/tests/MockResource.hpp
-    src/ecore/tests/MockResourceFactory.hpp
-    src/ecore/tests/MockResourceFactoryRegistry.hpp
+    src/ecore/tests/MockEAdapter.hpp
+    src/ecore/tests/MockEList.hpp
+    src/ecore/tests/MockENotifier.hpp
+    src/ecore/tests/MockENotification.hpp
+    src/ecore/tests/MockEObjectInternal.hpp
+    src/ecore/tests/MockEResource.hpp
+    src/ecore/tests/MockEResourceFactory.hpp
+    src/ecore/tests/MockEResourceFactoryRegistry.hpp
 )
 

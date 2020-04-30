@@ -15,7 +15,7 @@
 
 namespace ecore::tests
 {
-    MOCK_BASE_CLASS( MockResourceFactory ,  EResourceFactory )
+    MOCK_BASE_CLASS( MockEResourceFactory ,  EResourceFactory )
     {
         MOCK_METHOD(createResource, 1)
     };

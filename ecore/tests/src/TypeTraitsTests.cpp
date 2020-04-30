@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE( IsUnitialized )
 {
     std::weak_ptr<A> w;
     BOOST_CHECK( is_uninitialized( w ) );
-    
+
     std::shared_ptr<B> b = std::make_shared<B>();
     std::weak_ptr<B> bw = b;
     BOOST_CHECK( !is_uninitialized( bw ) );
@@ -40,10 +40,9 @@ BOOST_AUTO_TEST_CASE( IsUnitialized )
 
 BOOST_AUTO_TEST_CASE( IsVirtualBase )
 {
-    BOOST_CHECK( static_cast<bool>(is_virtual_base_of<A, C>::value) );
-    BOOST_CHECK( !static_cast<bool>(is_virtual_base_of<A, B>::value) );
+    BOOST_CHECK( static_cast<bool>( is_virtual_base_of<A, C>::value ) );
+    BOOST_CHECK( !static_cast<bool>( is_virtual_base_of<A, B>::value ) );
     BOOST_CHECK( !static_cast<bool>( is_virtual_base_of<A, A>::value ) );
 }
-
 
 BOOST_AUTO_TEST_SUITE_END()

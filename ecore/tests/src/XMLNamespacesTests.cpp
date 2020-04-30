@@ -7,11 +7,11 @@ using namespace ecore::impl;
 
 BOOST_AUTO_TEST_SUITE( XMLNamespacesTests )
 
-BOOST_AUTO_TEST_CASE(NoContext)
+BOOST_AUTO_TEST_CASE( NoContext )
 {
     XMLNamespaces namespaces;
-    BOOST_CHECK(namespaces.getURI("prefix").empty());
-    BOOST_CHECK(namespaces.getPrefix("uri").empty());
+    BOOST_CHECK( namespaces.getURI( "prefix" ).empty() );
+    BOOST_CHECK( namespaces.getPrefix( "uri" ).empty() );
 }
 
 BOOST_AUTO_TEST_CASE( Empty )
@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE( Empty )
     BOOST_CHECK( namespaces.getURI( "prefix" ).empty() );
     BOOST_CHECK( namespaces.getPrefix( "uri" ).empty() );
     auto c = namespaces.popContext();
-    BOOST_CHECK(c.empty());
+    BOOST_CHECK( c.empty() );
 }
 
 BOOST_AUTO_TEST_CASE( Context )
@@ -72,6 +72,5 @@ BOOST_AUTO_TEST_CASE( Context_NoRemap )
     BOOST_CHECK( namespaces.getURI( "prefix" ) == "uri2" );
     BOOST_CHECK( namespaces.getPrefix( "uri2" ) == "prefix" );
 }
-
 
 BOOST_AUTO_TEST_SUITE_END()

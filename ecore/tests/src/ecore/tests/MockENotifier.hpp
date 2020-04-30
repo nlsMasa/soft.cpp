@@ -16,7 +16,7 @@
 namespace ecore::tests
 {
     template <typename... I>
-    class MockNotifierBase : public mock::object, public I...
+    class MockENotifierBase : public mock::object, public I...
     {
     public:
         typedef ENotifier base_type;
@@ -27,7 +27,7 @@ namespace ecore::tests
         MOCK_METHOD( eNotify, 1 );
     };
 
-    typedef MockNotifierBase<ENotifier> MockNotifier;
+    typedef MockENotifierBase<ENotifier> MockENotifier;
 }
 
 #endif

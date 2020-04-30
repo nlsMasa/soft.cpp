@@ -1,10 +1,10 @@
 #include <boost/test/unit_test.hpp>
 
 #include "ecore/EAdapter.hpp"
-#include "ecore/EcoreFactory.hpp"
-#include "ecore/EClass.hpp"
 #include "ecore/EAttribute.hpp"
+#include "ecore/EClass.hpp"
 #include "ecore/EOperation.hpp"
+#include "ecore/EcoreFactory.hpp"
 #include "ecore/Stream.hpp"
 
 using namespace ecore;
@@ -43,9 +43,9 @@ BOOST_AUTO_TEST_CASE( Contents )
     auto o1 = f->createEOperation();
     auto o2 = f->createEOperation();
     BOOST_CHECK_EQUAL( c->eContents(), std::vector<std::shared_ptr<EObject>>( {} ) );
-    c->getEStructuralFeatures()->add(a1);
+    c->getEStructuralFeatures()->add( a1 );
     BOOST_CHECK_EQUAL( c->eContents(), std::vector<std::shared_ptr<EObject>>( {a1} ) );
-    c->getEStructuralFeatures()->add(a2);
+    c->getEStructuralFeatures()->add( a2 );
     BOOST_CHECK_EQUAL( c->eContents(), std::vector<std::shared_ptr<EObject>>( {a1, a2} ) );
     c->getEOperations()->add( o1 );
     BOOST_CHECK_EQUAL( c->eContents(), std::vector<std::shared_ptr<EObject>>( {a1, a2, o1} ) );

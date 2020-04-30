@@ -16,7 +16,7 @@
 namespace ecore::tests
 {
     template <typename T>
-    MOCK_BASE_CLASS( MockList, EList<T> )
+    MOCK_BASE_CLASS( MockEList, EList<T> )
     {
         MOCK_METHOD_TPL( add, 1, bool( const T& ), add );
         MOCK_METHOD_TPL( add, 2, bool( std::size_t, const T& ), addIndex );
