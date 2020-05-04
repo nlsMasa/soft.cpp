@@ -7,10 +7,10 @@
 //
 // *****************************************************************************
 
-#ifndef ECORE_EOBJECTELIST_HPP_
-#define ECORE_EOBJECTELIST_HPP_
+#ifndef ECORE_BASICEOBJECTLIST_HPP_
+#define ECORE_BASICEOBJECTLIST_HPP_
 
-#include "ecore/ENotifyingList.hpp"
+#include "ecore/EObjectList.hpp"
 #include "ecore/EUnsettableList.hpp"
 #include "ecore/impl/AbstractENotifyingList.hpp"
 #include "ecore/impl/ArrayEList.hpp"
@@ -19,15 +19,15 @@
 namespace ecore::impl
 {
     template <typename T, bool containement = false, bool inverse = false, bool opposite = false, bool proxies = false, bool unset = false>
-    class EObjectEList
-        : public ArrayEList<AbstractENotifyingList<typename std::conditional<unset, EUnsettableList<T>, ENotifyingList<T>>::type>,
+    class BasicEObjectList
+        : public ArrayEList<AbstractENotifyingList<typename std::conditional<unset, EUnsettableList<T>, EObjectList<T>>::type>,
                             typename std::conditional<proxies, Proxy<T>, T>::type>
     {
     public:
         using EList<T>::add;
         using ENotifyingList<T>::add;
 
-        EObjectEList( const std::weak_ptr<EObject>& owner, int featureID, int inverseFeatureID = -1 )
+        BasicEObjectList( const std::weak_ptr<EObject>& owner, int featureID, int inverseFeatureID = -1 )
             : owner_( owner )
             , featureID_( featureID )
             , inverseFeatureID_( inverseFeatureID )
@@ -35,10 +35,8 @@ namespace ecore::impl
         {
         }
 
-        virtual ~EObjectEList()
-        {
-        }
-
+        virtual ~BasicEObjectList() = default;
+        
         virtual std::shared_ptr<ENotifier> getNotifier() const
         {
             return owner_.lock();

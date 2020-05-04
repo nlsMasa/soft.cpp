@@ -7,25 +7,19 @@
 //
 // *****************************************************************************
 
-#ifndef ECORE_EUNSETTABLELIST_HPP_
-#define ECORE_EUNSETTABLELIST_HPP_
+#ifndef ECORE_EOBJECTLIST_HPP_
+#define ECORE_EOBJECTLIST_HPP_
 
-#include "ecore/EObjectList.hpp"
+#include "ecore/ENotifyingList.hpp"
 
 namespace ecore
 {
     template <typename T>
-    class EUnsettableList : public EObjectList<T>
+    class EObjectList : public ENotifyingList<T>
     {
     public:
-        virtual ~EUnsettableList() {}
-
-        virtual bool isSet() const = 0;
-
-        virtual void unset() = 0;
+        virtual ~EObjectList() = default;
     };
-}
+} // namespace ecore
 
-
-
-#endif /* ECORE_EUNSETTABLELIST_HPP_ */
+#endif /* ECORE_EOBJECTLIST_HPP_ */
