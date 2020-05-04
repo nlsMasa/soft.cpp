@@ -72,7 +72,7 @@ namespace ecore::ext {
         if (!nameToClassifierMap_)
         {
             nameToClassifierMap_ = std::make_unique< std::unordered_map< std::string, std::shared_ptr<EClassifier>>>();
-            for (const auto& eClassifier : *getEClassifiers())
+            for (const auto& eClassifier : getEClassifiers())
                 nameToClassifierMap_->operator[](eClassifier->getName()) = eClassifier;
         }
         return nameToClassifierMap_->operator[](name);

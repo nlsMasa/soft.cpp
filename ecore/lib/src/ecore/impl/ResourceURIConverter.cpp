@@ -34,7 +34,7 @@ URI ResourceURIConverter::normalize(const URI& uri) const
 
 std::shared_ptr<URIHandler> ResourceURIConverter::getURIHandler( const URI& uri ) const
 {
-    for( auto handler : *uriHandlers_ )
+    for( auto handler : uriHandlers_ )
     {
         if( handler->canHandle( uri ) )
             return handler;

@@ -324,7 +324,7 @@ void XMLSave::saveContainedMany( const std::shared_ptr<EObject>& eObject, const 
 {
     auto val = eObject->eGet( eFeature );
     auto l = anyListCast<std::shared_ptr<EObject>>( val );
-    for (auto obj : *l)
+    for (auto obj : l)
         saveEObject(obj, eFeature);
 }
 

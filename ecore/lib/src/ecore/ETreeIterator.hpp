@@ -115,7 +115,7 @@ namespace ecore
     private:
         std::function< std::shared_ptr<const EList<T>>( const T& )> getChildren_;
         T current_;
-        std::stack<typename EList<T>::const_iterator> stack_;
+        std::stack<typename EList<T>::ConstIterator> stack_;
     };
 }
 

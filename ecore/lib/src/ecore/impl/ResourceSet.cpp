@@ -50,7 +50,7 @@ std::shared_ptr<EResource> ResourceSet::getResource(const URI& uri, bool loadOnD
     }
         
     auto normalizedURI = uriConverter_->normalize(uri);
-    for (auto resource : *resources_.get()) {
+    for (auto resource : resources_.get()) {
         auto resourceURI = uriConverter_->normalize(resource->getURI());
         if (resourceURI == normalizedURI) {
             if (loadOnDemand && !resource->isLoaded())

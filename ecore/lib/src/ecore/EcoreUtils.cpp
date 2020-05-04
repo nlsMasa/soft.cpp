@@ -180,7 +180,7 @@ bool EcoreUtils::isAssignableFrom( const std::shared_ptr<EClass>& eSuper, const 
     else if( eClass )
     {
         auto supers = eClass->getESuperTypes();
-        for( auto s : *supers )
+        for( auto s : supers )
         {
             if( isAssignableFrom( eSuper, s ) )
                 return true;

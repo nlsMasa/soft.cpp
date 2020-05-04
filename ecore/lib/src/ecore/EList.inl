@@ -17,20 +17,148 @@
 
 namespace ecore
 {
-    template <typename T>
-    bool operator==( const EList<T>& lhs, const EList<T>& rhs )
-    {
-        return lhs.size() == rhs.size() && std::equal( lhs.begin(), lhs.end(), rhs.begin() );
-    }
-
-    template <typename T>
-    bool operator!=( const EList<T>& lhs, const EList<T>& rhs )
-    {
-        return !( lhs == rhs );
-    }
-
     namespace detail
     {
+        /** Iterator interfaces for an EList<T>. */
+        template <typename ListType>
+        class EListIterator
+        {
+        public:
+            using iterator_category = std::random_access_iterator_tag;
+            using difference_type = std::ptrdiff_t;
+            using value_type = typename ListType::ValueType;
+            using pointer = typename ListType::ValueType*;
+            using reference = typename ListType::ValueType&;
+
+        public:
+            EListIterator( ListType* eList, std::size_t index )
+                : eList_( eList )
+                , index_( index )
+            {
+            }
+
+            value_type operator*() const
+            {
+                return eList_->get( index_ );
+            }
+
+            EListIterator& operator--()
+            {
+                --index_;
+                return *this;
+            }
+
+            EListIterator operator--( int )
+            {
+                EListIterator old( *this );
+                --( *this );
+                return old;
+            }
+
+            EListIterator& operator++()
+            {
+                ++index_;
+                return *this;
+            }
+
+            EListIterator operator++( int )
+            {
+                EListIterator old( *this );
+                ++( *this );
+                return old;
+            }
+
+            EListIterator& operator+=( difference_type offset )
+            {
+                index_ += offset;
+                return ( *this );
+            }
+
+            EListIterator& operator-=( difference_type offset )
+            {
+                return ( *this += -offset );
+            }
+
+            EListIterator operator+( const difference_type& offset ) const
+            {
+                EListIterator tmp = *this;
+                return ( tmp += offset );
+            }
+
+            EListIterator operator-( const difference_type& rhs ) const
+            {
+                EListIterator tmp = *this;
+                return ( tmp -= offset );
+            }
+
+            difference_type operator-( const EListIterator& rhs ) const
+            {
+                _Compat( rhs );
+                return index_ - rhs.index_;
+            }
+
+            bool operator==( const EListIterator& rhs ) const
+            {
+                _Compat( rhs );
+                return ( index_ == rhs.index_ );
+            }
+
+            bool operator!=( const EListIterator& rhs ) const
+            {
+                return !( *this == rhs );
+            }
+
+            bool operator<( const EListIterator& rhs )
+            {
+                _Compat( rhs );
+                return index_ < rhs.index_;
+            }
+
+            bool operator>( const EListIterator& rhs )
+            {
+                return ( rhs < *this );
+            }
+
+            bool operator<=( const EListIterator& rhs )
+            {
+                return ( !( rhs < *this ) );
+            }
+
+            bool operator>=( const EListIterator& rhs )
+            {
+                return ( !( *this < rhs ) );
+            }
+
+            bool hasNext() const
+            {
+                return ( (int64_t)index_ < (int64_t)eList_->size() - 1 );
+            }
+
+            const ListType* getEList() const
+            {
+                return eList_;
+            }
+
+            std::size_t getIndex() const
+            {
+                return index_;
+            }
+
+        private:
+            void _Compat( const EListIterator& rhs ) const
+            {
+#if _ITERATOR_DEBUG_LEVEL == 0
+                (void)rhs;
+#else
+                VERIFY( eList_ == rhs.eList_, "vector iterators incompatible" );
+#endif
+            }
+
+        private:
+            ListType* eList_;
+            std::size_t index_;
+        };
+
         template <typename T, typename Q>
         class ConstDelegateEList : public EList<T>
         {
