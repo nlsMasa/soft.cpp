@@ -102,6 +102,17 @@ namespace ecore::impl
             return v_.empty();
         }
 
+        virtual bool contains( const T& e ) const
+        {
+            return std::find( v_.begin(), v_.end(), e ) != v_.end();
+        }
+
+        virtual std::size_t indexOf( const T& e ) const
+        {
+            std::size_t index = std::distance( v_.begin(), std::find( v_.begin(), v_.end(), e ) );
+            return index == size() ? -1 : index;
+        }
+
     private:
         std::vector<T> v_;
     };

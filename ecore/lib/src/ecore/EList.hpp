@@ -55,16 +55,9 @@ namespace ecore
 
         virtual bool empty() const = 0;
 
-        virtual bool contains( const T& e ) const
-        {
-            return std::find( begin(), end(), e ) != end();
-        }
+        virtual bool contains( const T& e ) const = 0;
 
-        std::size_t indexOf( const T& e ) const
-        {
-            std::size_t index = std::distance( begin(), std::find( begin(), end(), e ) );
-            return index == size() ? -1 : index;
-        }
+        virtual std::size_t indexOf( const T& e ) const = 0;
 
         typedef detail::EListIterator<EList<T>> Iterator;
         typedef detail::EListIterator<const EList<T>> ConstIterator;

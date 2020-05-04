@@ -61,6 +61,17 @@ namespace ecore
                 return v_.empty();
             }
 
+            virtual bool contains( const T& e ) const
+            {
+                return std::find( v_.begin(), v_.end(), e ) != v_.end();
+            }
+
+            virtual std::size_t indexOf( const T& e ) const
+            {
+                std::size_t index = std::distance( v_.begin(), std::find( v_.begin(), v_.end(), e ) );
+                return index == size() ? -1 : index;
+            }
+
         protected:
             virtual T doGet( std::size_t index ) const
             {
@@ -169,6 +180,21 @@ namespace ecore
             virtual bool empty() const
             {
                 return v_.empty();
+            }
+
+            virtual bool contains( const T& e ) const
+            {
+                return indexOf( e ) != -1;
+            }
+
+            virtual std::size_t indexOf( const T& e ) const
+            {
+                for( std::size_t i = 0; i < v_.size(); ++i )
+                {
+                    if( e == v_[i].get() || e == resolve( i, v_[i] ) )
+                        return i;
+                }
+                return -1;
             }
 
         protected:

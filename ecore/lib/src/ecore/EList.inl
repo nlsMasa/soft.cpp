@@ -240,6 +240,16 @@ namespace ecore
                 return delegate_->empty();
             }
 
+            virtual bool contains( const T& e ) const
+            {
+                return delegate_->contains( cast<T, Q>::do_cast(e) );
+            }
+
+            virtual std::size_t indexOf( const T& e ) const
+            {
+                return delegate_->indexOf( cast<T, Q>::do_cast(e) );
+            }
+
         protected:
             T_ListDelegate delegate_;
 
