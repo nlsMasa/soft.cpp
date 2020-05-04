@@ -19,6 +19,12 @@ namespace ecore
     {
     public:
         virtual ~EObjectList() = default;
+
+        /**
+         * Returns the the list of unresolved objects.
+         * @return the the list of unresolved objects.
+         */
+        virtual std::shared_ptr<EList<T>> getUnResolvedList() = 0;
     };
 } // namespace ecore
 

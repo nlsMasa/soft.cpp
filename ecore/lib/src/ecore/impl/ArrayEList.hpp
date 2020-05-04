@@ -73,6 +73,11 @@ namespace ecore
             }
 
         protected:
+            std::vector<T>& getVector()
+            {
+                return v_;
+            }
+
             virtual T doGet( std::size_t index ) const
             {
                 return v_[index];
@@ -196,8 +201,13 @@ namespace ecore
                 }
                 return -1;
             }
-
+            
         protected:
+            std::vector<Proxy<T>>& getVector()
+            {
+                return v_;
+            }
+
             virtual T doGet( std::size_t index ) const
             {
                 return resolve( index, v_[index] );
