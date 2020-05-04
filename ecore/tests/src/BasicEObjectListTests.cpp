@@ -1,6 +1,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "ecore/EAdapter.hpp"
+#include "ecore/Stream.hpp"
 #include "ecore/impl/BasicEObjectList.hpp"
 #include "ecore/tests/MockEAdapter.hpp"
 #include "ecore/tests/MockEClass.hpp"
@@ -8,6 +9,8 @@
 #include "ecore/tests/MockEObject.hpp"
 #include "ecore/tests/MockEObjectInternal.hpp"
 #include "ecore/tests/MockEStructuralFeature.hpp"
+
+#include <random>
 
 using namespace ecore;
 using namespace ecore::impl;
@@ -173,5 +176,33 @@ BOOST_FIXTURE_TEST_CASE( Unset, Fixture )
     list.unset();
     BOOST_CHECK( !list.isSet() );
 }
+
+BOOST_FIXTURE_TEST_CASE( Range_Resolved, Fixture )
+{
+    MOCK_EXPECT( owner->getInternal ).returns( *mockInternal );
+
+    BasicEObjectList<std::shared_ptr<EObject>, false, false, false, true> list( owner, 1, 2 );
+    std::default_random_engine generator;
+    std::uniform_int_distribution<int> d( 1, 10 );
+    std::vector<std::shared_ptr<EObject>> expected;
+
+    for( int i = 0; i < d( generator ); ++i )
+    {
+        auto proxy = std::make_shared<MockEObject>();
+        auto resolved = std::make_shared<MockEObject>();
+        MOCK_EXPECT( proxy->eIsProxy ).returns( true );
+        MOCK_EXPECT( resolved->eIsProxy ).returns( false );
+        MOCK_EXPECT( mockInternal->eResolveProxy ).once().with( proxy ).returns( resolved );
+        list.add( proxy );
+        expected.push_back( resolved );
+    }
+
+    std::vector<std::shared_ptr<EObject>> result;
+    for( auto o : list )
+        result.push_back( o );
+
+    BOOST_CHECK_EQUAL( expected, result );
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()
