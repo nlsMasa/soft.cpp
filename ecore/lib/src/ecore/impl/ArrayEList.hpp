@@ -196,7 +196,7 @@ namespace ecore
             {
                 for( std::size_t i = 0; i < v_.size(); ++i )
                 {
-                    if( e == v_[i].get() || e == resolve( i, v_[i] ) )
+                    if( v_[i] == e || resolve( i, v_[i] ) == e )
                         return i;
                 }
                 return -1;
@@ -216,7 +216,7 @@ namespace ecore
             virtual T doSet( std::size_t index, const T& e )
             {
                 auto old = v_[index].get();
-                v_[index].set( e );
+                v_[index] = e;
                 didSet( index, e, old );
                 didChange();
                 return old;
@@ -258,7 +258,7 @@ namespace ecore
             virtual T doRemove( std::size_t index )
             {
                 auto it = std::next( v_.begin(), index );
-                auto element = std::move( (*it).get() );
+                auto element = it->get();
                 v_.erase( it );
                 didRemove( index, element );
                 didChange();
@@ -268,7 +268,7 @@ namespace ecore
             virtual T doMove( std::size_t newIndex, std::size_t oldIndex )
             {
                 auto it = std::next( v_.begin(), oldIndex );
-                auto element = std::move( (*it).get() );
+                auto element = it->get();
                 v_.erase( it );
                 v_.insert( std::next( v_.begin(), newIndex ), element );
                 didMove( newIndex, element, oldIndex );

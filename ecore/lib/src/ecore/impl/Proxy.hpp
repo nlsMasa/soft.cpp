@@ -116,12 +116,17 @@ namespace ecore::impl
 
         bool operator==( const T& value ) const
         {
-            return value_ == value;
+            return get() == value;
         }
 
         bool operator!=( const T& value ) const
         {
             return !operator==( value );
+        }
+
+        explicit operator T() const
+        {
+            return get();
         }
 
     private:

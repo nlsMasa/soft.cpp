@@ -68,7 +68,7 @@ namespace ecore::impl
                     const auto& v = list_->getVector();
                     for( std::size_t i = 0; i < size(); ++i )
                     {
-                        if( v[i].get() == e )
+                        if( v[i] == e )
                             return i;
                     }
                     return -1;
