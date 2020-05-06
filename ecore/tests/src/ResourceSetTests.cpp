@@ -43,6 +43,8 @@ BOOST_AUTO_TEST_CASE( Resources_WithMock )
     auto resource = std::make_shared<MockEResource>();
     auto resources = resourceSet->getResources();
     resources->add( resource );
+
+    BOOST_CHECK( resources->get( 0 ) == resource );
 }
 
 BOOST_AUTO_TEST_CASE( Resources_NoMock )
