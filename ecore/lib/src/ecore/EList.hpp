@@ -354,6 +354,4 @@ namespace ecore
 
 } // namespace ecore
 
-#include "ecore/EList.inl"
-
 #endif /* ECORE_ELIST_HPP_ */
