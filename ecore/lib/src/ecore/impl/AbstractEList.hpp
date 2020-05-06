@@ -45,7 +45,7 @@ namespace ecore::impl
             return true;
         }
 
-        virtual bool addAll( const EList<ValueType>& l )
+        virtual bool addAll( const Collection<ValueType>& l )
         {
             return addAll( size(), l );
         }
@@ -61,7 +61,7 @@ namespace ecore::impl
             return true;
         }
 
-        virtual bool addAll( std::size_t index, const EList<ValueType>& l )
+        virtual bool addAll( std::size_t index, const Collection<ValueType>& l )
         {
             VERIFY( index <= size(), "out of range" );
             if constexpr( unique )
@@ -132,6 +132,16 @@ namespace ecore::impl
             doClear();
         }
 
+        virtual std::shared_ptr<EList<ValueType>> getUnResolvedList()
+        {
+            return std::static_pointer_cast<EList<ValueType> >( shared_from_this());
+        }
+
+        virtual std::shared_ptr<const EList<ValueType>> getUnResolvedList() const
+        {
+            return std::static_pointer_cast<const EList<ValueType>>(shared_from_this());
+        }
+
     protected:
         virtual ValueType doGet( std::size_t index ) const = 0;
 
@@ -141,7 +151,7 @@ namespace ecore::impl
 
         virtual void doAdd( std::size_t index, const ValueType& e ) = 0;
 
-        virtual bool doAddAll( std::size_t index, const EList<ValueType>& l ) = 0;
+        virtual bool doAddAll( std::size_t index, const Collection<ValueType>& l ) = 0;
 
         virtual ValueType doRemove( std::size_t index ) = 0;
 
@@ -182,7 +192,7 @@ namespace ecore::impl
         }
 
     private:
-        std::unique_ptr<EList<ValueType>> getNonDuplicates( const EList<ValueType>& l )
+        std::unique_ptr<EList<ValueType>> getNonDuplicates( const Collection<ValueType>& l )
         {
             std::unordered_set<ValueType> s;
             std::vector<ValueType> v;

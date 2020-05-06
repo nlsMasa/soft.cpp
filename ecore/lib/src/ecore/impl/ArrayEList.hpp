@@ -107,7 +107,7 @@ namespace ecore
                 didChange();
             }
 
-            virtual bool doAddAll( std::size_t index, const EList<T>& l )
+            virtual bool doAddAll( std::size_t index, const Collection<T>& l )
             {
                 std::size_t growth = l.size();
                 std::size_t oldSize = v_.size();
@@ -237,7 +237,7 @@ namespace ecore
                 didChange();
             }
 
-            virtual bool doAddAll( std::size_t index, const EList<T>& l )
+            virtual bool doAddAll( std::size_t index, const Collection<T>& l )
             {
                 std::size_t growth = l.size();
                 std::size_t oldSize = v_.size();

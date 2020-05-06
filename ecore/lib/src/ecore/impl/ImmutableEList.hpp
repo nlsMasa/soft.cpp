@@ -42,7 +42,7 @@ namespace ecore::impl
             throw "UnsupportedOperationException";
         }
 
-        virtual bool addAll( const EList<T>& l )
+        virtual bool addAll( const Collection<T>& l )
         {
             throw "UnsupportedOperationException";
         }
@@ -52,7 +52,7 @@ namespace ecore::impl
             throw "UnsupportedOperationException";
         }
 
-        virtual bool addAll( std::size_t pos, const EList<T>& l )
+        virtual bool addAll( std::size_t pos, const Collection<T>& l )
         {
             throw "UnsupportedOperationException";
         }
@@ -112,6 +112,17 @@ namespace ecore::impl
             std::size_t index = std::distance( v_.begin(), std::find( v_.begin(), v_.end(), e ) );
             return index == size() ? -1 : index;
         }
+
+        virtual std::shared_ptr<EList<ValueType>> getUnResolvedList()
+        {
+            return std::static_pointer_cast<EList<ValueType>>( shared_from_this() );
+        }
+
+        virtual std::shared_ptr<const EList<ValueType>> getUnResolvedList() const
+        {
+            return std::static_pointer_cast<const EList<ValueType>>( shared_from_this() );
+        }
+
 
     private:
         std::vector<T> v_;

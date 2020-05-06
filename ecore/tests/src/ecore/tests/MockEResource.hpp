@@ -11,6 +11,7 @@
 #define ECORE_MOCK_RESOURCE_HPP_
 
 #include "ecore/EResource.hpp"
+#include "ecore/EDiagnostic.hpp"
 #include "ecore/tests/MockENotifier.hpp"
 
 namespace ecore::tests

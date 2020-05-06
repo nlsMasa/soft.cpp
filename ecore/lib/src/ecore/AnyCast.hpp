@@ -11,8 +11,8 @@
 #define ECORE_ANYCAST_HPP_
 
 #include "ecore/Any.hpp"
-#include "ecore/EList.hpp"
 #include "ecore/EObject.hpp"
+#include "ecore/EList.hpp"
 #include "ecore/SmartPtr.hpp"
 #include "ecore/TypeTraits.hpp"
 

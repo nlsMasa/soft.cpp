@@ -26,7 +26,12 @@ namespace ecore::impl
 
         virtual std::shared_ptr<EList<T>> getUnResolvedList()
         {
-            return shared_from_this();
+            return std::static_pointer_cast<EList<T>>( shared_from_this() );
+        }
+
+        virtual std::shared_ptr<const EList<T>> getUnResolvedList() const
+        {
+            return std::static_pointer_cast<const EList<T>>( shared_from_this() );
         }
     };
 
@@ -96,7 +101,7 @@ namespace ecore::impl
                     return list_->doAdd( index, e );
                 }
 
-                virtual bool doAddAll( std::size_t index, const EList<T>& l )
+                virtual bool doAddAll( std::size_t index, const Collection<T>& l )
                 {
                     return list_->doAddAll( index, l );
                 }
@@ -120,6 +125,11 @@ namespace ecore::impl
                 AbstractEObjectList* list_;
             };
             return std::make_shared<UnResolvedList>( this );
+        }
+
+        virtual std::shared_ptr<const EList<T>> getUnResolvedList() const
+        {
+            return std::static_pointer_cast<const EList<T>>( shared_from_this() );
         }
     };
 

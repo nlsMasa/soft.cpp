@@ -16,7 +16,157 @@
 namespace ecore
 {
     template <typename T>
-    class Collection
+    class Collection;
+
+    namespace detail
+    {
+        template <typename CT, typename CQ>
+        class ConstDelegateCollection : public CT
+        {
+            typedef typename CT::ValueType T;
+            typedef typename CQ::ValueType Q;
+            typedef std::shared_ptr<const CQ> T_Delegate;
+
+        public:
+            ConstDelegateCollection( const T_Delegate& delegate )
+                : delegate_( delegate )
+            {
+                _ASSERTE( delegate_ );
+            }
+
+            virtual ~ConstDelegateCollection()
+            {
+            }
+
+            virtual bool add( const T& e )
+            {
+                throw "UnsupportedOperationException";
+            }
+
+            virtual bool addAll( const Collection<T>& l )
+            {
+                throw "UnsupportedOperationException";
+            }
+
+            virtual T get( std::size_t pos ) const
+            {
+                return cast<Q, T>::do_cast( delegate_->get( pos ) );
+            }
+
+            virtual bool remove( const T& e )
+            {
+                throw "UnsupportedOperationException";
+            }
+
+            virtual std::size_t size() const
+            {
+                return delegate_->size();
+            }
+
+            virtual void clear()
+            {
+                throw "UnsupportedOperationException";
+            }
+
+            virtual bool empty() const
+            {
+                return delegate_->empty();
+            }
+
+            virtual bool contains( const T& e ) const
+            {
+                return delegate_->contains( cast<T, Q>::do_cast( e ) );
+            }
+
+        protected:
+            T_Delegate delegate_;
+
+            template <typename A, typename B>
+            struct cast
+            {
+                static inline B do_cast( const A& a )
+                {
+                    return derived_pointer_cast<typename B::element_type, typename A::element_type>( a );
+                }
+            };
+
+            template <typename A>
+            struct cast<A, A>
+            {
+                static inline A do_cast( const A& a )
+                {
+                    return a;
+                }
+            };
+
+            template <typename A>
+            struct cast<A, Any>
+            {
+                static inline Any do_cast( const A& a )
+                {
+                    return a;
+                }
+            };
+
+            template <typename A>
+            struct cast<Any, A>
+            {
+                static inline A do_cast( const Any& a )
+                {
+                    return anyCast<A>( a );
+                }
+            };
+        };
+
+        template <typename CT, typename CQ>
+        class DelegateCollection : public ConstDelegateCollection<CT, CQ>
+        {
+            typedef typename CT::ValueType T;
+            typedef typename CQ::ValueType Q;
+            typedef std::shared_ptr<CQ> T_Delegate;
+
+        public:
+            DelegateCollection( const T_Delegate& delegate )
+                : ConstDelegateCollection<CT, CQ>( delegate )
+                , delegate_( delegate )
+            {
+                _ASSERTE( delegate_ );
+            }
+
+            virtual ~DelegateCollection()
+            {
+            }
+
+            virtual bool add( const T& e )
+            {
+                return delegate_->add( cast<T, Q>::do_cast( e ) );
+            }
+
+            virtual bool addAll( const Collection<T>& l )
+            {
+                auto transformed = l.asCollectionOf<Q>();
+                return delegate_->addAll( *transformed );
+            }
+
+            virtual bool remove( const T& e )
+            {
+                return delegate_->remove( cast<T, Q>::do_cast( e ) );
+            }
+
+            virtual void clear()
+            {
+                delegate_->clear();
+            }
+
+
+        protected:
+            T_Delegate delegate_;
+        };
+
+    } // namespace detail
+  
+    template <typename T>
+    class Collection : public std::enable_shared_from_this<Collection<T>>
     {
     public:
         typedef typename T ValueType;
@@ -210,6 +360,21 @@ namespace ecore
         ConstIterator cend() const
         {
             return end();
+        }
+
+        /**
+         * Allows treating an EList<T> as an EList<Q> (if T can be casted to Q dynamically)
+         */
+        template <typename Q>
+        inline std::shared_ptr<Collection<Q>> asCollectionOf()
+        {
+            return std::make_shared<detail::DelegateCollection<Collection<Q>, Collection<T>>>( shared_from_this() );
+        }
+
+        template <typename Q>
+        inline std::shared_ptr<const Collection<Q>> asCollectionOf() const
+        {
+            return std::make_shared<detail::ConstDelegateCollection<Collection<Q>, Collection<T>>>( shared_from_this() );
         }
     };
 

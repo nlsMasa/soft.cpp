@@ -15,7 +15,12 @@
 #ifndef ECORE_EOBJECT_MOCKEOBJECT_HPP
 #define ECORE_EOBJECT_MOCKEOBJECT_HPP
 
+
+#include "ecore/EClass.hpp"
 #include "ecore/EObject.hpp"
+#include "ecore/EOperation.hpp"
+#include "ecore/EReference.hpp"
+#include "ecore/EStructuralFeature.hpp"
 #include "ecore/tests/MockENotifier.hpp"
 
 namespace ecore::tests

@@ -22,7 +22,11 @@ namespace ecore
 
         virtual ~List() = default;
 
+        using Collection::add;
+
         virtual bool add( std::size_t pos, const T& e ) = 0;
+
+        using Collection::addAll;
 
         virtual bool addAll( std::size_t pos, const Collection<T>& l ) = 0;
 
@@ -35,6 +39,8 @@ namespace ecore
         virtual T set( std::size_t pos, const T& e ) = 0;
 
         virtual T remove( std::size_t pos ) = 0;
+
+        using Collection::remove;
 
         virtual std::size_t indexOf( const T& e ) const = 0;
     };

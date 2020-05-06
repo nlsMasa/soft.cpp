@@ -14,6 +14,7 @@
 #include "ecore/ENotifier.hpp"
 #include "ecore/TypeTraits.hpp"
 #include "ecore/impl/AbstractEList.hpp"
+#include "ecore/impl/BasicEList.hpp"
 #include "ecore/impl/AbstractNotification.hpp"
 #include "ecore/impl/NotificationChain.hpp"
 
@@ -89,7 +90,7 @@ namespace ecore::impl
             return notifications;
         }
 
-        virtual bool addAll( std::size_t index, const EList<ValueType>& l )
+        virtual bool addAll( std::size_t index, const Collection<ValueType>& l )
         {
             bool result = Super::addAll( index, l );
             auto notifications = createNotificationChain();
@@ -165,7 +166,7 @@ namespace ecore::impl
             if( l )
             {
                 if( l->empty() )
-                    createAndDispatchNotification( nullptr, ENotification::REMOVE_MANY, l->asEListOf<Any>(), NO_VALUE, -1 );
+                    createAndDispatchNotification( nullptr, ENotification::REMOVE_MANY, toAny(*l), NO_VALUE, -1 );
                 else
                 {
                     auto notifications = createNotificationChain();
@@ -297,11 +298,11 @@ namespace ecore::impl
                 return Any( v );
         }
 
-        static Any toAny( const EList<ValueType>& l )
+        static Any toAny( const Collection<ValueType>& l )
         {
-            std::vector<Any> v;
-            std::transform( l.begin(), l.end(), v.end(), []( const ValueType& i ) { return toAny( i ); } );
-            return v;
+            auto result = std::make_shared<BasicEList<Any>>();
+            std::transform( l.begin(), l.end(), result->end(), []( const ValueType& i ) { return toAny( i ); } );
+            return std::static_pointer_cast<EList<Any>>(result);
         }
     };
 } // namespace ecore::impl

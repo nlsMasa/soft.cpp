@@ -2,6 +2,7 @@
 #include "ecore/EAttribute.hpp"
 #include "ecore/EClass.hpp"
 #include "ecore/ECollectionView.hpp"
+#include "ecore/EDiagnostic.hpp"
 #include "ecore/ENotificationChain.hpp"
 #include "ecore/ENotifyingList.hpp"
 #include "ecore/EObject.hpp"
