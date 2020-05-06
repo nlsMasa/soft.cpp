@@ -10,12 +10,12 @@
 #ifndef ECORE_EUNSETTABLELIST_HPP_
 #define ECORE_EUNSETTABLELIST_HPP_
 
-#include "ecore/EObjectList.hpp"
+#include "ecore/ENotifyingList.hpp"
 
 namespace ecore
 {
     template <typename T>
-    class EUnsettableList : public EObjectList<T>
+    class EUnsettableList : public ENotifyingList<T>
     {
     public:
         virtual ~EUnsettableList() {}
