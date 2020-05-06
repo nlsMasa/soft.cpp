@@ -17,6 +17,7 @@ set(SOURCE_FILES
     src/ECollectionViewTests.cpp
     src/EDynamicModelTests.cpp
     src/EFactoryTests.cpp
+    src/EListTests.cpp
     src/EObjectTests.cpp
     src/EPackageTests.cpp
     src/FileURIHandlerTests.cpp
