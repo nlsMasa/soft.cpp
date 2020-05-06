@@ -4,6 +4,7 @@
 #include "library/LibraryPackage.hpp"
 
 #include "ecore/EResource.hpp"
+#include "ecore/EDiagnostic.hpp"
 #include "ecore/EResourceFactory.hpp"
 #include "ecore/EResourceFactoryRegistry.hpp"
 #include "ecore/EPackageRegistry.hpp"
