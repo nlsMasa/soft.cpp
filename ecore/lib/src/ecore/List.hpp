@@ -24,7 +24,7 @@ namespace ecore
 
         virtual bool add( std::size_t pos, const T& e ) = 0;
 
-        virtual bool addAll( std::size_t pos, const EList<T>& l ) = 0;
+        virtual bool addAll( std::size_t pos, const Collection<T>& l ) = 0;
 
         virtual void move( std::size_t newPos, const T& e ) = 0;
 

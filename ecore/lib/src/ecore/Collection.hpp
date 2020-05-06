@@ -39,8 +39,6 @@ namespace ecore
 
         virtual bool contains( const T& e ) const = 0;
 
-        virtual bool containsAll( const Collection<T>& l ) const = 0;
-
         /** Iterator interfaces for an Collection<T>. */
         template <typename CollectionType>
         class CollectionIterator
@@ -181,8 +179,8 @@ namespace ecore
             std::size_t index_;
         };
 
-        typedef detail::CollectionIterator<Collection<T>> Iterator;
-        typedef detail::CollectionIterator<const Collection<T>> ConstIterator;
+        typedef CollectionIterator<Collection<T>> Iterator;
+        typedef CollectionIterator<const Collection<T>> ConstIterator;
 
         Iterator begin()
         {
