@@ -14,7 +14,6 @@
 #include "ecore/EObject.hpp"
 #include "ecore/EList.hpp"
 #include "ecore/SmartPtr.hpp"
-#include "ecore/TypeTraits.hpp"
 
 namespace ecore
 {
@@ -26,8 +25,8 @@ namespace ecore
         {
             auto object = anyCast<std::shared_ptr<EObject>>( any );
             return derived_pointer_cast<typename T::element_type>( object );
-        }
-        else if( id == &typeid( T ) )
+        }   
+        if( id == &typeid( T ) )
             return anyCast<T>( any );
         return nullptr;
     }
@@ -41,17 +40,15 @@ namespace ecore
             auto l = anyCast<std::shared_ptr<EList<Any>>>( any );
             return l->asEListOf<T>();
         }
-        else if( id == &typeid( std::shared_ptr<EList<std::shared_ptr<EObject>>> ) )
+        if( id == &typeid( std::shared_ptr<EList<std::shared_ptr<EObject>>> ) )
         {
-            if constexpr( ecore::is_shared_ptr<T>::value && std::is_base_of<ecore::EObject, typename T::element_type>::value )
+            if constexpr( IsSharedEObject<T>::value )
             {
                 auto l = anyCast<std::shared_ptr<EList<std::shared_ptr<EObject>>>>( any );
                 return l->asEListOf<T>();
             }
-            else
-                return nullptr;
         }
-        else if( id == &typeid( std::shared_ptr<EList<T>> ) )
+        if( id == &typeid( std::shared_ptr<EList<T>> ) )
             return anyCast<std::shared_ptr<EList<T>>>( any );
         return nullptr;
     }

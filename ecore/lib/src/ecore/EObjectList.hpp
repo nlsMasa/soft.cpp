@@ -17,24 +17,6 @@
 
 namespace ecore
 {
-    class EObject;
-
-    namespace detail
-    {
-        template <typename T>
-        struct IsSharedEObject : std::false_type
-        {
-        };
-
-        template <typename T>
-        struct IsSharedEObject<std::shared_ptr<T>> : std::is_base_of<EObject, typename T>
-        {
-        };
-    }
-
-    template <typename T>
-    using IsEObject = std::disjunction<std::is_same<T, Any>, detail::IsSharedEObject<T>>;
-
     template <typename L , typename T>
     class EObjectList : public List<T>
     {

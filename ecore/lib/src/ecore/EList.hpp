@@ -11,153 +11,27 @@
 #define ECORE_ELIST_HPP_
 
 #include "ecore/EObjectList.hpp"
+#include "ecore/TypeTraits.hpp"
 
 namespace ecore
 {
     class EObject;
 
-    namespace detail
+    template <typename T>
+    struct IsSharedEObject : std::false_type
     {
-        template <typename LT, typename LQ>
-        class ConstDelegateEList : public ConstDelegateCollection<LT, LQ>
-        {
-            typedef typename LT::ValueType T;
-            typedef typename LQ::ValueType Q;
-            typedef std::shared_ptr<const LQ> T_ListDelegate;
-
-        public:
-            ConstDelegateEList( const T_ListDelegate& delegate )
-                : ConstDelegateCollection<LT, LQ>( delegate )
-            {
-            }
-
-            virtual ~ConstDelegateEList()
-            {
-            }
-
-            virtual bool add( std::size_t pos, const T& e )
-            {
-                throw "UnsupportedOperationException";
-            }
-
-            virtual bool addAll( std::size_t pos, const Collection<T>& l )
-            {
-                throw "UnsupportedOperationException";
-            }
-
-            virtual void move( std::size_t newPos, const T& e )
-            {
-                throw "UnsupportedOperationException";
-            }
-
-            virtual T move( std::size_t newPos, std::size_t oldPos )
-            {
-                throw "UnsupportedOperationException";
-            }
-
-            virtual T set( std::size_t pos, const T& e )
-            {
-                throw "UnsupportedOperationException";
-            }
-
-            virtual T remove( std::size_t pos )
-            {
-                throw "UnsupportedOperationException";
-            }
-
-            virtual std::size_t indexOf( const T& e ) const
-            {
-                return delegate_->indexOf( cast<T, Q>::do_cast( e ) );
-            }
-
-            virtual std::shared_ptr<LT> getUnResolvedList()
-            {
-                throw "UnsupportedOperationException";
-            }
-
-            virtual std::shared_ptr<const LT> getUnResolvedList() const
-            {
-                if constexpr( IsEObject<Q>::value )
-                    return delegate_->getUnResolvedList()->asEListOf<T>();
-                else
-                    return delegate_->asEListOf<T>();
-            }
-        };
-
-        template <typename LT, typename LQ>
-        class DelegateEList : public DelegateCollection<LT, LQ>
-        {
-            typedef typename LT::ValueType T;
-            typedef typename LQ::ValueType Q;
-            typedef std::shared_ptr<LQ> T_Delegate;
-
-        public:
-            DelegateEList( const T_Delegate& delegate )
-                : DelegateCollection<LT, LQ>( delegate )
-            {
-            }
-
-            virtual ~DelegateEList()
-            {
-            }
-
-            virtual bool add( std::size_t pos, const T& e )
-            {
-                return delegate_->add( pos, cast<T, Q>::do_cast( e ) );
-            }
-
-            virtual bool addAll( std::size_t pos, const Collection<T>& l )
-            {
-                auto transformed = l.asCollectionOf<Q>();
-                return delegate_->addAll( pos, *transformed );
-            }
-
-            virtual void move( std::size_t newPos, const T& e )
-            {
-                delegate_->move( newPos, cast<T, Q>::do_cast( e ) );
-            }
-
-            virtual T move( std::size_t newPos, std::size_t oldPos )
-            {
-                return cast<Q, T>::do_cast( delegate_->move( newPos, oldPos ) );
-            }
-
-            virtual T set( std::size_t pos, const T& e )
-            {
-                return cast<Q, T>::do_cast( delegate_->set( pos, cast<T, Q>::do_cast( e ) ) );
-            }
-
-            virtual T remove( std::size_t pos )
-            {
-                return cast<Q, T>::do_cast( delegate_->remove( pos ) );
-            }
-
-            virtual std::size_t indexOf( const T& e ) const
-            {
-                return delegate_->indexOf( cast<T, Q>::do_cast( e ) );
-            }
-
-            virtual std::shared_ptr<LT> getUnResolvedList()
-            {
-                if constexpr( IsEObject<Q>::value )
-                    return delegate_->getUnResolvedList()->asEListOf<T>();
-                else
-                    return delegate_->asEListOf<T>();
-            }
-
-            virtual std::shared_ptr<const LT> getUnResolvedList() const
-            {
-                if constexpr( IsEObject<Q>::value )
-                    return delegate_->getUnResolvedList()->asEListOf<T>();
-                else
-                    return delegate_->asEListOf<T>();
-            }
-        };
-
-    } // namespace detail
+    };
 
     template <typename T>
-    class EList : public std::conditional_t< IsEObject<T>::value , EObjectList<EList<T>,T>, List<T>>
+    struct IsSharedEObject<std::shared_ptr<T>> : std::is_base_of<EObject, typename T>
+    {
+    };
+
+    template <typename T>
+    using IsSharedEObjectOrAny = std::disjunction<std::is_same<T, Any>, IsSharedEObject<T>>;
+
+    template <typename T>
+    class EList : public std::conditional_t<IsSharedEObjectOrAny<T>::value, EObjectList<EList<T>, T>, List<T>>
     {
     public:
         typedef typename T ValueType;
@@ -229,6 +103,147 @@ namespace ecore
     {
         return l->end();
     }
+
+    namespace detail
+    {
+
+        template <typename LT, typename LQ>
+        class ConstDelegateEList : public ConstDelegateCollection<LT, LQ>
+        {
+            typedef typename LT::ValueType T;
+            typedef typename LQ::ValueType Q;
+            typedef std::shared_ptr<const LQ> T_ListDelegate;
+
+        public:
+            ConstDelegateEList( const T_ListDelegate& delegate )
+                : ConstDelegateCollection<LT, LQ>( delegate )
+            {
+            }
+
+            virtual ~ConstDelegateEList()
+            {
+            }
+
+            virtual bool add( std::size_t pos, const T& e )
+            {
+                throw "UnsupportedOperationException";
+            }
+
+            virtual bool addAll( std::size_t pos, const Collection<T>& l )
+            {
+                throw "UnsupportedOperationException";
+            }
+
+            virtual void move( std::size_t newPos, const T& e )
+            {
+                throw "UnsupportedOperationException";
+            }
+
+            virtual T move( std::size_t newPos, std::size_t oldPos )
+            {
+                throw "UnsupportedOperationException";
+            }
+
+            virtual T set( std::size_t pos, const T& e )
+            {
+                throw "UnsupportedOperationException";
+            }
+
+            virtual T remove( std::size_t pos )
+            {
+                throw "UnsupportedOperationException";
+            }
+
+            virtual std::size_t indexOf( const T& e ) const
+            {
+                return delegate_->indexOf( cast<T, Q>::do_cast( e ) );
+            }
+
+            virtual std::shared_ptr<LT> getUnResolvedList()
+            {
+                throw "UnsupportedOperationException";
+            }
+
+            virtual std::shared_ptr<const LT> getUnResolvedList() const
+            {
+                if constexpr( IsSharedEObjectOrAny<Q>::value )
+                    return delegate_->getUnResolvedList()->asEListOf<T>();
+                else
+                    return delegate_->asEListOf<T>();
+            }
+        };
+
+        template <typename LT, typename LQ>
+        class DelegateEList : public DelegateCollection<LT, LQ>
+        {
+            typedef typename LT::ValueType T;
+            typedef typename LQ::ValueType Q;
+            typedef std::shared_ptr<LQ> T_Delegate;
+
+        public:
+            DelegateEList( const T_Delegate& delegate )
+                : DelegateCollection<LT, LQ>( delegate )
+            {
+            }
+
+            virtual ~DelegateEList()
+            {
+            }
+
+            virtual bool add( std::size_t pos, const T& e )
+            {
+                return delegate_->add( pos, cast<T, Q>::do_cast( e ) );
+            }
+
+            virtual bool addAll( std::size_t pos, const Collection<T>& l )
+            {
+                auto transformed = l.asCollectionOf<Q>();
+                return delegate_->addAll( pos, *transformed );
+            }
+
+            virtual void move( std::size_t newPos, const T& e )
+            {
+                delegate_->move( newPos, cast<T, Q>::do_cast( e ) );
+            }
+
+            virtual T move( std::size_t newPos, std::size_t oldPos )
+            {
+                return cast<Q, T>::do_cast( delegate_->move( newPos, oldPos ) );
+            }
+
+            virtual T set( std::size_t pos, const T& e )
+            {
+                return cast<Q, T>::do_cast( delegate_->set( pos, cast<T, Q>::do_cast( e ) ) );
+            }
+
+            virtual T remove( std::size_t pos )
+            {
+                return cast<Q, T>::do_cast( delegate_->remove( pos ) );
+            }
+
+            virtual std::size_t indexOf( const T& e ) const
+            {
+                return delegate_->indexOf( cast<T, Q>::do_cast( e ) );
+            }
+
+            virtual std::shared_ptr<LT> getUnResolvedList()
+            {
+                if constexpr( IsSharedEObjectOrAny<Q>::value )
+                    return delegate_->getUnResolvedList()->asEListOf<T>();
+                else
+                    return delegate_->asEListOf<T>();
+            }
+
+            virtual std::shared_ptr<const LT> getUnResolvedList() const
+            {
+                if constexpr( IsSharedEObjectOrAny<Q>::value )
+                    return delegate_->getUnResolvedList()->asEListOf<T>();
+                else
+                    return delegate_->asEListOf<T>();
+            }
+        };
+
+    } // namespace detail
 
 } // namespace ecore
 

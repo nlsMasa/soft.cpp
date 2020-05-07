@@ -300,8 +300,7 @@ namespace ecore::impl
     private:
         static Any toAny( const ValueType& v )
         {
-            if constexpr( is_shared_ptr<ValueType>::value && !std::is_same<ecore::EObject, typename ValueType::element_type>::value
-                          && std::is_base_of<ecore::EObject, typename ValueType::element_type>::value )
+            if constexpr( IsSharedEObject<ValueType>::value )
                 return Any( std::static_pointer_cast<EObject>( v ) );
             else
                 return Any( v );
