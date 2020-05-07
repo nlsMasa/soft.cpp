@@ -62,6 +62,7 @@ set(HEADER_ECORE_IMPL_FILES
     src/ecore/impl/EListBase.hpp
     src/ecore/impl/ENotifyingListBase.hpp
     src/ecore/impl/EObjectInternal.hpp
+    src/ecore/impl/EObjectListBase.hpp
     src/ecore/impl/FileURIHandler.hpp
     src/ecore/impl/ImmutableEList.hpp
     src/ecore/impl/ImmutableHashEList.hpp
