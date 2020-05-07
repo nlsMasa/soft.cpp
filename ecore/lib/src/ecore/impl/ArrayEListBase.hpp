@@ -3,297 +3,240 @@
 // This file is part of a MASA library or program.
 // Refer to the included end-user license agreement for restrictions.
 //
-// Copyright (c) 2018 MASA Group
+// Copyright (c) 2020 MASA Group
 //
 // *****************************************************************************
 
-#ifndef ECORE_ARRAYELIST_HPP_
-#define ECORE_ARRAYELIST_HPP_
+#ifndef ECORE_ARRAYELISTBASE_HPP_
+#define ECORE_ARRAYELISTBASE_HPP_
 
 #include "ecore/impl/EListBase.hpp"
 #include "ecore/impl/Proxy.hpp"
 
 #include <vector>
 
-namespace ecore
+namespace ecore::impl
 {
-    namespace impl
+    template <typename Base, typename T>
+    class AbstractArrayEListBase : public Base
     {
-        template <typename Base, typename T = typename Base::ValueType >
-        class ArrayEListBase : public Base
+    public:
+        typedef typename Base::ValueType ValueType;
+
+        virtual ~AbstractArrayEListBase() = default;
+
+    protected:
+        AbstractArrayEListBase()
+            : Base()
+            , v_()
         {
-        public:
-            ArrayEListBase()
-                : Base()
-                , v_()
-            {
-            }
+        }
 
-            ArrayEListBase( const std::vector<T>&& v )
-                : Base()
-                , v_( v )
-            {
-            }
-
-            ArrayEListBase( const std::initializer_list<T>& init )
-                : Base()
-                , v_( init )
-            {
-            }
-
-            ArrayEListBase( const ArrayEListBase& o )
-                : Base( o )
-                , v_( o.v_ )
-            {
-            }
-
-            virtual ~ArrayEListBase()
-            {
-            }
-
-            virtual std::size_t size() const
-            {
-                return v_.size();
-            }
-
-            virtual bool empty() const
-            {
-                return v_.empty();
-            }
-
-            virtual bool contains( const T& e ) const
-            {
-                return std::find( v_.begin(), v_.end(), e ) != v_.end();
-            }
-
-            virtual std::size_t indexOf( const T& e ) const
-            {
-                std::size_t index = std::distance( v_.begin(), std::find( v_.begin(), v_.end(), e ) );
-                return index == size() ? -1 : index;
-            }
-
-        protected:
-            std::vector<T>& getVector()
-            {
-                return v_;
-            }
-
-            virtual T doGet( std::size_t index ) const
-            {
-                return v_[index];
-            }
-
-            virtual T doSet( std::size_t index, const T& e )
-            {
-                auto old = v_[index];
-                v_[index] = e;
-                didSet( index, e, old );
-                didChange();
-                return old;
-            }
-
-            virtual void doAdd( const T& e )
-            {
-                auto index = size();
-                v_.push_back( e );
-                didAdd( index, e );
-                didChange();
-            }
-
-            virtual void doAdd( std::size_t index, const T& e )
-            {
-                v_.insert( std::next( v_.begin(), index ), e );
-                didAdd( index, e );
-                didChange();
-            }
-
-            virtual bool doAddAll( std::size_t index, const Collection<T>& l )
-            {
-                std::size_t growth = l.size();
-                std::size_t oldSize = v_.size();
-                v_.resize( oldSize + growth );
-                for( int i = (int)oldSize - 1; i >= (int)index; --i )
-                    v_[i + growth] = v_[i];
-                for( int i = 0; i < growth; ++i )
-                {
-                    auto v = l.get( i );
-                    auto n = i + index;
-                    v_[n] = v;
-                    didAdd( n, v );
-                    didChange();
-                }
-                return growth != 0;
-            }
-
-            virtual T doRemove( std::size_t index )
-            {
-                auto it = std::next( v_.begin(), index );
-                auto element = std::move( *it );
-                v_.erase( it );
-                didRemove( index, element );
-                didChange();
-                return element;
-            }
-
-            virtual T doMove( std::size_t newIndex, std::size_t oldIndex )
-            {
-                auto it = std::next( v_.begin(), oldIndex );
-                auto element = std::move( *it );
-                v_.erase( it );
-                v_.insert( std::next( v_.begin(), newIndex ), element );
-                didMove( newIndex, element, oldIndex );
-                didChange();
-                return element;
-            }
-
-            virtual std::shared_ptr<EList<T>> doClear()
-            {
-                auto l = std::make_shared<ImmutableEList<T>>( std::move( v_ ) );
-                v_.clear();
-                return l;
-            }
-
-        private:
-            std::vector<T> v_;
-        };
-
-        template <typename Base, typename T>
-        class ArrayEListBase<Base, Proxy<T>> : public Base
+        AbstractArrayEListBase( const std::vector<T>&& v )
+            : Base()
+            , v_( v )
         {
-        public:
-            ArrayEListBase()
-                : Base()
-                , v_()
-            {
-            }
+        }
 
-            ArrayEListBase( const ArrayEListBase& o )
-                : Base( o )
-                , v_( o.v_ )
-            {
-            }
+        AbstractArrayEListBase( const std::initializer_list<T>& init )
+            : Base()
+            , v_( init )
+        {
+        }
 
-            virtual ~ArrayEListBase()
-            {
-            }
+        AbstractArrayEListBase( const AbstractArrayEListBase& o )
+            : Base( o )
+            , v_( o.v_ )
+        {
+        }
 
-            virtual std::size_t size() const
-            {
-                return v_.size();
-            }
+    public:
+        virtual std::size_t size() const
+        {
+            return v_.size();
+        }
 
-            virtual bool empty() const
-            {
-                return v_.empty();
-            }
+        virtual bool empty() const
+        {
+            return v_.empty();
+        }
 
-            virtual bool contains( const T& e ) const
-            {
-                return indexOf( e ) != -1;
-            }
+        virtual bool contains( const ValueType& e ) const
+        {
+            return std::find( v_.begin(), v_.end(), e ) != v_.end();
+        }
 
-            virtual std::size_t indexOf( const T& e ) const
-            {
-                for( std::size_t i = 0; i < v_.size(); ++i )
-                {
-                    if( v_[i] == e || resolve( i, v_[i] ) == e )
-                        return i;
-                }
-                return -1;
-            }
-            
-        protected:
-            std::vector<Proxy<T>>& getVector()
-            {
-                return v_;
-            }
+        virtual std::size_t indexOf( const ValueType& e ) const
+        {
+            std::size_t index = std::distance( v_.begin(), std::find( v_.begin(), v_.end(), e ) );
+            return index == size() ? -1 : index;
+        }
 
-            virtual T doGet( std::size_t index ) const
-            {
-                return resolve( index, v_[index] );
-            }
+protected:
+        virtual ValueType doGet( std::size_t index ) const
+        {
+            return static_cast<ValueType>( v_[index] );
+        }
 
-            virtual T doSet( std::size_t index, const T& e )
+        virtual ValueType doSet( std::size_t index, const ValueType& e )
+        {
+            auto old = static_cast<ValueType>(v_[index]);
+            v_[index] = e;
+            didSet( index, e, old );
+            didChange();
+            return old;
+        }
+
+        virtual void doAdd( const ValueType& e )
+        {
+            auto index = size();
+            v_.push_back( e );
+            didAdd( index, e );
+            didChange();
+        }
+
+        virtual void doAdd( std::size_t index, const ValueType& e )
+        {
+            v_.insert( std::next( v_.begin(), index ), e );
+            didAdd( index, e );
+            didChange();
+        }
+
+        virtual bool doAddAll( std::size_t index, const Collection<ValueType>& l )
+        {
+            std::size_t growth = l.size();
+            std::size_t oldSize = v_.size();
+            v_.resize( oldSize + growth );
+            for( int i = (int)oldSize - 1; i >= (int)index; --i )
+                v_[i + growth] = v_[i];
+            for( int i = 0; i < growth; ++i )
             {
-                auto old = v_[index].get();
-                v_[index] = e;
-                didSet( index, e, old );
+                auto v = l.get( i );
+                auto n = i + index;
+                v_[n] = v;
+                didAdd( n, v );
                 didChange();
-                return old;
             }
+            return growth != 0;
+        }
 
-            virtual void doAdd( const T& e )
+        virtual ValueType doRemove( std::size_t index )
+        {
+            auto it = std::next( v_.begin(), index );
+            auto element = static_cast<ValueType>(*it);
+            v_.erase( it );
+            didRemove( index, element );
+            didChange();
+            return element;
+        }
+
+        virtual ValueType doMove( std::size_t newIndex, std::size_t oldIndex )
+        {
+            auto it = std::next( v_.begin(), oldIndex );
+            auto element = static_cast<ValueType>(*it);
+            v_.erase( it );
+            v_.insert( std::next( v_.begin(), newIndex ), element );
+            didMove( newIndex, element, oldIndex );
+            didChange();
+            return element;
+        }
+
+    protected:
+        std::vector<T> v_;
+    };
+
+    template <typename Base, typename T = typename Base::ValueType>
+    class ArrayEListBase : public AbstractArrayEListBase<Base,T>
+    {
+    public:
+        ArrayEListBase()
+            : AbstractArrayEListBase()
+        {
+        }
+
+        ArrayEListBase( const std::vector<T>&& v )
+            : AbstractArrayEListBase(v)
+        {
+        }
+
+        ArrayEListBase( const std::initializer_list<T>& init )
+            : AbstractArrayEListBase(init)
+        {
+        }
+
+        ArrayEListBase( const ArrayEListBase& o )
+            : AbstractArrayEListBase( o )
+        {
+        }
+
+        virtual ~ArrayEListBase()
+        {
+        }
+
+    protected:    
+
+        virtual std::shared_ptr<EList<T>> doClear()
+        {
+            auto l = std::make_shared<ImmutableEList<T>>( std::move( v_ ) );
+            v_.clear();
+            return l;
+        }
+    };
+
+    template <typename Base, typename T>
+    class ArrayEListBase<Base, Proxy<T>> : public AbstractArrayEListBase<Base, Proxy<T> >
+    {
+    public:
+        ArrayEListBase()
+            : AbstractArrayEListBase()
+        {
+        }
+
+        ArrayEListBase( const ArrayEListBase& o )
+            : AbstractArrayEListBase( o )
+        {
+        }
+
+        virtual ~ArrayEListBase()
+        {
+        }
+
+        virtual bool contains( const T& e ) const
+        {
+            return indexOf( e ) != -1;
+        }
+
+        virtual std::size_t indexOf( const T& e ) const
+        {
+            for( std::size_t i = 0; i < v_.size(); ++i )
             {
-                auto index = size();
-                v_.push_back( e );
-                didAdd( index, e );
-                didChange();
+                if( v_[i] == e || resolve( i, v_[i] ) == e )
+                    return i;
             }
+            return -1;
+        }
 
-            virtual void doAdd( std::size_t index, const T& e )
-            {
-                v_.insert( std::next( v_.begin(), index ), e );
-                didAdd( index, e );
-                didChange();
-            }
+    protected:
+        
+        virtual T doGet( std::size_t index ) const
+        {
+            return resolve( index, v_[index] );
+        }
 
-            virtual bool doAddAll( std::size_t index, const Collection<T>& l )
-            {
-                std::size_t growth = l.size();
-                std::size_t oldSize = v_.size();
-                v_.resize( oldSize + growth );
-                for( int i = (int)oldSize - 1; i >= (int)index; --i )
-                    v_[i + growth] = v_[i];
-                for( int i = 0; i < growth; ++i )
-                {
-                    auto e = l.get( i );
-                    auto n = i + index;
-                    v_[n] = e;
-                    didAdd( n, e );
-                    didChange();
-                }
-                return growth != 0;
-            }
+        virtual std::shared_ptr<EList<T>> doClear()
+        {
+            std::vector<T> result;
+            std::transform( v_.begin(), v_.end(), result.end(), []( const Proxy<T>& p ) { return p.get(); } );
+            auto l = std::make_shared<ImmutableEList<T>>( std::move( result ) );
+            v_.clear();
+            return l;
+        }
 
-            virtual T doRemove( std::size_t index )
-            {
-                auto it = std::next( v_.begin(), index );
-                auto element = it->get();
-                v_.erase( it );
-                didRemove( index, element );
-                didChange();
-                return element;
-            }
+    protected:
+        virtual T resolve( std::size_t index, const Proxy<T>& e ) const = 0;
 
-            virtual T doMove( std::size_t newIndex, std::size_t oldIndex )
-            {
-                auto it = std::next( v_.begin(), oldIndex );
-                auto element = it->get();
-                v_.erase( it );
-                v_.insert( std::next( v_.begin(), newIndex ), element );
-                didMove( newIndex, element, oldIndex );
-                didChange();
-                return element;
-            }
+    };
 
-            virtual std::shared_ptr<EList<T>> doClear()
-            {
-                std::vector<T> result;
-                std::transform( v_.begin(), v_.end(), result.end(), []( const Proxy<T>& p ) { return p.get(); } );
-                auto l = std::make_shared<ImmutableEList<T>>( std::move( result ) );
-                v_.clear();
-                return l;
-            }
+} // namespace ecore::impl
 
-        protected:
-            virtual T resolve( std::size_t index, const Proxy<T>& e ) const = 0;
-
-        private:
-            std::vector<Proxy<T>> v_;
-        };
-
-    } // namespace impl
-
-} // namespace ecore
-
-#endif /* ECORE_ABSTRACTARRAYELIST_HPP_ */
+#endif /* ECORE_ARRAYELISTBASE_HPP_ */
