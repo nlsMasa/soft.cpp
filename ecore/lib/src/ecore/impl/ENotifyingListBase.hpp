@@ -3,12 +3,12 @@
 // This file is part of a MASA library or program.
 // Refer to the included end-user license agreement for restrictions.
 //
-// Copyright (c) 2018 MASA Group
+// Copyright (c) 2020 MASA Group
 //
 // *****************************************************************************
 
-#ifndef ECORE_ABSTRACT_ENOTIFYING_LIST_HPP_
-#define ECORE_ABSTRACT_ENOTIFYING_LIST_HPP_
+#ifndef ECORE_ENOTIFYING_LIST_BASE_HPP_
+#define ECORE_ENOTIFYING_LIST_BASE_HPP_
 
 #include "ecore/Constants.hpp"
 #include "ecore/ENotifier.hpp"
