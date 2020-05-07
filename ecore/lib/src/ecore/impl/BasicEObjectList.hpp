@@ -11,7 +11,7 @@
 #define ECORE_BASICEOBJECTLIST_HPP_
 
 #include "ecore/EUnsettableList.hpp"
-#include "ecore/impl/AbstractENotifyingList.hpp"
+#include "ecore/impl/ENotifyingListBase.hpp"
 #include "ecore/impl/ArrayEList.hpp"
 #include "ecore/impl/Proxy.hpp"
 
@@ -19,7 +19,7 @@ namespace ecore::impl
 {
     template <typename T, bool containement = false, bool inverse = false, bool opposite = false, bool proxies = false, bool unset = false>
     class BasicEObjectList
-        : public ArrayEList<AbstractENotifyingList<typename std::conditional<unset, EUnsettableList<T>, ENotifyingList<T>>::type>,
+        : public ArrayEList<ENotifyingListBase<typename std::conditional<unset, EUnsettableList<T>, ENotifyingList<T>>::type>,
                             typename std::conditional<proxies, Proxy<T>, T>::type>
     {
     public:

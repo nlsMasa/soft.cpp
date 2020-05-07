@@ -24,19 +24,19 @@
 namespace ecore::impl
 {
     template <typename I>
-    class AbstractENotifyingList : public EListBase<I, true>
+    class ENotifyingListBase : public EListBase<I, true>
     {
     public:
         typedef typename EListBase<I, true> Super;
         typedef typename I InterfaceType;
         typedef typename I::ValueType ValueType;
 
-        AbstractENotifyingList()
+        ENotifyingListBase()
             : Super()
         {
         }
 
-        virtual ~AbstractENotifyingList()
+        virtual ~ENotifyingListBase()
         {
         }
 
@@ -197,7 +197,7 @@ namespace ecore::impl
             class Notification : public AbstractNotification
             {
             public:
-                Notification( const AbstractENotifyingList& list,
+                Notification( const ENotifyingListBase& list,
                               ENotification::EventType eventType,
                               const Any& oldValue,
                               const Any& newValue,
@@ -223,7 +223,7 @@ namespace ecore::impl
                 }
 
             private:
-                const AbstractENotifyingList& list_;
+                const ENotifyingListBase& list_;
             };
 
             return std::make_shared<Notification>( *this, eventType, oldValue, newValue, position );
