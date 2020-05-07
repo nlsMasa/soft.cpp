@@ -24,13 +24,13 @@ namespace
 
 BOOST_AUTO_TEST_SUITE( EListTests )
 
-BOOST_AUTO_TEST_CASE( IsEObject )
+BOOST_AUTO_TEST_CASE( IsEObjectTest )
 {
-    BOOST_CHECK( detail::IsEObject<Any>::value );
-    BOOST_CHECK( detail::IsEObject<std::shared_ptr<EObject>>::value );    
-    BOOST_CHECK( detail::IsEObject<std::shared_ptr<EObjectDerived>>::value );
-    BOOST_CHECK( !detail::IsEObject<int>::value );
-    BOOST_CHECK( !detail::IsEObject<NotEObject>::value );
+    BOOST_CHECK( IsEObject<Any>::value );
+    BOOST_CHECK( IsEObject<std::shared_ptr<EObject>>::value );    
+    BOOST_CHECK( IsEObject<std::shared_ptr<EObjectDerived>>::value );
+    BOOST_CHECK( !IsEObject<int>::value );
+    BOOST_CHECK( !IsEObject<NotEObject>::value );
 }
 
 BOOST_AUTO_TEST_CASE( PrimitiveList)

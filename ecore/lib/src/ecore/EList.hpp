@@ -3,17 +3,14 @@
 // This file is part of a MASA library or program.
 // Refer to the included end-user license agreement for restrictions.
 //
-// Copyright (c) 2018 MASA Group
+// Copyright (c) 2020 MASA Group
 //
 // *****************************************************************************
 
 #ifndef ECORE_ELIST_HPP_
 #define ECORE_ELIST_HPP_
 
-#include "ecore/Any.hpp"
-#include "ecore/List.hpp"
-#include "ecore/TypeTraits.hpp"
-#include <memory>
+#include "ecore/EObjectList.hpp"
 
 namespace ecore
 {
@@ -21,37 +18,6 @@ namespace ecore
 
     namespace detail
     {
-        template <typename T>
-        struct IsSharedEObject : std::false_type
-        {
-        };
-
-        template <typename T>
-        struct IsSharedEObject<std::shared_ptr<T>> : std::is_base_of<EObject, typename T>
-        {
-        };
-
-        template <typename T>
-        using IsEObject = std::disjunction<std::is_same<T, Any>, IsSharedEObject<T>>;
-
-        template <typename L, typename T, typename = void>
-        class EList : public List<T>
-        {
-        public:
-            virtual ~EList() = default;
-        };
-
-        template <typename L, typename T>
-        class EList<L, T, typename std::enable_if<IsEObject<T>::value>::type> : public List<T>
-        {
-        public:
-            virtual ~EList() = default;
-
-            virtual std::shared_ptr<L> getUnResolvedList() = 0;
-
-            virtual std::shared_ptr<const L> getUnResolvedList() const = 0;
-        };
-
         template <typename LT, typename LQ>
         class ConstDelegateEList : public ConstDelegateCollection<LT, LQ>
         {
@@ -191,7 +157,7 @@ namespace ecore
     } // namespace detail
 
     template <typename T>
-    class EList : public detail::EList<EList<T>, T>
+    class EList : public std::conditional_t< IsEObject<T>::value , EObjectList<EList<T>,T>, List<T>>
     {
     public:
         typedef typename T ValueType;
