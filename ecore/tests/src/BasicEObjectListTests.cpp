@@ -64,6 +64,22 @@ namespace
 
 } // namespace
 
+namespace std
+{
+    template <typename T>
+    ostream& operator<<( ostream& os, const std::vector<T>& v )
+    {
+        return print_container( os, v );
+    }
+
+    template <typename T>
+    bool operator==( const std::shared_ptr<EList<T>>& lhs, const std::vector<T>& rhs )
+    {
+        return lhs->size() == rhs.size() && std::equal( lhs->begin(), lhs->end(), rhs.begin() );
+    }
+
+} // namespace std
+
 BOOST_AUTO_TEST_SUITE( BasicEObjectListTests )
 
 BOOST_AUTO_TEST_CASE( Constructor )
@@ -177,13 +193,12 @@ BOOST_FIXTURE_TEST_CASE( Unset, Fixture )
     BOOST_CHECK( !list.isSet() );
 }
 
-
-
 BOOST_FIXTURE_TEST_CASE( ResolvedList, Fixture )
 {
     MOCK_EXPECT( owner->getInternal ).returns( *mockInternal );
 
-    BasicEObjectList<std::shared_ptr<EObject>, false, false, false, true> list( owner, 1, 2 );
+    auto objects = std::make_shared<BasicEObjectList<std::shared_ptr<EObject>, false, false, false, true>>( owner, 1, 2 );
+    auto list = std::static_pointer_cast<EList<std::shared_ptr<EObject>>>( objects );
     std::default_random_engine generator;
     std::uniform_int_distribution<int> d( 1, 10 );
     std::vector<std::shared_ptr<EObject>> expected;
@@ -195,15 +210,11 @@ BOOST_FIXTURE_TEST_CASE( ResolvedList, Fixture )
         MOCK_EXPECT( proxy->eIsProxy ).returns( true );
         MOCK_EXPECT( resolved->eIsProxy ).returns( false );
         MOCK_EXPECT( mockInternal->eResolveProxy ).once().with( proxy ).returns( resolved );
-        list.add( proxy );
+        list->add( proxy );
         expected.push_back( resolved );
     }
 
-    std::vector<std::shared_ptr<EObject>> result;
-    for( auto o : list )
-        result.push_back( o );
-
-    BOOST_CHECK_EQUAL( expected, result );
+    BOOST_CHECK_EQUAL( list, expected );
 }
 
 BOOST_FIXTURE_TEST_CASE( UnResolvedListNoProxies, Fixture )
@@ -216,7 +227,8 @@ BOOST_FIXTURE_TEST_CASE( UnResolvedListWithProxies, Fixture )
 {
     MOCK_EXPECT( owner->getInternal ).returns( *mockInternal );
 
-    auto list = std::make_shared<BasicEObjectList<std::shared_ptr<EObject>, false, false, false, true>>( owner, 1, 2 );
+    auto objects = std::make_shared<BasicEObjectList<std::shared_ptr<EObject>, false, false, false, true>>( owner, 1, 2 );
+    auto list = std::static_pointer_cast<EList<std::shared_ptr<EObject>>>( objects );
     auto unresolved = list->getUnResolvedList();
     std::default_random_engine generator;
     std::uniform_int_distribution<int> d( 1, 10 );
@@ -230,11 +242,7 @@ BOOST_FIXTURE_TEST_CASE( UnResolvedListWithProxies, Fixture )
         expected.push_back( proxy );
     }
 
-    std::vector<std::shared_ptr<EObject>> result;
-    for( auto o : unresolved )
-        result.push_back( o );
-
-    BOOST_CHECK_EQUAL( expected, result );
+    BOOST_CHECK_EQUAL( unresolved , expected );
 }
 
 

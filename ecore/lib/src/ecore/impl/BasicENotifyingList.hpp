@@ -17,7 +17,7 @@
 namespace ecore::impl
 {
     template <typename T>
-    using BasicENotifyingList = ArrayEListBase<ENotifyingListBase<ENotifyingList<T>>>;
+    using BasicENotifyingList = ArrayEListBase<ENotifyingListBase<ENotifyingList<T>,true>>;
     
 } // namespace ecore::impl
 

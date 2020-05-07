@@ -61,17 +61,6 @@ namespace ecore::impl
             return v_.empty();
         }
 
-        virtual bool contains( const ValueType& e ) const
-        {
-            return std::find( v_.begin(), v_.end(), e ) != v_.end();
-        }
-
-        virtual std::size_t indexOf( const ValueType& e ) const
-        {
-            std::size_t index = std::distance( v_.begin(), std::find( v_.begin(), v_.end(), e ) );
-            return index == size() ? -1 : index;
-        }
-
 protected:
         virtual ValueType doGet( std::size_t index ) const
         {
@@ -149,6 +138,9 @@ protected:
     class ArrayEListBase : public AbstractArrayEListBase<Base,T>
     {
     public:
+        typedef typename Base Base;
+        typedef typename Base::ValueType ValueType;
+
         ArrayEListBase()
             : AbstractArrayEListBase()
         {
@@ -173,7 +165,29 @@ protected:
         {
         }
 
+        virtual bool contains( const ValueType& e ) const
+        {
+            return std::find( v_.begin(), v_.end(), e ) != v_.end();
+        }
+
+        virtual std::size_t indexOf( const ValueType& e ) const
+        {
+            std::size_t index = std::distance( v_.begin(), std::find( v_.begin(), v_.end(), e ) );
+            return index == size() ? -1 : index;
+        }
+
     protected:    
+
+        inline ValueType unresolvedGet( std::size_t index ) const
+        {
+            return v_[index];
+        }
+
+        inline std::size_t unresolvedIndexOf( const ValueType& e ) const
+        {
+            std::size_t index = std::distance( v_.begin(), std::find( v_.begin(), v_.end(), e ) );
+            return index == size() ? -1 : index;
+        }
 
         virtual std::shared_ptr<EList<T>> doClear()
         {
@@ -187,6 +201,9 @@ protected:
     class ArrayEListBase<Base, Proxy<T>> : public AbstractArrayEListBase<Base, Proxy<T> >
     {
     public:
+        typedef typename Base Base;
+        typedef typename Base::ValueType ValueType;
+
         ArrayEListBase()
             : AbstractArrayEListBase()
         {
@@ -221,6 +238,21 @@ protected:
         virtual T doGet( std::size_t index ) const
         {
             return resolve( index, v_[index] );
+        }
+
+        inline ValueType unresolvedGet( std::size_t index ) const
+        {
+            return static_cast<ValueType>(v_[index]);
+        }
+
+        inline std::size_t unresolvedIndexOf( const ValueType& e ) const
+        {
+            for( std::size_t i = 0; i < v_.size(); ++i )
+            {
+                if( v_[i] == e )
+                    return i;
+            }
+            return -1;
         }
 
         virtual std::shared_ptr<EList<T>> doClear()

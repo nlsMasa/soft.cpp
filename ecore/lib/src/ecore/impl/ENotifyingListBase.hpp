@@ -23,11 +23,14 @@
 
 namespace ecore::impl
 {
-    template <typename I>
-    class ENotifyingListBase : public EListBase<I, true>
+    // ENotifyingListBase defines all ENotifyingList interface methods
+    // ENotifyingListBase handle uniqueness, index range check,
+    // and notify notification if a modification occured.
+    template <typename I, bool unique>
+    class ENotifyingListBase : public EListBase<I, unique>
     {
     public:
-        typedef typename EListBase<I, true> Super;
+        typedef typename EListBase<I, unique> Super;
         typedef typename I InterfaceType;
         typedef typename I::ValueType ValueType;
 
@@ -90,6 +93,8 @@ namespace ecore::impl
             return notifications;
         }
 
+        using EListBase<I, unique>::addAll;
+
         virtual bool addAll( std::size_t index, const Collection<ValueType>& l )
         {
             bool result = Super::addAll( index, l );
@@ -105,6 +110,8 @@ namespace ecore::impl
             } );
             return result;
         }
+
+        using EListBase<I, unique>::remove;
 
         virtual ValueType remove( std::size_t index )
         {
@@ -152,6 +159,8 @@ namespace ecore::impl
             }
             return notifications;
         }
+
+        using EListBase<I, unique>::move;
 
         virtual ValueType move( std::size_t newPos, std::size_t oldPos )
         {

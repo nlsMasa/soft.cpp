@@ -19,6 +19,9 @@
 namespace ecore::impl
 {
 
+    // EListBase defines all EList interface methods
+    // EListBase handle uniqueness, index range check, 
+    // and delegates method to corresponding do... method
     template <typename I, bool unique>
     class EListBase : public I
     {
