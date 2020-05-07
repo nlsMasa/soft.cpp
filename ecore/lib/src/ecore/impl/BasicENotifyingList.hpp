@@ -12,12 +12,12 @@
 
 #include "ecore/ENotifyingList.hpp"
 #include "ecore/impl/ENotifyingListBase.hpp"
-#include "ecore/impl/ArrayEList.hpp"
+#include "ecore/impl/ArrayEListBase.hpp"
 
 namespace ecore::impl
 {
     template <typename T>
-    using BasicENotifyingList = ArrayEList<ENotifyingListBase<ENotifyingList<T>>>;
+    using BasicENotifyingList = ArrayEListBase<ENotifyingListBase<ENotifyingList<T>>>;
     
 } // namespace ecore::impl
 

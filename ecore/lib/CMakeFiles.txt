@@ -49,7 +49,7 @@ set(HEADER_ECORE_IMPL_FILES
     src/ecore/impl/AbstractAdapter.hpp
     src/ecore/impl/AbstractNotification.hpp
     src/ecore/impl/AbstractResource.hpp
-    src/ecore/impl/ArrayEList.hpp
+    src/ecore/impl/ArrayEListBase.hpp
     src/ecore/impl/BasicEList.hpp
     src/ecore/impl/BasicENotifyingList.hpp
     src/ecore/impl/BasicEObject.hpp

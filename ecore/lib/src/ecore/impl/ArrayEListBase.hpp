@@ -20,34 +20,34 @@ namespace ecore
     namespace impl
     {
         template <typename Base, typename T = typename Base::ValueType >
-        class ArrayEList : public Base
+        class ArrayEListBase : public Base
         {
         public:
-            ArrayEList()
+            ArrayEListBase()
                 : Base()
                 , v_()
             {
             }
 
-            ArrayEList( const std::vector<T>&& v )
+            ArrayEListBase( const std::vector<T>&& v )
                 : Base()
                 , v_( v )
             {
             }
 
-            ArrayEList( const std::initializer_list<T>& init )
+            ArrayEListBase( const std::initializer_list<T>& init )
                 : Base()
                 , v_( init )
             {
             }
 
-            ArrayEList( const ArrayEList& o )
+            ArrayEListBase( const ArrayEListBase& o )
                 : Base( o )
                 , v_( o.v_ )
             {
             }
 
-            virtual ~ArrayEList()
+            virtual ~ArrayEListBase()
             {
             }
 
@@ -158,22 +158,22 @@ namespace ecore
         };
 
         template <typename Base, typename T>
-        class ArrayEList<Base, Proxy<T>> : public Base
+        class ArrayEListBase<Base, Proxy<T>> : public Base
         {
         public:
-            ArrayEList()
+            ArrayEListBase()
                 : Base()
                 , v_()
             {
             }
 
-            ArrayEList( const ArrayEList& o )
+            ArrayEListBase( const ArrayEListBase& o )
                 : Base( o )
                 , v_( o.v_ )
             {
             }
 
-            virtual ~ArrayEList()
+            virtual ~ArrayEListBase()
             {
             }
 
