@@ -23,6 +23,11 @@ namespace ecore::impl
     public:
         ImmutableEList() = default;
 
+        ImmutableEList( const std::vector<T>& v )
+            : v_( v )
+        {
+        }
+
         ImmutableEList( const std::vector<T>&& v )
             : v_( v )
         {

@@ -203,10 +203,18 @@ BOOST_FIXTURE_TEST_CASE( UnResolvedListNoProxies, Fixture )
 
 BOOST_FIXTURE_TEST_CASE( UnResolvedListWithProxies, Fixture )
 {
-    auto list = std::make_shared<BasicEObjectList<std::shared_ptr<EObject>, false, false, false, true>>( owner, 1, 2 );
-    auto unresolved = list->getUnResolvedList();
-    BOOST_CHECK( list != unresolved );
-    BOOST_CHECK( std::dynamic_pointer_cast<ENotifyingList<std::shared_ptr<EObject>>>( unresolved ) );
+    {
+        auto list = std::make_shared<BasicEObjectList<std::shared_ptr<EObject>, false, false, false, true>>( owner, 1, 2 );
+        auto unresolved = list->getUnResolvedList();
+        BOOST_CHECK( list != unresolved );
+        BOOST_CHECK( std::dynamic_pointer_cast<ENotifyingList<std::shared_ptr<EObject>>>( unresolved ) );
+    }
+    {
+        auto list = std::make_shared<BasicEObjectList<std::shared_ptr<EObject>, false, false, false, true,true>>( owner, 1, 2 );
+        auto unresolved = list->getUnResolvedList();
+        BOOST_CHECK( list != unresolved );
+        BOOST_CHECK( std::dynamic_pointer_cast<EUnsettableList<std::shared_ptr<EObject>>>( unresolved ) );
+    }
 }
 
 BOOST_FIXTURE_TEST_CASE( ResolvedList_Add, Fixture )
@@ -242,17 +250,72 @@ BOOST_FIXTURE_TEST_CASE( UnResolvedList_Add, Fixture )
     auto unresolved = list->getUnResolvedList();
     std::default_random_engine generator;
     std::uniform_int_distribution<int> d( 1, 10 );
-    std::vector<std::shared_ptr<EObject>> expected;
+    std::vector<std::shared_ptr<EObject>> proxies;
 
     for( int i = 0; i < d( generator ); ++i )
     {
         auto proxy = std::make_shared<MockEObject>();
         MOCK_EXPECT( proxy->eIsProxy ).returns( true );
         unresolved->add( proxy );
-        expected.push_back( proxy );
+        proxies.push_back( proxy );
     }
 
-    BOOST_CHECK_EQUAL( unresolved, expected );
+    BOOST_CHECK_EQUAL( unresolved, proxies );
 }
+
+BOOST_FIXTURE_TEST_CASE( UnResolvedList_AddAll, Fixture )
+{
+    MOCK_EXPECT( owner->getInternal ).returns( *mockInternal );
+
+    auto objects = std::make_shared<BasicEObjectList<std::shared_ptr<EObject>, false, false, false, true>>( owner, 1, 2 );
+    auto list = std::static_pointer_cast<EList<std::shared_ptr<EObject>>>( objects );
+    auto unresolved = list->getUnResolvedList();
+    std::default_random_engine generator;
+    std::uniform_int_distribution<int> d( 1, 10 );
+    std::vector<std::shared_ptr<EObject>> proxies;
+    
+    // add a list of proxies
+    for( int i = 0; i < d( generator ); ++i )
+    {
+        auto object = std::make_shared<MockEObject>();
+        MOCK_EXPECT( object->eIsProxy ).returns( true );
+        proxies.push_back( object );
+    }
+    auto proxiesList = std::make_shared<ImmutableEList<std::shared_ptr<EObject>>>( proxies );
+    unresolved->addAll( *proxiesList );
+
+    // check that there were really added
+    BOOST_CHECK_EQUAL( unresolved, proxies );
+
+    // check if resolution is called
+    std::vector<std::shared_ptr<EObject>> resolved;
+    for( auto proxy : proxies )
+    {
+        auto object = std::make_shared<MockEObject>();
+        MOCK_EXPECT( object->eIsProxy ).returns( false );
+        MOCK_EXPECT( mockInternal->eResolveProxy ).once().with( proxy ).returns( object );
+        resolved.push_back( object );
+    }
+
+    // check that there were added in the real list 
+    // and then resolved when called
+    BOOST_CHECK_EQUAL( list, resolved );
+}
+
+BOOST_FIXTURE_TEST_CASE( UnResolvedList_Remove, Fixture )
+{
+    MOCK_EXPECT( owner->getInternal ).returns( *mockInternal );
+
+    auto objects = std::make_shared<BasicEObjectList<std::shared_ptr<EObject>, false, false, false, true>>( owner, 1, 2 );
+    auto list = std::static_pointer_cast<EList<std::shared_ptr<EObject>>>( objects );
+    MOCK_EXPECT( object->eIsProxy ).returns( false );
+    list->add( object );
+
+    auto unresolved = list->getUnResolvedList();
+    BOOST_CHECK( unresolved->remove( object ) );
+    BOOST_CHECK( unresolved->empty() );
+    BOOST_CHECK( list->empty() );
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()
