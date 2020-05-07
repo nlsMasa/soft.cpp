@@ -13,7 +13,7 @@
 #include "ecore/Constants.hpp"
 #include "ecore/ENotifier.hpp"
 #include "ecore/TypeTraits.hpp"
-#include "ecore/impl/AbstractEList.hpp"
+#include "ecore/impl/EListBase.hpp"
 #include "ecore/impl/BasicEList.hpp"
 #include "ecore/impl/AbstractNotification.hpp"
 #include "ecore/impl/NotificationChain.hpp"
@@ -24,10 +24,10 @@
 namespace ecore::impl
 {
     template <typename I>
-    class AbstractENotifyingList : public AbstractEList<I, true>
+    class AbstractENotifyingList : public EListBase<I, true>
     {
     public:
-        typedef typename AbstractEList<I, true> Super;
+        typedef typename EListBase<I, true> Super;
         typedef typename I InterfaceType;
         typedef typename I::ValueType ValueType;
 

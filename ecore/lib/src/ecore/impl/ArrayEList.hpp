@@ -10,7 +10,7 @@
 #ifndef ECORE_ARRAYELIST_HPP_
 #define ECORE_ARRAYELIST_HPP_
 
-#include "ecore/impl/AbstractEList.hpp"
+#include "ecore/impl/EListBase.hpp"
 #include "ecore/impl/Proxy.hpp"
 
 #include <vector>

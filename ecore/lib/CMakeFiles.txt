@@ -47,7 +47,6 @@ set(HEADER_ECORE_FILES
 
 set(HEADER_ECORE_IMPL_FILES 
     src/ecore/impl/AbstractAdapter.hpp
-    src/ecore/impl/AbstractEList.hpp
     src/ecore/impl/AbstractENotifyingList.hpp
     src/ecore/impl/AbstractNotification.hpp
     src/ecore/impl/AbstractResource.hpp
@@ -61,6 +60,7 @@ set(HEADER_ECORE_IMPL_FILES
     src/ecore/impl/Diagnostic.hpp
     src/ecore/impl/DynamicEObjectImpl.hpp
     src/ecore/impl/DynamicEObjectImpl.inl
+    src/ecore/impl/EListBase.hpp
     src/ecore/impl/EObjectInternal.hpp
     src/ecore/impl/FileURIHandler.hpp
     src/ecore/impl/ImmutableEList.hpp

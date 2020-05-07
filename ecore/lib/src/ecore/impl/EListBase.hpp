@@ -3,12 +3,12 @@
 // This file is part of a MASA library or program.
 // Refer to the included end-user license agreement for restrictions.
 //
-// Copyright (c) 2018 MASA Group
+// Copyright (c) 2020 MASA Group
 //
 // *****************************************************************************
 
-#ifndef ECORE_ABSTRACTELIST_HPP_
-#define ECORE_ABSTRACTELIST_HPP_
+#ifndef ECORE_ELISTBASE_HPP_
+#define ECORE_ELISTBASE_HPP_
 
 #include "ecore/EList.hpp"
 #include "ecore/impl/ImmutableEList.hpp"
@@ -20,17 +20,17 @@ namespace ecore::impl
 {
 
     template <typename I, bool unique>
-    class AbstractEList : public I
+    class EListBase : public I
     {
     public:
         typedef typename I InterfaceType;
         typedef typename I::ValueType ValueType;
 
-        AbstractEList()
+        EListBase()
         {
         }
 
-        virtual ~AbstractEList()
+        virtual ~EListBase()
         {
         }
 
