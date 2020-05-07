@@ -58,14 +58,14 @@ namespace ecore
                 throw "UnsupportedOperationException";
             }
 
-            virtual std::size_t size() const
-            {
-                return delegate_->size();
-            }
-
             virtual void clear()
             {
                 throw "UnsupportedOperationException";
+            }
+
+            virtual std::size_t size() const
+            {
+                return delegate_->size();
             }
 
             virtual bool empty() const
