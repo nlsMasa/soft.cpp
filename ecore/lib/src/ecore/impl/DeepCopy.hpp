@@ -46,6 +46,10 @@ namespace ecore::impl
                               const std::shared_ptr<EObject>& eObject,
                               const std::shared_ptr<EObject>& copyEObject );
         void copyProxyURI( const std::shared_ptr<EObject>& eObject, const std::shared_ptr<EObject>& copyEObject ) const;
+        void copyReference( const std::shared_ptr<EReference>& eReference,
+                            const std::shared_ptr<EObject>& eObject,
+                            const std::shared_ptr<EObject>& copyEObject );
+
     private:
         bool resolve_;
         bool originalReferences_;
