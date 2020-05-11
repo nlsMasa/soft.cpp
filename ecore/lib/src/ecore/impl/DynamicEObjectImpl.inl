@@ -121,7 +121,7 @@ namespace ecore::impl
     }
 
     template <typename... I>
-    Any DynamicEObjectBase<I...>::eGet( int featureID, bool resolve, bool coreType ) const
+    Any DynamicEObjectBase<I...>::eGet( int featureID, bool resolve  ) const
     {
         int dynamicFeatureID = featureID - eStaticFeatureCount();
         if( dynamicFeatureID >= 0 )
@@ -206,7 +206,7 @@ namespace ecore::impl
 
             return result;
         }
-        return EObjectBase<I...>::eGet( featureID, resolve, coreType );
+        return EObjectBase<I...>::eGet( featureID, resolve );
     }
 
     template <typename... I>

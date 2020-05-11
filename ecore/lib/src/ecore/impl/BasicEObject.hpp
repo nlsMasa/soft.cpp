@@ -46,7 +46,6 @@ namespace ecore::impl
         virtual std::shared_ptr<const EList<std::shared_ptr<ecore::EObject>>> eCrossReferences() const;
         virtual Any eGet( const std::shared_ptr<ecore::EStructuralFeature>& feature ) const;
         virtual Any eGet( const std::shared_ptr<ecore::EStructuralFeature>& feature, bool resolve ) const;
-        virtual Any eGet( const std::shared_ptr<ecore::EStructuralFeature>& feature, bool resolve, bool coreType ) const;
         virtual bool eIsSet( const std::shared_ptr<ecore::EStructuralFeature>& feature ) const;
         virtual void eSet( const std::shared_ptr<ecore::EStructuralFeature>& feature, const Any& newValue );
         virtual void eUnset( const std::shared_ptr<ecore::EStructuralFeature>& feature );
@@ -68,7 +67,7 @@ namespace ecore::impl
         virtual int eOperationID( const std::shared_ptr<EOperation>& eOperation ) const;
         virtual int eOperationID( const std::shared_ptr<EObject>& eContainer, int operationID ) const;
 
-        virtual Any eGet( int featureID, bool resolve, bool coreType ) const;
+        virtual Any eGet( int featureID, bool resolve ) const;
         virtual bool eIsSet( int featureID ) const;
         virtual void eSet( int featureID, const Any& newValue );
         virtual void eUnset( int featureID );

@@ -354,7 +354,10 @@ namespace ecore::impl
     template <typename... I>
     Any BasicEObject<I...>::eGet( const std::shared_ptr<EStructuralFeature>& feature, bool resolve ) const
     {
-        return eGet( feature, resolve, true );
+        int featureID = eStructuralFeatureID( feature );
+        if( featureID >= 0 )
+            return eGet( featureID, resolve );
+        throw "The feature '" + feature->getName() + "' is not a valid feature";
     }
 
     template <typename... I>
@@ -388,16 +391,7 @@ namespace ecore::impl
     }
 
     template <typename... I>
-    Any BasicEObject<I...>::eGet( const std::shared_ptr<EStructuralFeature>& eFeature, bool resolve, bool coreType ) const
-    {
-        int featureID = eStructuralFeatureID( eFeature );
-        if( featureID >= 0 )
-            return eGet( featureID, resolve, coreType );
-        throw "The feature '" + eFeature->getName() + "' is not a valid feature";
-    }
-
-    template <typename... I>
-    Any BasicEObject<I...>::eGet( int featureID, bool resolve, bool coreType ) const
+    Any BasicEObject<I...>::eGet( int featureID, bool resolve ) const
     {
         std::shared_ptr<EStructuralFeature> eFeature = eClass()->getEStructuralFeature( featureID );
         VERIFYN( eFeature, "Invalid featureID: %i ", featureID );
