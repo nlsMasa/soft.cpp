@@ -40,7 +40,7 @@ namespace ecore::impl
         }
 
         virtual ~ImmutableArrayEList() = default;
-        
+
         virtual T get( std::size_t pos ) const
         {
             return v_.at( pos );
@@ -67,7 +67,7 @@ namespace ecore::impl
             return index == size() ? -1 : index;
         }
 
-    private:
+    protected:
         std::vector<T> v_;
     };
 } // namespace ecore::impl
