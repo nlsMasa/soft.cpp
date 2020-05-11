@@ -2,13 +2,14 @@
 #include "ecore/EAttribute.hpp"
 #include "ecore/EClass.hpp"
 #include "ecore/EDataType.hpp"
-#include "ecore/EList.hpp"
 #include "ecore/EFactory.hpp"
+#include "ecore/EList.hpp"
 #include "ecore/EObject.hpp"
 #include "ecore/EPackage.hpp"
 #include "ecore/EPackageRegistry.hpp"
 #include "ecore/EResource.hpp"
 #include "ecore/EResourceSet.hpp"
+#include "ecore/impl/DeepCopy.hpp"
 #include "ecore/impl/EObjectInternal.hpp"
 #include "ecore/impl/StringUtils.hpp"
 
@@ -88,7 +89,8 @@ std::string EcoreUtils::getRelativeURIFragmentPath( const std::shared_ptr<EObjec
     std::unordered_set<std::shared_ptr<EObject>> visited;
     std::deque<std::string> fragmentURIPath;
     auto eObject = descendant;
-    for( auto eContainer = eObject->getInternal().eInternalContainer(); eContainer && visited.insert( eContainer ).second; eContainer = eObject->getInternal().eInternalContainer() )
+    for( auto eContainer = eObject->getInternal().eInternalContainer(); eContainer && visited.insert( eContainer ).second;
+         eContainer = eObject->getInternal().eInternalContainer() )
     {
         fragmentURIPath.push_front( eContainer->getInternal().eURIFragmentSegment( eObject->eContainingFeature(), eObject ) );
         eObject = eContainer;
@@ -187,4 +189,21 @@ bool EcoreUtils::isAssignableFrom( const std::shared_ptr<EClass>& eSuper, const 
         }
     }
     return false;
+}
+
+std::shared_ptr<EObject> ecore::EcoreUtils::copy( const std::shared_ptr<EObject>& eObject )
+{
+    auto dc = std::make_unique<DeepCopy>();
+    auto eCopy = dc->copy( eObject );
+    dc->copyReferences();
+    return eCopy;
+}
+
+std::shared_ptr<EList<std::shared_ptr<EObject>>> ecore::EcoreUtils::copyAll(
+    const std::shared_ptr<EList<std::shared_ptr<EObject>>>& eObjects )
+{
+    auto dc = std::make_unique<DeepCopy>();
+    auto eCopies = dc->copyAll( eObjects );
+    dc->copyReferences();
+    return eCopies;
 }
