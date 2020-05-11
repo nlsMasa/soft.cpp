@@ -15,7 +15,9 @@
 namespace ecore
 {
     class EObject;
+    class EResource;
     class ENotificationChain;
+    class EStructuralFeature;
 } // namespace ecore
 
 namespace ecore::impl
