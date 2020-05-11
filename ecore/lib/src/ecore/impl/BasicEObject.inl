@@ -87,7 +87,7 @@ namespace ecore::impl
                         }
                     }
                 }
-                l_ = std::make_shared<ImmutableEList<std::shared_ptr<EObject>>>( std::move( v ) );
+                l_ = std::make_shared<ImmutableArrayEList<std::shared_ptr<EObject>>>( std::move( v ) );
             }
             return l_;
         }

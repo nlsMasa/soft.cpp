@@ -1,5 +1,5 @@
 #include "ecore/impl/ResourceURIConverter.hpp"
-#include "ecore/impl/ImmutableEList.hpp"
+#include "ecore/impl/ImmutableArrayEList.hpp"
 #include "ecore/impl/FileURIHandler.hpp"
 #include "ecore/URI.hpp"
 
@@ -7,7 +7,7 @@ using namespace ecore;
 using namespace ecore::impl;
 
 ResourceURIConverter::ResourceURIConverter()
-    : uriHandlers_( new ImmutableEList<std::shared_ptr<URIHandler>>( { std::make_shared<FileURIHandler>() } ) )
+    : uriHandlers_( new ImmutableArrayEList<std::shared_ptr<URIHandler>>( { std::make_shared<FileURIHandler>() } ) )
 {
 }
 

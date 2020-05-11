@@ -191,7 +191,7 @@ protected:
 
         virtual std::shared_ptr<EList<T>> doClear()
         {
-            auto l = std::make_shared<ImmutableEList<T>>( std::move( v_ ) );
+            auto l = std::make_shared<ImmutableArrayEList<T>>( std::move( v_ ) );
             v_.clear();
             return l;
         }
@@ -259,7 +259,7 @@ protected:
         {
             std::vector<T> result;
             std::transform( v_.begin(), v_.end(), result.end(), []( const Proxy<T>& p ) { return p.get(); } );
-            auto l = std::make_shared<ImmutableEList<T>>( std::move( result ) );
+            auto l = std::make_shared<ImmutableArrayEList<T>>( std::move( result ) );
             v_.clear();
             return l;
         }

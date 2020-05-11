@@ -2,7 +2,7 @@
 
 #include "ecore/EContentAdapter.hpp"
 #include "ecore/Stream.hpp"
-#include "ecore/impl/ImmutableEList.hpp"
+#include "ecore/impl/ImmutableArrayEList.hpp"
 #include "ecore/tests/MockEAttribute.hpp"
 #include "ecore/tests/MockEList.hpp"
 #include "ecore/tests/MockENotification.hpp"
@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE( SetTarget )
         MOCK_EXPECT( mockAdapters->removeObject ).once().with( &adapter ).returns( true );
         vchildren.push_back( mockObject );
     }
-    auto mockChildren = std::make_shared<ImmutableEList<std::shared_ptr<EObject>>>( std::move( vchildren ) );
+    auto mockChildren = std::make_shared<ImmutableArrayEList<std::shared_ptr<EObject>>>( std::move( vchildren ) );
 
     // create mock object
     auto mockObject = std::make_shared<MockEObject>();

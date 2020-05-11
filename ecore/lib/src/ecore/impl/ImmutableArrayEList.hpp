@@ -7,8 +7,8 @@
 //
 // *****************************************************************************
 
-#ifndef ECORE_IMMUTABLE_ELIST_HPP_
-#define ECORE_IMMUTABLE_ELIST_HPP_
+#ifndef ECORE_IMMUTABLE_ARRAY_ELIST_HPP_
+#define ECORE_IMMUTABLE_ARRAY_ELIST_HPP_
 
 #include "ecore/EList.hpp"
 
@@ -18,27 +18,27 @@ namespace ecore::impl
 {
 
     template <typename T>
-    class ImmutableEList : public EList<T>
+    class ImmutableArrayEList : public EList<T>
     {
     public:
-        ImmutableEList() = default;
+        ImmutableArrayEList() = default;
 
-        ImmutableEList( const std::vector<T>& v )
+        ImmutableArrayEList( const std::vector<T>& v )
             : v_( v )
         {
         }
 
-        ImmutableEList( const std::vector<T>&& v )
+        ImmutableArrayEList( const std::vector<T>&& v )
             : v_( v )
         {
         }
 
-        ImmutableEList( std::initializer_list<T> l )
+        ImmutableArrayEList( std::initializer_list<T> l )
             : v_( l )
         {
         }
 
-        virtual ~ImmutableEList()
+        virtual ~ImmutableArrayEList()
         {
         }
         

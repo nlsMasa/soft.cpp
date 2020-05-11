@@ -281,7 +281,7 @@ BOOST_FIXTURE_TEST_CASE( UnResolvedList_AddAll, Fixture )
         MOCK_EXPECT( object->eIsProxy ).returns( true );
         proxies.push_back( object );
     }
-    auto proxiesList = std::make_shared<ImmutableEList<std::shared_ptr<EObject>>>( proxies );
+    auto proxiesList = std::make_shared<ImmutableArrayEList<std::shared_ptr<EObject>>>( proxies );
     unresolved->addAll( *proxiesList );
 
     // check that there were really added

@@ -11,7 +11,7 @@
 #define ECORE_ELISTBASE_HPP_
 
 #include "ecore/EList.hpp"
-#include "ecore/impl/ImmutableEList.hpp"
+#include "ecore/impl/ImmutableArrayEList.hpp"
 
 #include <unordered_set>
 #include <vector>
@@ -208,7 +208,7 @@ namespace ecore::impl
                         v.push_back( e );
                 }
             }
-            return std::make_unique<ImmutableEList<ValueType>>( std::move( v ) );
+            return std::make_unique<ImmutableArrayEList<ValueType>>( std::move( v ) );
         }
     };
 
