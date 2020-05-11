@@ -129,7 +129,7 @@ namespace ecore::ext
         auto eNamedElement = std::dynamic_pointer_cast<ENamedElement>(eObject);
         if (eNamedElement) {
             auto name = eNamedElement->getName();
-            auto contents = eContents();
+            auto contents = eContents()->getUnResolvedList();
             int count = 0;
             for (auto otherEObject : contents)
             {
