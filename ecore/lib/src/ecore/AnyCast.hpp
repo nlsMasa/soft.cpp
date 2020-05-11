@@ -83,37 +83,37 @@ namespace ecore
     {
         auto id = &any.type();
         
-        // Any store a list of EObject
-        if( id == &typeid( std::shared_ptr<EList<std::shared_ptr<EObject>>> ) )
+        if constexpr( IsSharedEObject<T>::value )
         {
-            auto l = anyCast<std::shared_ptr<EList<std::shared_ptr<EObject>>>>( any );
-            if constexpr( is_shared_ptr<T>::value && std::is_same<EObject, typename T::element_type>::value )
-                return l;
-            else
-                return l->asEListOf<T>();
-        }
-
-        // Any store a list of EObject with the correct type
-        if( id == &typeid( std::shared_ptr<EList<T>> ) )
-            return anyCast<std::shared_ptr<EList<T>>>( any );
-
-        // Any store a list of Any
-        if( id == &typeid( std::shared_ptr<EList<Any>> ) )
-        {
-            auto l = anyCast<std::shared_ptr<EList<Any>>>( any );
-            if constexpr( std::is_same<Any, T>::value )
-                return l;
-            
-            if constexpr( IsSharedEObject<T>::value )
+            // Any store a list of EObject
+            if( id == &typeid( std::shared_ptr<EList<std::shared_ptr<EObject>>> ) )
             {
+                auto l = anyCast<std::shared_ptr<EList<std::shared_ptr<EObject>>>>( any );
+                if constexpr( std::is_same<EObject, typename T::element_type>::value )
+                    return l;
+                else
+                    return l->asEListOf<T>();
+            }
+
+            // Any store a list of EObject with the correct type
+            if( id == &typeid( std::shared_ptr<EList<T>> ) )
+                return anyCast<std::shared_ptr<EList<T>>>( any );
+
+            // Any store a list of Any
+            if( id == &typeid( std::shared_ptr<EList<Any>> ) )
+            {
+                auto l = anyCast<std::shared_ptr<EList<Any>>>( any );
                 auto o = l->asEListOf<std::shared_ptr<EObject>>();
                 if constexpr( std::is_same<EObject, typename T::element_type>::value )
                     return o;
                 else
                     return o->asEListOf<T>();
             }
-            
-            return l->asEListOf<T>();
+        }
+        else
+        {
+            if( id == &typeid( std::shared_ptr<EList<T>> ) )
+                return anyCast<std::shared_ptr<EList<T>>>( any );
         }
         return nullptr;
         
