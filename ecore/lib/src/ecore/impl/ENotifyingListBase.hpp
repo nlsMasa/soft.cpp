@@ -10,12 +10,13 @@
 #ifndef ECORE_ENOTIFYING_LIST_BASE_HPP_
 #define ECORE_ENOTIFYING_LIST_BASE_HPP_
 
+#include "ecore/AnyCast.hpp"
 #include "ecore/Constants.hpp"
 #include "ecore/ENotifier.hpp"
 #include "ecore/TypeTraits.hpp"
-#include "ecore/impl/EListBase.hpp"
-#include "ecore/impl/BasicEList.hpp"
 #include "ecore/impl/AbstractNotification.hpp"
+#include "ecore/impl/BasicEList.hpp"
+#include "ecore/impl/EListBase.hpp"
 #include "ecore/impl/NotificationChain.hpp"
 
 #include <algorithm>
@@ -175,7 +176,7 @@ namespace ecore::impl
             if( l )
             {
                 if( l->empty() )
-                    createAndDispatchNotification( nullptr, ENotification::REMOVE_MANY, toAny(*l), NO_VALUE, -1 );
+                    createAndDispatchNotification( nullptr, ENotification::REMOVE_MANY, toAny( l ), NO_VALUE, -1 );
                 else
                 {
                     auto notifications = createNotificationChain();
@@ -185,7 +186,7 @@ namespace ecore::impl
 
                     createAndDispatchNotification( notifications, [&]() {
                         return l->size() == 1 ? createNotification( ENotification::REMOVE, toAny( l->get( 0 ) ), NO_VALUE, 0 )
-                                              : createNotification( ENotification::ADD_MANY, toAny( *l ), NO_VALUE, -1 );
+                                              : createNotification( ENotification::ADD_MANY, toAny( l ), NO_VALUE, -1 );
                     } );
                 }
             }
@@ -295,22 +296,6 @@ namespace ecore::impl
         {
             auto notifier = getNotifier();
             return notifier && notifier->eDeliver() && !notifier->eAdapters().empty();
-        }
-
-    private:
-        static Any toAny( const ValueType& v )
-        {
-            if constexpr( IsSharedEObject<ValueType>::value )
-                return Any( std::static_pointer_cast<EObject>( v ) );
-            else
-                return Any( v );
-        }
-
-        static Any toAny( const Collection<ValueType>& l )
-        {
-            auto result = std::make_shared<BasicEList<Any>>();
-            std::transform( l.begin(), l.end(), result->end(), []( const ValueType& i ) { return toAny( i ); } );
-            return std::static_pointer_cast<EList<Any>>(result);
         }
     };
 } // namespace ecore::impl
