@@ -19,7 +19,6 @@ set(SOURCE_FILES
     src/EFactoryTests.cpp
     src/EListTests.cpp
     src/EObjectTests.cpp
-    src/EPackageTests.cpp
     src/FileURIHandlerTests.cpp
     src/LazyTests.cpp
     src/Memory.cpp
