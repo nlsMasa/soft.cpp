@@ -11,6 +11,7 @@
 #define ECORE_IMMUTABLE_ARRAY_ELIST_HPP_
 
 #include "ecore/EList.hpp"
+#include "ecore/impl/ImmutableEListBase.hpp"
 
 #include <vector>
 
@@ -18,7 +19,7 @@ namespace ecore::impl
 {
 
     template <typename T>
-    class ImmutableArrayEList : public EList<T>
+    class ImmutableArrayEList : public ImmutableEListBase<EList<T>>
     {
     public:
         ImmutableArrayEList() = default;
@@ -38,60 +39,8 @@ namespace ecore::impl
         {
         }
 
-        virtual ~ImmutableArrayEList()
-        {
-        }
+        virtual ~ImmutableArrayEList() = default;
         
-        virtual bool add( const T& e )
-        {
-            throw "UnsupportedOperationException";
-        }
-
-        virtual bool addAll( const Collection<T>& l )
-        {
-            throw "UnsupportedOperationException";
-        }
-
-        virtual bool add( std::size_t pos, const T& e )
-        {
-            throw "UnsupportedOperationException";
-        }
-
-        virtual bool addAll( std::size_t pos, const Collection<T>& l )
-        {
-            throw "UnsupportedOperationException";
-        }
-
-        virtual void move( std::size_t oldPos, const T& e )
-        {
-            throw "UnsupportedOperationException";
-        }
-
-        virtual T move( std::size_t oldPos, std::size_t newPos )
-        {
-            throw "UnsupportedOperationException";
-        }
-
-        virtual T set( std::size_t pos, const T& e )
-        {
-            throw "UnsupportedOperationException";
-        }
-
-        virtual T remove( std::size_t pos )
-        {
-            throw "UnsupportedOperationException";
-        }
-
-        virtual bool remove( const T& e )
-        {
-            throw "UnsupportedOperationException";
-        }
-
-        virtual void clear()
-        {
-            throw "UnsupportedOperationException";
-        }
-
         virtual T get( std::size_t pos ) const
         {
             return v_.at( pos );
@@ -117,17 +66,6 @@ namespace ecore::impl
             std::size_t index = std::distance( v_.begin(), std::find( v_.begin(), v_.end(), e ) );
             return index == size() ? -1 : index;
         }
-
-        virtual std::shared_ptr<EList<ValueType>> getUnResolvedList()
-        {
-            return std::static_pointer_cast<EList<ValueType>>( shared_from_this() );
-        }
-
-        virtual std::shared_ptr<const EList<ValueType>> getUnResolvedList() const
-        {
-            return std::static_pointer_cast<const EList<ValueType>>( shared_from_this() );
-        }
-
 
     private:
         std::vector<T> v_;

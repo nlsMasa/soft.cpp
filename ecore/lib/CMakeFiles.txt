@@ -65,6 +65,7 @@ set(HEADER_ECORE_IMPL_FILES
     src/ecore/impl/EObjectListBase.hpp
     src/ecore/impl/FileURIHandler.hpp
     src/ecore/impl/ImmutableArrayEList.hpp
+    src/ecore/impl/ImmutableEListBase.hpp
     src/ecore/impl/ImmutableHashEList.hpp
     src/ecore/impl/Lazy.hpp
     src/ecore/impl/Notification.hpp
