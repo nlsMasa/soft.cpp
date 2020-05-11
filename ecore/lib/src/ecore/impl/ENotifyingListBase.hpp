@@ -3,18 +3,20 @@
 // This file is part of a MASA library or program.
 // Refer to the included end-user license agreement for restrictions.
 //
-// Copyright (c) 2018 MASA Group
+// Copyright (c) 2020 MASA Group
 //
 // *****************************************************************************
 
-#ifndef ECORE_ABSTRACT_ENOTIFYING_LIST_HPP_
-#define ECORE_ABSTRACT_ENOTIFYING_LIST_HPP_
+#ifndef ECORE_ENOTIFYING_LIST_BASE_HPP_
+#define ECORE_ENOTIFYING_LIST_BASE_HPP_
 
+#include "ecore/AnyCast.hpp"
 #include "ecore/Constants.hpp"
 #include "ecore/ENotifier.hpp"
 #include "ecore/TypeTraits.hpp"
-#include "ecore/impl/AbstractEList.hpp"
 #include "ecore/impl/AbstractNotification.hpp"
+#include "ecore/impl/BasicEList.hpp"
+#include "ecore/impl/EListBase.hpp"
 #include "ecore/impl/NotificationChain.hpp"
 
 #include <algorithm>
@@ -22,20 +24,23 @@
 
 namespace ecore::impl
 {
-    template <typename I>
-    class AbstractENotifyingList : public AbstractEList<I, true>
+    // ENotifyingListBase defines all ENotifyingList interface methods
+    // ENotifyingListBase handle uniqueness, index range check,
+    // and notify notification if a modification occured.
+    template <typename I, bool unique>
+    class ENotifyingListBase : public EListBase<I, unique>
     {
     public:
-        typedef typename AbstractEList<I, true> Super;
+        typedef typename EListBase<I, unique> Super;
         typedef typename I InterfaceType;
         typedef typename I::ValueType ValueType;
 
-        AbstractENotifyingList()
+        ENotifyingListBase()
             : Super()
         {
         }
 
-        virtual ~AbstractENotifyingList()
+        virtual ~ENotifyingListBase()
         {
         }
 
@@ -89,7 +94,9 @@ namespace ecore::impl
             return notifications;
         }
 
-        virtual bool addAll( std::size_t index, const EList<ValueType>& l )
+        using EListBase<I, unique>::addAll;
+
+        virtual bool addAll( std::size_t index, const Collection<ValueType>& l )
         {
             bool result = Super::addAll( index, l );
             auto notifications = createNotificationChain();
@@ -104,6 +111,8 @@ namespace ecore::impl
             } );
             return result;
         }
+
+        using EListBase<I, unique>::remove;
 
         virtual ValueType remove( std::size_t index )
         {
@@ -152,6 +161,8 @@ namespace ecore::impl
             return notifications;
         }
 
+        using EListBase<I, unique>::move;
+
         virtual ValueType move( std::size_t newPos, std::size_t oldPos )
         {
             auto element = Super::move( newPos, oldPos );
@@ -165,7 +176,7 @@ namespace ecore::impl
             if( l )
             {
                 if( l->empty() )
-                    createAndDispatchNotification( nullptr, ENotification::REMOVE_MANY, l->asEListOf<Any>(), NO_VALUE, -1 );
+                    createAndDispatchNotification( nullptr, ENotification::REMOVE_MANY, toAny( l ), NO_VALUE, -1 );
                 else
                 {
                     auto notifications = createNotificationChain();
@@ -175,7 +186,7 @@ namespace ecore::impl
 
                     createAndDispatchNotification( notifications, [&]() {
                         return l->size() == 1 ? createNotification( ENotification::REMOVE, toAny( l->get( 0 ) ), NO_VALUE, 0 )
-                                              : createNotification( ENotification::ADD_MANY, toAny( *l ), NO_VALUE, -1 );
+                                              : createNotification( ENotification::ADD_MANY, toAny( l ), NO_VALUE, -1 );
                     } );
                 }
             }
@@ -196,7 +207,7 @@ namespace ecore::impl
             class Notification : public AbstractNotification
             {
             public:
-                Notification( const AbstractENotifyingList& list,
+                Notification( const ENotifyingListBase& list,
                               ENotification::EventType eventType,
                               const Any& oldValue,
                               const Any& newValue,
@@ -222,7 +233,7 @@ namespace ecore::impl
                 }
 
             private:
-                const AbstractENotifyingList& list_;
+                const ENotifyingListBase& list_;
             };
 
             return std::make_shared<Notification>( *this, eventType, oldValue, newValue, position );
@@ -285,23 +296,6 @@ namespace ecore::impl
         {
             auto notifier = getNotifier();
             return notifier && notifier->eDeliver() && !notifier->eAdapters().empty();
-        }
-
-    private:
-        static Any toAny( const ValueType& v )
-        {
-            if constexpr( is_shared_ptr<ValueType>::value && !std::is_same<ecore::EObject, typename ValueType::element_type>::value
-                          && std::is_base_of<ecore::EObject, typename ValueType::element_type>::value )
-                return Any( std::static_pointer_cast<EObject>( v ) );
-            else
-                return Any( v );
-        }
-
-        static Any toAny( const EList<ValueType>& l )
-        {
-            std::vector<Any> v;
-            std::transform( l.begin(), l.end(), v.end(), []( const ValueType& i ) { return toAny( i ); } );
-            return v;
         }
     };
 } // namespace ecore::impl

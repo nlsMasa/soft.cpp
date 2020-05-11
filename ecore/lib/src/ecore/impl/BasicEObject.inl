@@ -25,6 +25,7 @@
 #include "ecore/EcorePackage.hpp"
 #include "ecore/EcoreUtils.hpp"
 #include "ecore/impl/AbstractAdapter.hpp"
+#include "ecore/impl/ImmutableArrayEList.hpp"
 #include "ecore/impl/Notification.hpp"
 
 #include <sstream>
@@ -64,31 +65,125 @@ namespace ecore::impl
 
         std::shared_ptr<const EList<std::shared_ptr<EObject>>> getList()
         {
-            if( !l_ )
+            // AbstractEContentsEList implements a lazy list that computes
+            // list of contents only when needed
+            // this list can be resolved/unresolved
+            class AbstractEContentsEList : public ImmutableArrayEList<std::shared_ptr<EObject>>
             {
-                std::vector<std::shared_ptr<EObject>> v;
-                auto refs = std::invoke( refsGetter_, *obj_.eClass() );
-                for( auto ref : *refs )
+            public:
+                typedef ImmutableArrayEList<std::shared_ptr<EObject>> Super;
+
+                AbstractEContentsEList( const EContentsEList& l, bool resolve )
+                    : l_( l )
+                    , resolve_( resolve )
+                    , initialized_( false )
                 {
-                    if( obj_.eIsSet( ref ) )
+                }
+
+                virtual ~AbstractEContentsEList() = default;
+
+                virtual std::shared_ptr<EObject> get( std::size_t pos ) const
+                {
+                    const_cast<AbstractEContentsEList*>( this )->initialize();
+                    return Super::get( pos );
+                }
+
+                virtual std::size_t size() const
+                {
+                    const_cast<AbstractEContentsEList*>( this )->initialize();
+                    return Super::size();
+                }
+
+                virtual bool empty() const
+                {
+                    const_cast<AbstractEContentsEList*>( this )->initialize();
+                    return Super::empty();
+                }
+
+                virtual bool contains( const std::shared_ptr<EObject>& e ) const
+                {
+                    const_cast<AbstractEContentsEList*>( this )->initialize();
+                    return Super::contains( e );
+                }
+
+                virtual std::size_t indexOf( const std::shared_ptr<EObject>& e ) const
+                {
+                    const_cast<AbstractEContentsEList*>( this )->initialize();
+                    return Super::indexOf( e );
+                }
+
+            private:
+                void initialize()
+                {
+                    if( initialized_ )
+                        return;
+
+                    initialized_ = true;
+                    const auto& o = l_.obj_;
+                    auto refs = std::invoke( l_.refsGetter_, *o.eClass() );
+                    for( auto ref : *refs )
                     {
-                        auto value = obj_.eGet( ref );
-                        if( ref->isMany() )
+                        if( o.eIsSet( ref ) )
                         {
-                            auto l = anyListCast<std::shared_ptr<EObject>>( value );
-                            v.reserve( v.size() + l->size() );
-                            std::copy( l->begin(), l->end(), std::back_inserter( v ) );
-                        }
-                        else if( !value.empty() )
-                        {
-                            auto object = anyObjectCast<std::shared_ptr<EObject>>( value );
-                            if( object )
-                                v.push_back( object );
+                            auto value = o.eGet( ref, resolve_ );
+                            if( ref->isMany() )
+                            {
+                                auto l = anyListCast<std::shared_ptr<EObject>>( value );
+                                v_.reserve( v_.size() + l->size() );
+                                std::copy( l->begin(), l->end(), std::back_inserter( v_ ) );
+                            }
+                            else if( !value.empty() )
+                            {
+                                auto object = anyObjectCast<std::shared_ptr<EObject>>( value );
+                                if( object )
+                                    v_.push_back( object );
+                            }
                         }
                     }
                 }
-                l_ = std::make_shared<ImmutableEList<std::shared_ptr<EObject>>>( std::move( v ) );
-            }
+
+            protected:
+                const EContentsEList& l_;
+
+            private:
+                bool resolve_;
+                bool initialized_;
+            };
+
+            // UnResolvedEContentsEList implements a lazy list that computes
+            // list of unresolved contents only when needed
+            class UnResolvedEContentsEList : public AbstractEContentsEList
+            {
+            public:
+                UnResolvedEContentsEList( const EContentsEList& l )
+                    : AbstractEContentsEList( l, false )
+                {
+                }
+
+                virtual ~UnResolvedEContentsEList() = default;
+            };
+
+            // ResolvedEContentsEList implements a lazy list that computes
+            // list of resolved contents only when needed
+            class ResolvedEContentsEList : public AbstractEContentsEList
+            {
+            public:
+                ResolvedEContentsEList( const EContentsEList& l )
+                    : AbstractEContentsEList( l, true )
+                {
+                }
+
+                virtual ~ResolvedEContentsEList() = default;
+
+                virtual std::shared_ptr<const EList<std::shared_ptr<EObject>>> getUnResolvedList() const
+                {
+                    return std::make_shared<UnResolvedEContentsEList>( l_ );
+                }
+            };
+
+            // the real list
+            if( !l_ )
+                l_ = std::make_shared<ResolvedEContentsEList>( *this );
             return l_;
         }
 
@@ -199,7 +294,7 @@ namespace ecore::impl
 
     template <typename... I>
     std::string BasicEObject<I...>::eURIFragmentSegment( const std::shared_ptr<EStructuralFeature>& eFeature,
-                                                            const std::shared_ptr<EObject>& eObject ) const
+                                                         const std::shared_ptr<EObject>& eObject ) const
     {
         std::stringstream s;
         s << "@";
@@ -251,8 +346,8 @@ namespace ecore::impl
 
     template <typename... I>
     std::shared_ptr<EReference> BasicEObject<I...>::eContainmentFeature( const std::shared_ptr<EObject>& eObject,
-                                                                            const std::shared_ptr<EObject>& eContainer,
-                                                                            int eContainerFeatureID )
+                                                                         const std::shared_ptr<EObject>& eContainer,
+                                                                         int eContainerFeatureID )
     {
         if( eContainer )
         {
@@ -306,7 +401,7 @@ namespace ecore::impl
 
     template <typename... I>
     std::shared_ptr<ENotificationChain> BasicEObject<I...>::eSetInternalResource( const std::shared_ptr<EResource>& newResource,
-                                                                                     const std::shared_ptr<ENotificationChain>& n )
+                                                                                  const std::shared_ptr<ENotificationChain>& n )
     {
         auto notifications = n;
         auto oldResource = eResource_.lock();
@@ -354,7 +449,10 @@ namespace ecore::impl
     template <typename... I>
     Any BasicEObject<I...>::eGet( const std::shared_ptr<EStructuralFeature>& feature, bool resolve ) const
     {
-        return eGet( feature, resolve, true );
+        int featureID = eStructuralFeatureID( feature );
+        if( featureID >= 0 )
+            return eGet( featureID, resolve );
+        throw "The feature '" + feature->getName() + "' is not a valid feature";
     }
 
     template <typename... I>
@@ -388,16 +486,7 @@ namespace ecore::impl
     }
 
     template <typename... I>
-    Any BasicEObject<I...>::eGet( const std::shared_ptr<EStructuralFeature>& eFeature, bool resolve, bool coreType ) const
-    {
-        int featureID = eStructuralFeatureID( eFeature );
-        if( featureID >= 0 )
-            return eGet( featureID, resolve, coreType );
-        throw "The feature '" + eFeature->getName() + "' is not a valid feature";
-    }
-
-    template <typename... I>
-    Any BasicEObject<I...>::eGet( int featureID, bool resolve, bool coreType ) const
+    Any BasicEObject<I...>::eGet( int featureID, bool resolve ) const
     {
         std::shared_ptr<EStructuralFeature> eFeature = eClass()->getEStructuralFeature( featureID );
         VERIFYN( eFeature, "Invalid featureID: %i ", featureID );
@@ -474,6 +563,14 @@ namespace ecore::impl
 
     template <typename... I>
     std::shared_ptr<ENotificationChain> BasicEObject<I...>::eBasicInverseAdd( const std::shared_ptr<EObject>& otherEnd,
+                                                                              int featureID,
+                                                                              const std::shared_ptr<ENotificationChain>& notifications )
+    {
+        return notifications;
+    }
+
+    template <typename... I>
+    std::shared_ptr<ENotificationChain> BasicEObject<I...>::eBasicInverseRemove( const std::shared_ptr<EObject>& otherEnd,
                                                                                  int featureID,
                                                                                  const std::shared_ptr<ENotificationChain>& notifications )
     {
@@ -481,16 +578,9 @@ namespace ecore::impl
     }
 
     template <typename... I>
-    std::shared_ptr<ENotificationChain> BasicEObject<I...>::eBasicInverseRemove(
-        const std::shared_ptr<EObject>& otherEnd, int featureID, const std::shared_ptr<ENotificationChain>& notifications )
-    {
-        return notifications;
-    }
-
-    template <typename... I>
     std::shared_ptr<ENotificationChain> BasicEObject<I...>::eInverseAdd( const std::shared_ptr<EObject>& otherEnd,
-                                                                            int featureID,
-                                                                            const std::shared_ptr<ENotificationChain>& n )
+                                                                         int featureID,
+                                                                         const std::shared_ptr<ENotificationChain>& n )
     {
         auto notifications = n;
         if( featureID >= 0 )
@@ -504,8 +594,8 @@ namespace ecore::impl
 
     template <typename... I>
     std::shared_ptr<ENotificationChain> BasicEObject<I...>::eInverseRemove( const std::shared_ptr<EObject>& otherEnd,
-                                                                               int featureID,
-                                                                               const std::shared_ptr<ENotificationChain>& notifications )
+                                                                            int featureID,
+                                                                            const std::shared_ptr<ENotificationChain>& notifications )
     {
         if( featureID >= 0 )
             return eBasicInverseRemove( otherEnd, featureID, notifications );
@@ -580,8 +670,8 @@ namespace ecore::impl
 
     template <typename... I>
     std::shared_ptr<ENotificationChain> BasicEObject<I...>::eBasicSetContainer( const std::shared_ptr<EObject>& newContainer,
-                                                                                   int newContainerFeatureID,
-                                                                                   const std::shared_ptr<ENotificationChain>& n )
+                                                                                int newContainerFeatureID,
+                                                                                const std::shared_ptr<ENotificationChain>& n )
     {
         auto notifications = n;
         auto oldContainer = eContainer_.lock();

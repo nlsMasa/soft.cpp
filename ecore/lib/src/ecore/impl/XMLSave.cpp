@@ -233,7 +233,7 @@ bool XMLSave::saveFeatures( const std::shared_ptr<EObject>& eObject, bool attrib
 
 void XMLSave::saveDataTypeSingle( const std::shared_ptr<EObject>& eObject, const std::shared_ptr<EStructuralFeature>& eFeature )
 {
-    auto val = eObject->eGet( eFeature );
+    auto val = eObject->eGet( eFeature, false );
     auto d = getDataType( val, eFeature, true );
     if( !d.empty() )
         str_.addAttribute( getQName( eFeature ), d );
@@ -241,7 +241,7 @@ void XMLSave::saveDataTypeSingle( const std::shared_ptr<EObject>& eObject, const
 
 void XMLSave::saveDataTypeMany( const std::shared_ptr<EObject>& eObject, const std::shared_ptr<EStructuralFeature>& eFeature )
 {
-    auto val = eObject->eGet( eFeature );
+    auto val = eObject->eGet( eFeature, false );
     auto l = anyCast<std::shared_ptr<EList<Any>>>( val );
     auto d = std::dynamic_pointer_cast<EDataType>( eFeature->getEType() );
     auto p = d->getEPackage();
@@ -272,7 +272,7 @@ void XMLSave::saveManyEmpty( const std::shared_ptr<EObject>& eObject, const std:
 
 void XMLSave::saveEObjectSingle( const std::shared_ptr<EObject>& eObject, const std::shared_ptr<EStructuralFeature>& eFeature )
 {
-    auto val = eObject->eGet( eFeature );
+    auto val = eObject->eGet( eFeature , false );
     auto obj = anyObjectCast<std::shared_ptr<EObject>>( val );
     if( obj )
     {
@@ -283,11 +283,11 @@ void XMLSave::saveEObjectSingle( const std::shared_ptr<EObject>& eObject, const 
 
 void XMLSave::saveEObjectMany( const std::shared_ptr<EObject>& eObject, const std::shared_ptr<EStructuralFeature>& eFeature )
 {
-    auto val = eObject->eGet( eFeature );
+    auto val = eObject->eGet( eFeature , false );
     auto l = anyListCast<std::shared_ptr<EObject>>( val );
     auto failure = false;
     std::string s = "";
-    for( auto it = std::begin( *l ); it != std::end( *l ); ++it )
+    for( auto it = l->begin(); it != l->end() ; ++it )
     {
         auto obj = *it;
         auto id = getHRef( obj );
@@ -298,7 +298,7 @@ void XMLSave::saveEObjectMany( const std::shared_ptr<EObject>& eObject, const st
         }
         else
         {
-            if( it != std::begin( *l ) )
+            if( it != l->begin() )
                 s += " ";
             s += id;
         }
@@ -314,7 +314,7 @@ void XMLSave::saveNil( const std::shared_ptr<EObject>& eObject, const std::share
 
 void XMLSave::saveContainedSingle( const std::shared_ptr<EObject>& eObject, const std::shared_ptr<EStructuralFeature>& eFeature )
 {
-    auto val = eObject->eGet( eFeature );
+    auto val = eObject->eGet( eFeature , false );
     auto obj = anyObjectCast<std::shared_ptr<EObject>>( val );
     if (obj)
         saveEObject(obj, eFeature);
@@ -322,9 +322,9 @@ void XMLSave::saveContainedSingle( const std::shared_ptr<EObject>& eObject, cons
 
 void XMLSave::saveContainedMany( const std::shared_ptr<EObject>& eObject, const std::shared_ptr<EStructuralFeature>& eFeature )
 {
-    auto val = eObject->eGet( eFeature );
+    auto val = eObject->eGet( eFeature, false );
     auto l = anyListCast<std::shared_ptr<EObject>>( val );
-    for (auto obj : *l)
+    for (auto obj : l)
         saveEObject(obj, eFeature);
 }
 
@@ -354,7 +354,7 @@ void XMLSave::saveTypeAttribute( const std::shared_ptr<EClass>& eClass )
 
 void XMLSave::saveHRefSingle( const std::shared_ptr<EObject>& eObject, const std::shared_ptr<EStructuralFeature>& eFeature )
 {
-    auto value = eObject->eGet( eFeature );
+    auto value = eObject->eGet( eFeature , false );
     auto o = anyObjectCast<std::shared_ptr<EObject>>( value );
     if( o )
         saveHRef( o, eFeature );
@@ -362,7 +362,7 @@ void XMLSave::saveHRefSingle( const std::shared_ptr<EObject>& eObject, const std
 
 void XMLSave::saveHRefMany( const std::shared_ptr<EObject>& eObject, const std::shared_ptr<EStructuralFeature>& eFeature )
 {
-    auto val = eObject->eGet( eFeature );
+    auto val = eObject->eGet( eFeature, false );
     auto l = anyListCast<std::shared_ptr<EObject>>( val );
     for( auto obj : *l )
         saveHRef( obj, eFeature );
@@ -384,7 +384,7 @@ void XMLSave::saveHRef( const std::shared_ptr<EObject>& eObject, const std::shar
 
 void XMLSave::saveIDRefSingle( const std::shared_ptr<EObject>& eObject, const std::shared_ptr<EStructuralFeature>& eFeature )
 {
-    auto value = eObject->eGet( eFeature );
+    auto value = eObject->eGet( eFeature, false );
     auto obj = anyObjectCast<std::shared_ptr<EObject>>( value );
     if( obj )
     {
@@ -396,7 +396,7 @@ void XMLSave::saveIDRefSingle( const std::shared_ptr<EObject>& eObject, const st
 
 void XMLSave::saveIDRefMany( const std::shared_ptr<EObject>& eObject, const std::shared_ptr<EStructuralFeature>& eFeature )
 {
-    auto val = eObject->eGet( eFeature );
+    auto val = eObject->eGet( eFeature, false );
     auto l = anyListCast<std::shared_ptr<EObject>>( val );
     auto failure = false;
     std::string s = "";
@@ -422,12 +422,12 @@ void XMLSave::saveIDRefMany( const std::shared_ptr<EObject>& eObject, const std:
 
 bool XMLSave::isNil( const std::shared_ptr<EObject>& eObject, const std::shared_ptr<EStructuralFeature>& eFeature )
 {
-    return eObject->eGet( eFeature ).empty();
+    return eObject->eGet( eFeature, false ).empty();
 }
 
 bool XMLSave::isEmpty( const std::shared_ptr<EObject>& eObject, const std::shared_ptr<EStructuralFeature>& eFeature )
 {
-    auto value = eObject->eGet( eFeature );
+    auto value = eObject->eGet( eFeature, false );
     auto l = anyCast<std::shared_ptr<EList<Any>>>( value );
     return l->empty();
 }
@@ -476,7 +476,7 @@ XMLSave::FeatureKind XMLSave::getFeatureKind( const std::shared_ptr<EStructuralF
 XMLSave::ResourceKind XMLSave::getResourceKindSingle( const std::shared_ptr<EObject>& eObject,
                                                 const std::shared_ptr<EStructuralFeature>& eFeature )
 {
-    auto val = eObject->eGet( eFeature );
+    auto val = eObject->eGet( eFeature, false );
     auto internal = anyObjectCast<std::shared_ptr<EObject>>( val );
     if( !internal )
         return SKIP;
@@ -495,7 +495,7 @@ XMLSave::ResourceKind XMLSave::getResourceKindSingle( const std::shared_ptr<EObj
 XMLSave::ResourceKind XMLSave::getResourceKindMany( const std::shared_ptr<EObject>& eObject,
                                                       const std::shared_ptr<EStructuralFeature>& eFeature )
 {
-    auto val = eObject->eGet( eFeature );
+    auto val = eObject->eGet( eFeature , false );
     auto list = anyListCast<std::shared_ptr<EObject>>( val );
     if( !list || list->empty() )
         return SKIP;

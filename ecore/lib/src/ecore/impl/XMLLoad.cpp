@@ -304,15 +304,24 @@ void XMLLoad::setFeatureValue( const std::shared_ptr<EObject>& eObject,
         auto eClassifier = eFeature->getEType();
         auto eDataType = std::dynamic_pointer_cast<EDataType>( eClassifier );
         auto eFactory = eDataType->getEPackage()->getEFactoryInstance();
-        auto eList = anyListCast<std::shared_ptr<EObject>>( eObject->eGet( eFeature ) );
+        auto eList = anyListCast<std::shared_ptr<EObject>>( eObject->eGet( eFeature, false ) );
         if( position == -2 )
         {
+            auto s = anyCast<std::string>( value );
+            auto v = split( s, " " );
+            for( const auto& t : v )
+            {
+                auto any = eFactory->createFromString( eDataType, t );
+                auto eValue = anyObjectCast<std::shared_ptr<EObject>>( any );
+                eList->add( eValue );
+            }
         }
         else if( value.empty() )
             eList->add( std::shared_ptr<EObject>() );
         else
         {
-            auto any = eFactory->createFromString( eDataType, anyCast<std::string>( value ) );
+            auto s = anyCast<std::string>( value );
+            auto any = eFactory->createFromString( eDataType, s );
             auto eValue = anyObjectCast<std::shared_ptr<EObject>>( any );
             eList->add( eValue );
         }
@@ -320,7 +329,7 @@ void XMLLoad::setFeatureValue( const std::shared_ptr<EObject>& eObject,
     case ManyAdd:
     case ManyMove:
     {
-        auto eList = anyListCast<std::shared_ptr<EObject>>( eObject->eGet( eFeature ) );
+        auto eList = anyListCast<std::shared_ptr<EObject>>( eObject->eGet( eFeature , false ) );
         auto eValue = anyObjectCast<std::shared_ptr<EObject>>( value );
         if( position == -1 )
             eList->add( eValue );
@@ -412,9 +421,9 @@ void XMLLoad::setValueFromId( const std::shared_ptr<EObject>& eObject,
                 if( eProxy )
                 {
                     handleProxy( eProxy, id );
-                    setFeatureValue( eObject, eReference , eProxy );
+                    setFeatureValue( eObject, eReference, eProxy );
                 }
-                    
+
                 objects_.pop();
                 qName.clear();
                 ++position;
@@ -520,7 +529,7 @@ void XMLLoad::handleReferences()
 {
     for( auto eProxy : sameDocumentProxies_ )
     {
-        for( auto eReference : *eProxy->eClass()->getEAllReferences() )
+        for( auto eReference : eProxy->eClass()->getEAllReferences() )
         {
             auto eOpposite = eReference->getEOpposite();
             if( eOpposite && eOpposite->isChangeable() && eProxy->eIsSet( eReference ) )
@@ -543,7 +552,7 @@ void XMLLoad::handleReferences()
 
                     if( eOpposite->isMany() )
                     {
-                        auto value = proxyHolder->eGet( eOpposite );
+                        auto value = proxyHolder->eGet( eOpposite , false );
                         auto holderContents = anyListCast<std::shared_ptr<EObject>>( value );
                         auto resolvedIndex = holderContents->indexOf( resolvedObject );
                         if( resolvedIndex != -1 )
@@ -573,7 +582,7 @@ void XMLLoad::handleReferences()
                     {
                         if( eOpposite->isMany() )
                         {
-                            auto value = proxyHolder->eGet( eOpposite );
+                            auto value = proxyHolder->eGet( eOpposite , false );
                             auto list = anyListCast<std::shared_ptr<EObject>>( value );
                             auto ndx = list->indexOf( eProxy );
                             list->set( ndx, resolvedObject );
@@ -608,7 +617,7 @@ const Attributes* XMLLoad::setAttributes( const xercesc::Attributes* attrs )
 
 void XMLLoad::handleProxy( const std::shared_ptr<EObject>& eProxy, const std::string& id )
 {
-    auto uri = URI(id);
+    auto uri = URI( id );
     eProxy->getInternal().eSetProxyURI( uri );
     if( uri.trimFragment() == resource_.getURI() )
         sameDocumentProxies_.push_back( eProxy );

@@ -13,8 +13,7 @@ set(HEADER_ECORE_FILES
     src/ecore/Any.hpp
     src/ecore/AnyCast.hpp
     src/ecore/Assert.hpp 
-    src/ecore/EList.hpp
-    src/ecore/EList.inl
+    src/ecore/Collection.hpp
     src/ecore/Constants.hpp
     src/ecore/EAdapter.hpp
     src/ecore/EContentAdapter.hpp
@@ -22,10 +21,12 @@ set(HEADER_ECORE_FILES
     src/ecore/ECollectionView.hpp
     src/ecore/EDiagnostic.hpp
     src/ecore/EFeatureMap.hpp
+    src/ecore/EList.hpp
     src/ecore/ENotification.hpp
     src/ecore/ENotificationChain.hpp
     src/ecore/ENotifier.hpp
     src/ecore/ENotifyingList.hpp
+    src/ecore/EObjectList.hpp
     src/ecore/EPackageRegistry.hpp
     src/ecore/EPackageResourceRegistry.hpp
     src/ecore/EResource.hpp
@@ -34,6 +35,7 @@ set(HEADER_ECORE_FILES
     src/ecore/EResourceSet.hpp
     src/ecore/ETreeIterator.hpp
     src/ecore/EUnsettableList.hpp
+    src/ecore/List.hpp
     src/ecore/SmartPtr.hpp
     src/ecore/Stream.hpp
     src/ecore/TypeTraits.hpp
@@ -45,23 +47,25 @@ set(HEADER_ECORE_FILES
 
 set(HEADER_ECORE_IMPL_FILES 
     src/ecore/impl/AbstractAdapter.hpp
-    src/ecore/impl/AbstractEList.hpp
-    src/ecore/impl/AbstractENotifyingList.hpp
     src/ecore/impl/AbstractNotification.hpp
     src/ecore/impl/AbstractResource.hpp
-    src/ecore/impl/ArrayEList.hpp
+    src/ecore/impl/ArrayEListBase.hpp
     src/ecore/impl/BasicEList.hpp
     src/ecore/impl/BasicENotifyingList.hpp
     src/ecore/impl/BasicEObject.hpp
     src/ecore/impl/BasicEObject.inl
+    src/ecore/impl/BasicEObjectList.hpp
     src/ecore/impl/BasicNotifier.hpp
     src/ecore/impl/Diagnostic.hpp
     src/ecore/impl/DynamicEObjectImpl.hpp
     src/ecore/impl/DynamicEObjectImpl.inl
-    src/ecore/impl/EObjectEList.hpp
+    src/ecore/impl/EListBase.hpp
+    src/ecore/impl/ENotifyingListBase.hpp
     src/ecore/impl/EObjectInternal.hpp
+    src/ecore/impl/EObjectListBase.hpp
     src/ecore/impl/FileURIHandler.hpp
-    src/ecore/impl/ImmutableEList.hpp
+    src/ecore/impl/ImmutableArrayEList.hpp
+    src/ecore/impl/ImmutableEListBase.hpp
     src/ecore/impl/ImmutableHashEList.hpp
     src/ecore/impl/Lazy.hpp
     src/ecore/impl/Notification.hpp

@@ -4,6 +4,7 @@ set(SOURCE_FILES
     src/main.cpp
     src/AnyTests.cpp
     src/BasicEListTests.cpp
+    src/BasicEObjectListTests.cpp
     src/BasicNotifierTests.cpp
     src/DiamondVsMixinsTests.cpp
     src/DynamicEObjectTests.cpp
@@ -16,9 +17,8 @@ set(SOURCE_FILES
     src/ECollectionViewTests.cpp
     src/EDynamicModelTests.cpp
     src/EFactoryTests.cpp
-    src/EObjectEListTests.cpp
+    src/EListTests.cpp
     src/EObjectTests.cpp
-    src/EPackageTests.cpp
     src/FileURIHandlerTests.cpp
     src/LazyTests.cpp
     src/Memory.cpp

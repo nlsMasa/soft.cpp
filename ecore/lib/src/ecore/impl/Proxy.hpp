@@ -3,7 +3,7 @@
 // This file is part of a MASA library or program.
 // Refer to the included end-user license agreement for restrictions.
 //
-// Copyright (c) 2018 MASA Group
+// Copyright (c) 2020 MASA Group
 //
 // *****************************************************************************
 
@@ -116,12 +116,17 @@ namespace ecore::impl
 
         bool operator==( const T& value ) const
         {
-            return value_ == value;
+            return get() == value;
         }
 
         bool operator!=( const T& value ) const
         {
             return !operator==( value );
+        }
+
+        explicit operator T() const
+        {
+            return get();
         }
 
     private:

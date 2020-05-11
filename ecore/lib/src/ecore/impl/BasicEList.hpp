@@ -3,23 +3,23 @@
 // This file is part of a MASA library or program.
 // Refer to the included end-user license agreement for restrictions.
 //
-// Copyright (c) 2018 MASA Group
+// Copyright (c) 2020 MASA Group
 //
 // *****************************************************************************
 
 #ifndef ECORE_BASIC_ELIST_HPP_
 #define ECORE_BASIC_ELIST_HPP_
 
-#include "ecore/impl/AbstractEList.hpp"
-#include "ecore/impl/ArrayEList.hpp"
+#include "ecore/impl/EListBase.hpp"
+#include "ecore/impl/ArrayEListBase.hpp"
 
 namespace ecore::impl
 {
 
     template <typename T, bool unique = false>
-    class BasicEList : public ArrayEList<AbstractEList<EList<T>, unique>>
+    class BasicEList : public ArrayEListBase<EListBase<EList<T>, unique>>
     {
-        typedef typename ArrayEList<AbstractEList<EList<T>, unique>> Super;
+        typedef typename ArrayEListBase<EListBase<EList<T>, unique>> Super;
     public:
         BasicEList()
             : Super()

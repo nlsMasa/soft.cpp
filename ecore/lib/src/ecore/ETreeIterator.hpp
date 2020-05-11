@@ -3,7 +3,7 @@
 // This file is part of a MASA library or program.
 // Refer to the included end-user license agreement for restrictions.
 //
-// Copyright (c) 2018 MASA Group
+// Copyright (c) 2020 MASA Group
 //
 // *****************************************************************************
 
@@ -115,7 +115,7 @@ namespace ecore
     private:
         std::function< std::shared_ptr<const EList<T>>( const T& )> getChildren_;
         T current_;
-        std::stack<typename EList<T>::const_iterator> stack_;
+        std::stack<typename EList<T>::ConstIterator> stack_;
     };
 }
 

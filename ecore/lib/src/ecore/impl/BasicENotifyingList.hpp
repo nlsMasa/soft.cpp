@@ -3,7 +3,7 @@
 // This file is part of a MASA library or program.
 // Refer to the included end-user license agreement for restrictions.
 //
-// Copyright (c) 2018 MASA Group
+// Copyright (c) 2020 MASA Group
 //
 // *****************************************************************************
 
@@ -11,13 +11,13 @@
 #define ECORE_BASIC_ENOTIFYING_LIST_HPP_
 
 #include "ecore/ENotifyingList.hpp"
-#include "ecore/impl/AbstractENotifyingList.hpp"
-#include "ecore/impl/ArrayEList.hpp"
+#include "ecore/impl/ENotifyingListBase.hpp"
+#include "ecore/impl/ArrayEListBase.hpp"
 
 namespace ecore::impl
 {
     template <typename T>
-    using BasicENotifyingList = ArrayEList<AbstractENotifyingList<ENotifyingList<T>>>;
+    using BasicENotifyingList = ArrayEListBase<ENotifyingListBase<ENotifyingList<T>,true>>;
     
 } // namespace ecore::impl
 

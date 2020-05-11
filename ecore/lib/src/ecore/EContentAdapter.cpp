@@ -24,7 +24,7 @@ void EContentAdapter::setTarget( const std::shared_ptr<ENotifier>& newTarget )
     {
         auto eObject = std::static_pointer_cast<EObject>( newTarget );
         auto eContents = eObject->eContents();
-        for( auto& eContent : *eContents )
+        for( auto& eContent : eContents )
             addAdapter( eContent );
     }    
 }
@@ -36,7 +36,7 @@ void EContentAdapter::unsetTarget( const std::shared_ptr<ENotifier>& oldTarget )
     {
         auto eObject = std::static_pointer_cast<EObject>( oldTarget );
         auto eContents = eObject->eContents();
-        for( auto& eContent : *eContents )
+        for( auto& eContent : eContents )
             removeAdapter( eContent );
     }
 }

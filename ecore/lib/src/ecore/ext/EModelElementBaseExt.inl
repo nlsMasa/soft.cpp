@@ -77,7 +77,7 @@ namespace ecore::ext
 
                         // Look for the annotation with the matching source.
                         auto contents = eContents();
-                        for (auto eObject : *contents) {
+                        for (auto eObject : contents) {
 
                             auto eAnnotation = std::dynamic_pointer_cast<EAnnotation>(eObject);
                             if (eAnnotation) {
@@ -107,7 +107,7 @@ namespace ecore::ext
                 name = name == "%" ? "" : uriUnescape(name);
 
                 auto contents = eContents();
-                for (auto eObject : *contents) {
+                for (auto eObject : contents) {
 
                     auto eNamedElement = std::dynamic_pointer_cast<ENamedElement>(eObject);
                     if (eNamedElement) {
@@ -129,9 +129,9 @@ namespace ecore::ext
         auto eNamedElement = std::dynamic_pointer_cast<ENamedElement>(eObject);
         if (eNamedElement) {
             auto name = eNamedElement->getName();
-            auto contents = eContents();
+            auto contents = eContents()->getUnResolvedList();
             int count = 0;
-            for (auto otherEObject : *contents)
+            for (auto otherEObject : contents)
             {
                 if (otherEObject == eObject)
                     break;
@@ -157,7 +157,7 @@ namespace ecore::ext
             auto source = eAnnotation->getSource();
             auto contents = eContents();
             int count = 0;
-            for (auto otherEObject : *contents) {
+            for (auto otherEObject : contents) {
                 if (otherEObject == eObject)
                     break;
                 auto otherEAnnotation = std::dynamic_pointer_cast<EAnnotation>(otherEObject);

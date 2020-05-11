@@ -3,7 +3,7 @@
 // This file is part of a MASA library or program.
 // Refer to the included end-user license agreement for restrictions.
 //
-// Copyright (c) 2018 MASA Group
+// Copyright (c) 2020 MASA Group
 //
 // *****************************************************************************
 
@@ -11,6 +11,7 @@
 #define ECORE_MOCK_RESOURCE_HPP_
 
 #include "ecore/EResource.hpp"
+#include "ecore/EDiagnostic.hpp"
 #include "ecore/tests/MockENotifier.hpp"
 
 namespace ecore::tests

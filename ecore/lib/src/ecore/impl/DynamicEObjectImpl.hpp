@@ -39,7 +39,7 @@ namespace ecore::impl
         using EObject::eInvoke;
 
     protected:
-        virtual Any eGet( int featureID, bool resolve, bool coreType ) const;
+        virtual Any eGet( int featureID, bool resolve ) const;
         virtual bool eIsSet( int featureID ) const;
         virtual void eSet( int featureID, const Any& newValue );
         virtual void eUnset( int featureID );

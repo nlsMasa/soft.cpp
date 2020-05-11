@@ -3,238 +3,40 @@
 // This file is part of a MASA library or program.
 // Refer to the included end-user license agreement for restrictions.
 //
-// Copyright (c) 2018 MASA Group
+// Copyright (c) 2020 MASA Group
 //
 // *****************************************************************************
 
 #ifndef ECORE_ELIST_HPP_
 #define ECORE_ELIST_HPP_
 
-#include "ecore/Assert.hpp"
-#include <memory>
+#include "ecore/EObjectList.hpp"
+#include "ecore/TypeTraits.hpp"
 
 namespace ecore
 {
+    class EObject;
 
     template <typename T>
-    class EList : public std::enable_shared_from_this<EList<T>>
+    struct IsSharedEObject : std::false_type
+    {
+    };
+
+    template <typename T>
+    struct IsSharedEObject<std::shared_ptr<T>> : std::is_base_of<EObject, typename T>
+    {
+    };
+
+    template <typename T>
+    using IsSharedEObjectOrAny = std::disjunction<std::is_same<T, Any>, IsSharedEObject<T>>;
+
+    template <typename T>
+    class EList : public std::conditional_t<IsSharedEObjectOrAny<T>::value, EObjectList<EList<T>, T>, List<T>>
     {
     public:
         typedef typename T ValueType;
 
-        virtual ~EList()
-        {
-        }
-
-        virtual bool add( const T& e ) = 0;
-
-        virtual bool addAll( const EList<T>& l ) = 0;
-
-        virtual bool add( std::size_t pos, const T& e ) = 0;
-
-        virtual bool addAll( std::size_t pos, const EList<T>& l ) = 0;
-
-        virtual void move( std::size_t newPos, const T& e ) = 0;
-
-        virtual T move( std::size_t newPos, std::size_t oldPos ) = 0;
-
-        virtual T get( std::size_t pos ) const = 0;
-
-        virtual T set( std::size_t pos, const T& e ) = 0;
-
-        virtual T remove( std::size_t pos ) = 0;
-
-        virtual bool remove( const T& e ) = 0;
-
-        virtual std::size_t size() const = 0;
-
-        virtual void clear() = 0;
-
-        virtual bool empty() const = 0;
-
-        virtual bool contains( const T& e ) const
-        {
-            return std::find( begin(), end(), e ) != end();
-        }
-
-        std::size_t indexOf( const T& e ) const
-        {
-            std::size_t index = std::distance( begin(), std::find( begin(), end(), e ) );
-            return index == size() ? -1 : index;
-        }
-
-        /** Iterator interfaces for an EList<T>. */
-        template <typename ListType>
-        class EListIterator
-        {
-        public:
-            using iterator_category = std::random_access_iterator_tag;
-            using difference_type = std::ptrdiff_t;
-            using value_type = typename ListType::ValueType;
-            using pointer = typename ListType::ValueType*;
-            using reference = typename ListType::ValueType&;
-
-        public:
-            EListIterator( ListType* eList, std::size_t index )
-                : eList_( eList )
-                , index_( index )
-            {
-            }
-
-            T operator*() const
-            {
-                return eList_->get( index_ );
-            }
-
-            EListIterator& operator--()
-            {
-                --index_;
-                return *this;
-            }
-
-            EListIterator operator--( int )
-            {
-                EListIterator old( *this );
-                --( *this );
-                return old;
-            }
-
-            EListIterator& operator++()
-            {
-                ++index_;
-                return *this;
-            }
-
-            EListIterator operator++( int )
-            {
-                EListIterator old( *this );
-                ++( *this );
-                return old;
-            }
-
-            EListIterator& operator+=( difference_type offset )
-            {
-                index_ += offset;
-                return ( *this );
-            }
-
-            EListIterator& operator-=( difference_type offset )
-            {
-                return ( *this += -offset );
-            }
-
-            EListIterator operator+( const difference_type& offset ) const
-            {
-                EListIterator tmp = *this;
-                return ( tmp += offset );
-            }
-
-            EListIterator operator-( const difference_type& rhs ) const
-            {
-                EListIterator tmp = *this;
-                return ( tmp -= offset );
-            }
-
-            difference_type operator-( const EListIterator& rhs ) const
-            {
-                _Compat( rhs );
-                return index_ - rhs.index_;
-            }
-
-            bool operator==( const EListIterator& rhs ) const
-            {
-                _Compat( rhs );
-                return ( index_ == rhs.index_ );
-            }
-
-            bool operator!=( const EListIterator& rhs ) const
-            {
-                return !( *this == rhs );
-            }
-
-            bool operator<( const EListIterator& rhs )
-            {
-                _Compat( rhs );
-                return index_ < rhs.index_;
-            }
-
-            bool operator>( const EListIterator& rhs )
-            {
-                return ( rhs < *this );
-            }
-
-            bool operator<=( const EListIterator& rhs )
-            {
-                return ( !( rhs < *this ) );
-            }
-
-            bool operator>=( const EListIterator& rhs )
-            {
-                return ( !( *this < rhs ) );
-            }
-
-            bool hasNext() const
-            {
-                return ( (int64_t)index_ < (int64_t)eList_->size() - 1 );
-            }
-
-            const ListType* getEList() const
-            {
-                return eList_;
-            }
-
-            std::size_t getIndex() const
-            {
-                return index_;
-            }
-
-        private:
-            void _Compat( const EListIterator& rhs ) const
-            {
-#if _ITERATOR_DEBUG_LEVEL == 0
-                (void)rhs;
-#else
-                VERIFY( eList_ == rhs.eList_, "vector iterators incompatible" );
-#endif
-            }
-
-        private:
-            ListType* eList_;
-            std::size_t index_;
-        };
-
-        typedef EListIterator<EList<T>> iterator;
-        typedef EListIterator<const EList<T>> const_iterator;
-
-        iterator begin()
-        {
-            return iterator( this, 0 );
-        }
-
-        const_iterator begin() const
-        {
-            return const_iterator( this, 0 );
-        }
-
-        iterator end()
-        {
-            return iterator( this, size() );
-        }
-
-        const_iterator end() const
-        {
-            return const_iterator( this, size() );
-        }
-
-        const_iterator cbegin() const
-        {
-            return begin();
-        }
-
-        const_iterator cend() const
-        {
-            return end();
-        }
+        virtual ~EList() = default;
 
         /**
          * Allows treating an EList<T> as an EList<Q> (if T can be casted to Q dynamically)
@@ -242,24 +44,207 @@ namespace ecore
         template <typename Q>
         inline std::shared_ptr<EList<Q>> asEListOf()
         {
-            return std::make_shared<detail::DelegateEList<Q, T>>( shared_from_this() );
+            auto l = std::static_pointer_cast<EList<T>>( shared_from_this() );
+            return std::make_shared<detail::DelegateEList<EList<Q>, EList<T>>>( l );
         }
 
         template <typename Q>
         inline std::shared_ptr<const EList<Q>> asEListOf() const
         {
-            return std::make_shared<detail::ConstDelegateEList<Q, T>>( shared_from_this() );
+            auto l = std::static_pointer_cast<const EList<T>>( shared_from_this() );
+            return std::make_shared<detail::ConstDelegateEList<EList<Q>, EList<T>>>( l );
         }
     };
 
     template <typename T>
-    bool operator==( const EList<T>& lhs, const EList<T>& rhs );
+    inline typename EList<T>::Iterator begin( const std::unique_ptr<EList<T>>& l )
+    {
+        return l->begin();
+    }
 
     template <typename T>
-    bool operator!=( const EList<T>& lhs, const EList<T>& rhs );
+    inline typename EList<T>::ConstIterator begin( const std::unique_ptr<const EList<T>>& l )
+    {
+        return l->begin();
+    }
+
+    template <typename T>
+    inline typename EList<T>::Iterator end( const std::unique_ptr<EList<T>>& l )
+    {
+        return l->end();
+    }
+
+    template <typename T>
+    inline typename EList<T>::ConstIterator end( const std::unique_ptr<const EList<T>>& l )
+    {
+        return l->end();
+    }
+
+    template <typename T>
+    inline typename EList<T>::Iterator begin( const std::shared_ptr<EList<T>>& l )
+    {
+        return l->begin();
+    }
+
+    template <typename T>
+    inline typename EList<T>::ConstIterator begin( const std::shared_ptr<const EList<T>>& l )
+    {
+        return l->begin();
+    }
+
+    template <typename T>
+    inline typename EList<T>::Iterator end( const std::shared_ptr<EList<T>>& l )
+    {
+        return l->end();
+    }
+
+    template <typename T>
+    inline typename EList<T>::ConstIterator end( const std::shared_ptr<const EList<T>>& l )
+    {
+        return l->end();
+    }
+
+    namespace detail
+    {
+
+        template <typename LT, typename LQ>
+        class ConstDelegateEList : public ConstDelegateCollection<LT, LQ>
+        {
+            typedef typename LT::ValueType T;
+            typedef typename LQ::ValueType Q;
+            typedef std::shared_ptr<const LQ> T_ListDelegate;
+
+        public:
+            ConstDelegateEList( const T_ListDelegate& delegate )
+                : ConstDelegateCollection<LT, LQ>( delegate )
+            {
+            }
+
+            virtual ~ConstDelegateEList()
+            {
+            }
+
+            virtual bool add( std::size_t pos, const T& e )
+            {
+                throw "UnsupportedOperationException";
+            }
+
+            virtual bool addAll( std::size_t pos, const Collection<T>& l )
+            {
+                throw "UnsupportedOperationException";
+            }
+
+            virtual void move( std::size_t newPos, const T& e )
+            {
+                throw "UnsupportedOperationException";
+            }
+
+            virtual T move( std::size_t newPos, std::size_t oldPos )
+            {
+                throw "UnsupportedOperationException";
+            }
+
+            virtual T set( std::size_t pos, const T& e )
+            {
+                throw "UnsupportedOperationException";
+            }
+
+            virtual T remove( std::size_t pos )
+            {
+                throw "UnsupportedOperationException";
+            }
+
+            virtual std::size_t indexOf( const T& e ) const
+            {
+                return delegate_->indexOf( cast<T, Q>::do_cast( e ) );
+            }
+
+            virtual std::shared_ptr<LT> getUnResolvedList()
+            {
+                throw "UnsupportedOperationException";
+            }
+
+            virtual std::shared_ptr<const LT> getUnResolvedList() const
+            {
+                if constexpr( IsSharedEObjectOrAny<Q>::value )
+                    return delegate_->getUnResolvedList()->asEListOf<T>();
+                else
+                    return delegate_->asEListOf<T>();
+            }
+        };
+
+        template <typename LT, typename LQ>
+        class DelegateEList : public DelegateCollection<LT, LQ>
+        {
+            typedef typename LT::ValueType T;
+            typedef typename LQ::ValueType Q;
+            typedef std::shared_ptr<LQ> T_Delegate;
+
+        public:
+            DelegateEList( const T_Delegate& delegate )
+                : DelegateCollection<LT, LQ>( delegate )
+            {
+            }
+
+            virtual ~DelegateEList()
+            {
+            }
+
+            virtual bool add( std::size_t pos, const T& e )
+            {
+                return delegate_->add( pos, cast<T, Q>::do_cast( e ) );
+            }
+
+            virtual bool addAll( std::size_t pos, const Collection<T>& l )
+            {
+                auto transformed = l.asCollectionOf<Q>();
+                return delegate_->addAll( pos, *transformed );
+            }
+
+            virtual void move( std::size_t newPos, const T& e )
+            {
+                delegate_->move( newPos, cast<T, Q>::do_cast( e ) );
+            }
+
+            virtual T move( std::size_t newPos, std::size_t oldPos )
+            {
+                return cast<Q, T>::do_cast( delegate_->move( newPos, oldPos ) );
+            }
+
+            virtual T set( std::size_t pos, const T& e )
+            {
+                return cast<Q, T>::do_cast( delegate_->set( pos, cast<T, Q>::do_cast( e ) ) );
+            }
+
+            virtual T remove( std::size_t pos )
+            {
+                return cast<Q, T>::do_cast( delegate_->remove( pos ) );
+            }
+
+            virtual std::size_t indexOf( const T& e ) const
+            {
+                return delegate_->indexOf( cast<T, Q>::do_cast( e ) );
+            }
+
+            virtual std::shared_ptr<LT> getUnResolvedList()
+            {
+                if constexpr( IsSharedEObjectOrAny<Q>::value )
+                    return delegate_->getUnResolvedList()->asEListOf<T>();
+                else
+                    return delegate_->asEListOf<T>();
+            }
+
+            virtual std::shared_ptr<const LT> getUnResolvedList() const
+            {
+                if constexpr( IsSharedEObjectOrAny<Q>::value )
+                    return delegate_->getUnResolvedList()->asEListOf<T>();
+                else
+                    return delegate_->asEListOf<T>();
+            }
+        };
+
+    } // namespace detail
 
 } // namespace ecore
-
-#include "ecore/EList.inl"
 
 #endif /* ECORE_ELIST_HPP_ */
