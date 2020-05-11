@@ -35,19 +35,17 @@ std::shared_ptr<EObject> DeepCopy::copy( const std::shared_ptr<EObject>& eObject
             objects_[eObject] = copyEObject;
 
             auto eClass = eObject->eClass();
-            for( auto eFeature : eClass->getEStructuralFeatures() )
+            for( const auto& eAttribute : eClass->getEAttributes() )
             {
-                if( eFeature->isChangeable() && !eFeature->isDerived() )
-                {
-                    if( auto eAttribute = std::dynamic_pointer_cast<EAttribute>( eFeature ) )
-                        copyAttribute( eAttribute, eObject, copyEObject );
-                    if( auto eReference = std::dynamic_pointer_cast<EReference>( eFeature ) )
-                    {
-                        if( eReference->isContainment() )
-                            copyContainment( eReference, eObject, copyEObject );
-                    }
-                }
+                if( eAttribute->isChangeable() && !eAttribute->isDerived() )
+                    copyAttribute( eAttribute, eObject, copyEObject );
             }
+            for( const auto& eReference : eClass->getEReferences() )
+            {
+                if( eReference->isChangeable() && !eReference->isDerived() && eReference->isContainment() )
+                    copyContainment( eReference, eObject, copyEObject );
+            }
+
             copyProxyURI( eObject, copyEObject );
         }
         return copyEObject;
