@@ -66,8 +66,13 @@ BOOST_AUTO_TEST_CASE( Copy_Single_Attributes )
     eObject->eSet( eAttribute1, std::string( "attribute1" ) );
     eObject->eSet( eAttribute2, 1 );
 
+    // check that deep copy is deep equal
     auto eObjectCopy = EcoreUtils::copy( eObject );
     BOOST_CHECK( EcoreUtils::equals(eObject,eObjectCopy) );
+
+    // modify original object & check that deep equal is not true
+    eObject->eSet( eAttribute2, 2 );
+    BOOST_CHECK( !EcoreUtils::equals( eObject, eObjectCopy ) );
 }
 
 BOOST_AUTO_TEST_CASE( Copy_Single_Containments )
@@ -108,8 +113,13 @@ BOOST_AUTO_TEST_CASE( Copy_Single_Containments )
     eObject2->eSet( eAttribute2, 1 );
     eObject1->eSet( eReference1, toAny(eObject2) );
     
+    // check that deep copy is deep equal
     auto eObject1Copy = EcoreUtils::copy( eObject1 );
     BOOST_CHECK( EcoreUtils::equals( eObject1, eObject1Copy ) );
+
+    // modify original object & check that deep equal is not true
+    eObject2->eSet( eAttribute2, 2 );
+    BOOST_CHECK( !EcoreUtils::equals( eObject1, eObject1Copy ) );
 }
 
 
