@@ -69,22 +69,24 @@ namespace ecore::impl
 
         virtual std::shared_ptr<EList<T>> getUnResolvedList()
         {
+            const auto thisAsList = static_pointer_cast<BasicEObjectList>( shared_from_this() );
             if constexpr( proxies )
-                return std::make_shared<UnResolvedList<BasicEObjectList>>( this );
+                return std::make_shared<UnResolvedList<BasicEObjectList>>( thisAsList );
             else
                 // no need to create a delegate list if we don't have proxies
                 // return this
-                return std::static_pointer_cast<EList<T>>( shared_from_this() );
+                return thisAsList;
         }
 
         virtual std::shared_ptr<const EList<T>> getUnResolvedList() const
         {
+            const auto thisAsList = static_pointer_cast<const BasicEObjectList>( shared_from_this() );
             if constexpr( proxies )
-                return std::make_shared<ConstUnResolvedList<BasicEObjectList>>( this );
+                return std::make_shared<ConstUnResolvedList<BasicEObjectList>>( thisAsList );
             else
                 // no need to create a delegate list if we don't have proxies
                 // return this
-                return std::static_pointer_cast<const EList<T>>( shared_from_this() );
+                return thisAsList;
         }
 
     protected:
@@ -172,7 +174,7 @@ namespace ecore::impl
             typedef typename C::InterfaceType InterfaceType;
             typedef typename C::ValueType ValueType;
 
-            UnResolvedList( C* list )
+            UnResolvedList( const std::shared_ptr<C>& list )
                 : list_( list )
             {
             }
@@ -280,8 +282,8 @@ namespace ecore::impl
                 return list_->inverseRemove( object, notifications );
             }
 
-        private:
-            C* list_;
+        protected:
+            std::shared_ptr<C> list_;
         };
 
         template <typename C>
@@ -291,8 +293,8 @@ namespace ecore::impl
             typedef typename C::InterfaceType InterfaceType;
             typedef typename C::ValueType ValueType;
 
-            ConstUnResolvedList( const C* list )
-                : UnResolvedList<C>( const_cast<C*>( list ) )
+            ConstUnResolvedList( const std::shared_ptr<const C>& list )
+                : UnResolvedList<C>( std::const_pointer_cast<C>(list) )
             {
             }
 
