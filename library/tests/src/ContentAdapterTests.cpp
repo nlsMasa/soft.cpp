@@ -1,12 +1,12 @@
 #include <boost/test/unit_test.hpp>
 #include <turtle/mock.hpp>
 
-#include "LibraryFactory.hpp"
 #include "ecore/EContentAdapter.hpp"
 #include "ecore/ENotification.hpp"
 #include "library/Employee.hpp"
 #include "library/LibraryFactory.hpp"
 #include "library/LibraryPackage.hpp"
+#include "library/tests/LibraryFactory.hpp"
 
 using namespace ecore;
 using namespace library;

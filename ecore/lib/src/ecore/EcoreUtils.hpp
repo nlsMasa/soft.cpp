@@ -24,6 +24,8 @@ namespace ecore
     class EDataType;
     class EResource;
     class EResourceSet;
+    template <typename T>
+    class EList;
 
     class ECORE_API EcoreUtils
     {
@@ -51,6 +53,15 @@ namespace ecore
         // Determines if the class represented by eSuper object is either the same as, or is a superclass of, the class represented by the
         // specified eClass parameter. It returns true if so; otherwise it returns false.
         static bool isAssignableFrom( const std::shared_ptr<EClass>& eSuper, const std::shared_ptr<EClass>& eClass );
+
+        static std::shared_ptr<EObject> copy( const std::shared_ptr<EObject>& eObject );
+
+        static std::shared_ptr<EList<std::shared_ptr<EObject>>> copyAll( const std::shared_ptr<EList<std::shared_ptr<EObject>>>& eObjects );
+
+        static bool equals( const std::shared_ptr<EObject>& eObject1, const std::shared_ptr<EObject>& eObject2 );
+
+        static bool equals( const std::shared_ptr<EList<std::shared_ptr<EObject>>>& l1,
+                            const std::shared_ptr<EList<std::shared_ptr<EObject>>>& l2 );
 
     private:
         static std::string getRelativeURIFragmentPath( const std::shared_ptr<EObject>& ancestor,

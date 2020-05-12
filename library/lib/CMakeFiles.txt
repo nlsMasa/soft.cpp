@@ -1,0 +1,5 @@
+set(HEADER_LIBRARY_EXT_FILES
+    src/library/ext/WriterBaseExt.hpp
+    src/library/ext/WriterBaseExt.inl
+    src/library/ext/WriterExt.hpp
+)

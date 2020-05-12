@@ -25,7 +25,7 @@ namespace std
     }
 } // namespace std
 
-BOOST_AUTO_TEST_SUITE( ModelTests )
+BOOST_AUTO_TEST_SUITE( MetaModelTests )
 
 BOOST_AUTO_TEST_CASE( LendableCopiesContainer )
 {

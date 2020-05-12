@@ -121,7 +121,7 @@ namespace ecore::impl
     }
 
     template <typename... I>
-    Any DynamicEObjectBase<I...>::eGet( int featureID, bool resolve  ) const
+    Any DynamicEObjectBase<I...>::eGet( int featureID, bool resolve ) const
     {
         int dynamicFeatureID = featureID - eStaticFeatureCount();
         if( dynamicFeatureID >= 0 )
@@ -228,7 +228,7 @@ namespace ecore::impl
             auto dynamicFeature = eDynamicFeature( featureID );
             if( isContainer( dynamicFeature ) )
             {
-                ASSERT( newValue.type() == typeid( std::shared_ptr<EObject>() ),
+                ASSERT( &newValue.type() == &typeid( std::shared_ptr<EObject> ),
                         " Feature defined as a container : value must be a std::shared_ptr<EObject>" );
 
                 // container
@@ -249,7 +249,7 @@ namespace ecore::impl
             }
             else if( isBidirectional( dynamicFeature ) || isContains( dynamicFeature ) )
             {
-                ASSERT( newValue.type() == typeid( std::shared_ptr<EObject>() ),
+                ASSERT( &newValue.type() == &typeid( std::shared_ptr<EObject> ),
                         " Feature defined as birectional or containment : value must be a std::shared_ptr<EObject>" );
 
                 // inverse - opposite
@@ -258,13 +258,16 @@ namespace ecore::impl
                 {
                     std::shared_ptr<ENotificationChain> notifications;
                     std::shared_ptr<EObject> oldObject;
-                    if( isProxy( dynamicFeature ) )
-                        oldObject = anyCast<std::shared_ptr<EObjectProxy>>( oldValue )->get();
-                    else if( isBackReference( dynamicFeature ) )
-                        oldObject = anyCast<std::weak_ptr<EObject>>( oldValue ).lock();
-                    else
-                        oldObject = anyCast<std::shared_ptr<EObject>>( oldValue );
-
+                    if (oldValue != NO_VALUE)
+                    {
+                        if( isProxy( dynamicFeature ) )
+                            oldObject = anyCast<std::shared_ptr<EObjectProxy>>( oldValue )->get();
+                        else if( isBackReference( dynamicFeature ) )
+                            oldObject = anyCast<std::weak_ptr<EObject>>( oldValue ).lock();
+                        else
+                            oldObject = anyCast<std::shared_ptr<EObject>>( oldValue );
+                    }
+                    
                     auto newObject = anyCast<std::shared_ptr<EObject>>( newValue );
 
                     if( !isBidirectional( dynamicFeature ) )
@@ -327,7 +330,7 @@ namespace ecore::impl
 
                 if( isProxy( dynamicFeature ) )
                 {
-                    ASSERT( newValue.type() == typeid( std::shared_ptr<EObject>() ),
+                    ASSERT( &newValue.type() == &typeid( std::shared_ptr<EObject>() ),
                             " Feature defined as reference proxy : value must be a std::shared_ptr<EObject>" );
                     auto newObject = anyCast<std::shared_ptr<EObject>>( newValue );
 
@@ -336,7 +339,7 @@ namespace ecore::impl
                 }
                 else if( isBackReference( dynamicFeature ) )
                 {
-                    ASSERT( newValue.type() == typeid( std::shared_ptr<EObject>() ),
+                    ASSERT( &newValue.type() == &typeid( std::shared_ptr<EObject>() ),
                             " Feature defined as a back reference : value must be a std::shared_ptr<EObject>" );
                     auto newObject = anyCast<std::shared_ptr<EObject>>( newValue );
 
