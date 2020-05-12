@@ -10,6 +10,7 @@
 #include "ecore/EResource.hpp"
 #include "ecore/EResourceSet.hpp"
 #include "ecore/impl/DeepCopy.hpp"
+#include "ecore/impl/DeepEqual.hpp"
 #include "ecore/impl/EObjectInternal.hpp"
 #include "ecore/impl/StringUtils.hpp"
 
@@ -206,4 +207,17 @@ std::shared_ptr<EList<std::shared_ptr<EObject>>> ecore::EcoreUtils::copyAll(
     auto eCopies = dc->copyAll( eObjects );
     dc->copyReferences();
     return eCopies;
+}
+
+bool EcoreUtils::equals( const std::shared_ptr<EObject>& eObject1, const std::shared_ptr<EObject>& eObject2 )
+{
+    auto de = new DeepEqual();
+    return de->equals( eObject1, eObject2 );
+}
+
+bool EcoreUtils::equals( const std::shared_ptr<EList<std::shared_ptr<EObject>>>& l1,
+                         const std::shared_ptr<EList<std::shared_ptr<EObject>>>& l2 )
+{
+    auto de = new DeepEqual();
+    return de->equals( l1, l2 );
 }

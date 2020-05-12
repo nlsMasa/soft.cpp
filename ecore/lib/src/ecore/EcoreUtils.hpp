@@ -58,6 +58,11 @@ namespace ecore
 
         static std::shared_ptr<EList<std::shared_ptr<EObject>>> copyAll( const std::shared_ptr<EList<std::shared_ptr<EObject>>>& eObjects );
 
+        static bool equals( const std::shared_ptr<EObject>& eObject1, const std::shared_ptr<EObject>& eObject2 );
+
+        static bool equals( const std::shared_ptr<EList<std::shared_ptr<EObject>>>& l1,
+                            const std::shared_ptr<EList<std::shared_ptr<EObject>>>& l2 );
+
     private:
         static std::string getRelativeURIFragmentPath( const std::shared_ptr<EObject>& ancestor,
                                                        const std::shared_ptr<EObject>& descendant,
