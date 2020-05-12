@@ -4,11 +4,14 @@ set(SOURCE_FILES
     src/main.cpp
     src/ContentAdapterTests.cpp
     src/DeepUtilsTests.cpp
-    src/LibraryFactory.cpp
     src/SerializationTests.cpp
     src/MetaModelTests.cpp
 )
 
-set(HEADER_FILES
-    src/LibraryFactory.hpp
+set(HEADER_LIBRARY_TESTS_FILES
+    src/library/tests/LibraryFactory.hpp
+)
+
+set(SOURCE_LIBRARY_TESTS_FILES
+    src/library/tests/LibraryFactory.cpp
 )

@@ -1,7 +1,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "ecore/EcoreUtils.hpp"
-#include "LibraryFactory.hpp"
+#include "library/tests/LibraryFactory.hpp"
 
 using namespace ecore;
 using namespace library;

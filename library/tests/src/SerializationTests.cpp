@@ -1,7 +1,7 @@
 #include <boost/test/unit_test.hpp>
 
-#include "LibraryFactory.hpp"
 #include "library/LibraryPackage.hpp"
+#include "library/tests/LibraryFactory.hpp"
 
 #include "ecore/EResource.hpp"
 #include "ecore/EDiagnostic.hpp"
