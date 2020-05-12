@@ -33,15 +33,17 @@ namespace ecore
     {
         if constexpr( IsSharedEObject<T>::value )
         {
-            auto result = std::make_shared<impl::BasicEList<std::shared_ptr<EObject>>>();
-            std::transform( c.begin(), c.end(), result->end(), []( const T& t ) { return std::static_pointer_cast<EObject>( t ); } );
-            return std::static_pointer_cast<EList<std::shared_ptr<EObject>>>( result );
+            std::shared_ptr<EList<std::shared_ptr<EObject>>> result = std::make_shared<impl::BasicEList<std::shared_ptr<EObject>>>();
+            for( const auto& t : c )
+                result->add( std::static_pointer_cast<EObject>( t ) );
+            return result;
         }
         else
         {
-            auto result = std::make_shared<impl::BasicEList<Any>>();
-            std::transform( c.begin(), c.end(), result->end(), []( const T& t ) { return Any( t ); } );
-            return std::static_pointer_cast<EList<Any>>( result );
+            std::shared_ptr<EList<Any>> result = std::make_shared<impl::BasicEList<Any>>();
+            for( const auto& t : c )
+                result->add( Any( t ) );
+            return result;
         }
     }
 
@@ -82,7 +84,7 @@ namespace ecore
     std::shared_ptr<EList<T>> anyListCast( const Any& any )
     {
         auto id = &any.type();
-        
+
         if constexpr( IsSharedEObject<T>::value )
         {
             // Any store a list of EObject
@@ -116,7 +118,6 @@ namespace ecore
                 return anyCast<std::shared_ptr<EList<T>>>( any );
         }
         return nullptr;
-        
     }
 
 } // namespace ecore

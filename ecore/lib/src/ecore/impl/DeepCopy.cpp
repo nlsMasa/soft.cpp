@@ -56,7 +56,7 @@ std::shared_ptr<EObject> DeepCopy::copy( const std::shared_ptr<EObject>& eObject
 std::shared_ptr<EList<std::shared_ptr<EObject>>> DeepCopy::copyAll( const std::shared_ptr<EList<std::shared_ptr<EObject>>>& l )
 {
     std::vector<std::shared_ptr<EObject>> v;
-    std::transform( l->begin(), l->end(), v.end(), [&]( const std::shared_ptr<EObject>& o ) { return copy( o ); } );
+    std::transform( l->begin(), l->end(), std::back_inserter(v), [&]( const std::shared_ptr<EObject>& o ) { return copy( o ); } );
     return std::make_shared<ImmutableArrayEList<std::shared_ptr<EObject>>>( std::move( v ) );
 }
 
