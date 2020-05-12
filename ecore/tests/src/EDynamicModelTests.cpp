@@ -1,5 +1,6 @@
 #include <boost/test/unit_test.hpp>
 
+#include "ecore/AnyCast.hpp"
 #include "ecore/Constants.hpp"
 #include "ecore/EAttribute.hpp"
 #include "ecore/EClass.hpp"
@@ -138,7 +139,7 @@ namespace
             bookStoreObject->eSet( bookStoreOwner, std::string( "David Brown" ) );
             bookStoreObject->eSet( bookStoreLocation, std::string( "Street#12, Top Town, NY" ) );
             auto anyBooks = bookStoreObject->eGet( bookStore_Books );
-            auto allBooks = anyCast<std::shared_ptr<EList<std::shared_ptr<EObject>>>>( anyBooks );
+            auto allBooks = anyListCast<std::shared_ptr<EObject>>( anyBooks );
             allBooks->add( bookObject );
 
             /*
