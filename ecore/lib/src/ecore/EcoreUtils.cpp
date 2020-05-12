@@ -194,30 +194,28 @@ bool EcoreUtils::isAssignableFrom( const std::shared_ptr<EClass>& eSuper, const 
 
 std::shared_ptr<EObject> ecore::EcoreUtils::copy( const std::shared_ptr<EObject>& eObject )
 {
-    auto dc = std::make_unique<DeepCopy>();
-    auto eCopy = dc->copy( eObject );
-    dc->copyReferences();
+    DeepCopy dc;
+    auto eCopy = dc.copy( eObject );
+    dc.copyReferences();
     return eCopy;
 }
 
 std::shared_ptr<EList<std::shared_ptr<EObject>>> ecore::EcoreUtils::copyAll(
     const std::shared_ptr<EList<std::shared_ptr<EObject>>>& eObjects )
 {
-    auto dc = std::make_unique<DeepCopy>();
-    auto eCopies = dc->copyAll( eObjects );
-    dc->copyReferences();
+    DeepCopy dc;
+    auto eCopies = dc.copyAll( eObjects );
+    dc.copyReferences();
     return eCopies;
 }
 
 bool EcoreUtils::equals( const std::shared_ptr<EObject>& eObject1, const std::shared_ptr<EObject>& eObject2 )
 {
-    auto de = new DeepEqual();
-    return de->equals( eObject1, eObject2 );
+    return DeepEqual().equals( eObject1, eObject2 );
 }
 
 bool EcoreUtils::equals( const std::shared_ptr<EList<std::shared_ptr<EObject>>>& l1,
                          const std::shared_ptr<EList<std::shared_ptr<EObject>>>& l2 )
 {
-    auto de = new DeepEqual();
-    return de->equals( l1, l2 );
+    return DeepEqual().equals( l1, l2 );
 }
