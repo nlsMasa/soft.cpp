@@ -53,13 +53,16 @@ namespace ecore::impl
 
         virtual void notifyChanged( const std::shared_ptr<ENotification>& notification )
         {
-            auto feature = notification->getFeature();
-            auto ref = std::dynamic_pointer_cast<EReference>( feature );
-            if( ref )
+            if( l_ )
             {
-                auto refs = std::invoke( refsGetter_, *obj_.eClass() );
-                if( refs->contains( ref ) )
-                    l_.reset();
+                auto feature = notification->getFeature();
+                auto ref = std::dynamic_pointer_cast<EReference>( feature );
+                if( ref )
+                {
+                    auto refs = std::invoke( refsGetter_, *obj_.eClass() );
+                    if( refs->contains( ref ) )
+                        l_.reset();
+                }
             }
         }
 
