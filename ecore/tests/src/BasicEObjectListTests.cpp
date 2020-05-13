@@ -201,6 +201,51 @@ BOOST_FIXTURE_TEST_CASE( Proxies_Contains, Fixture )
     BOOST_CHECK( list.contains( resolved ) );
 }
 
+BOOST_FIXTURE_TEST_CASE( Proxies_Get, Fixture )
+{
+    MOCK_EXPECT( owner->getInternal ).returns( *mockInternal );
+
+    BasicEObjectList<std::shared_ptr<EObject>, false, false, false, true> list( owner, 1, 2 );
+    auto proxy = std::make_shared<MockEObject>();
+    MOCK_EXPECT( proxy->eIsProxy ).once().returns( true );
+    BOOST_CHECK( list.add( proxy ) );
+
+    auto resolved = std::make_shared<MockEObject>();
+    MOCK_EXPECT( resolved->eIsProxy ).once().returns( false );
+    MOCK_EXPECT( proxy->eIsProxy ).once().returns( true );
+    MOCK_EXPECT( mockInternal->eResolveProxy ).once().with( proxy ).returns( resolved );
+    BOOST_CHECK_EQUAL( list.get( 0 ) , resolved );
+}
+
+BOOST_FIXTURE_TEST_CASE( No_Proxies_Get, Fixture )
+{
+    MOCK_EXPECT( owner->getInternal ).returns( *mockInternal );
+
+    BasicEObjectList<std::shared_ptr<EObject>> list( owner, 1, 2 );
+    auto proxy = std::make_shared<MockEObject>();
+    BOOST_CHECK( list.add( proxy ) );
+    BOOST_CHECK_EQUAL( list.get( 0 ), proxy );
+}
+
+BOOST_FIXTURE_TEST_CASE( Proxies_Add, Fixture )
+{
+    MOCK_EXPECT( owner->getInternal ).returns( *mockInternal );
+
+    BasicEObjectList<std::shared_ptr<EObject>, false, false, false, true> list( owner, 1, 2 );
+    auto proxy = std::make_shared<MockEObject>();
+    MOCK_EXPECT( proxy->eIsProxy ).once().returns( true );
+    BOOST_CHECK( list.add( proxy ) );
+    BOOST_CHECK( list.contains( proxy ) );
+    BOOST_CHECK( list.contains( proxy ) );
+
+    auto resolved = std::make_shared<MockEObject>();
+    MOCK_EXPECT( resolved->eIsProxy ).once().returns( false );
+    MOCK_EXPECT( proxy->eIsProxy ).once().returns( true );
+    MOCK_EXPECT( mockInternal->eResolveProxy ).once().with( proxy ).returns( resolved );
+    BOOST_CHECK( !list.add( resolved ) );
+}
+
+
 BOOST_FIXTURE_TEST_CASE( Unset, Fixture )
 {
     BasicEObjectList<std::shared_ptr<EObject>, false, false, false, false, true> list( owner, 1, 2 );
