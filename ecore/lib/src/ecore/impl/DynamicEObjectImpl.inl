@@ -258,7 +258,7 @@ namespace ecore::impl
                 {
                     std::shared_ptr<ENotificationChain> notifications;
                     std::shared_ptr<EObject> oldObject;
-                    if (oldValue != NO_VALUE)
+                    if (!oldValue.empty())
                     {
                         if( isProxy( dynamicFeature ) )
                             oldObject = anyCast<std::shared_ptr<EObjectProxy>>( oldValue )->get();
@@ -295,6 +295,10 @@ namespace ecore::impl
                     // basic set
                     if( isProxy( dynamicFeature ) )
                     {
+                        if( oldValue.empty() )
+                            // unitialized value, got to initialize it
+                            properties_[dynamicFeatureID] = oldValue = std::make_shared<EObjectProxy>();
+                        
                         auto proxy = anyCast<std::shared_ptr<EObjectProxy>>( oldValue );
                         proxy->set( newObject );
                     }
@@ -330,16 +334,22 @@ namespace ecore::impl
 
                 if( isProxy( dynamicFeature ) )
                 {
-                    ASSERT( &newValue.type() == &typeid( std::shared_ptr<EObject>() ),
+                    ASSERT( &newValue.type() == &typeid( std::shared_ptr<EObject> ),
                             " Feature defined as reference proxy : value must be a std::shared_ptr<EObject>" );
+                    
                     auto newObject = anyCast<std::shared_ptr<EObject>>( newValue );
 
+                    if( oldValue.empty() )
+                        // unitialized value, got to initialize it
+                        properties_[dynamicFeatureID] = oldValue = std::make_shared<EObjectProxy>();
+
+                    // restrieve proxy
                     auto proxy = anyCast<std::shared_ptr<EObjectProxy>>( oldValue );
                     proxy->set( newObject );
                 }
                 else if( isBackReference( dynamicFeature ) )
                 {
-                    ASSERT( &newValue.type() == &typeid( std::shared_ptr<EObject>() ),
+                    ASSERT( &newValue.type() == &typeid( std::shared_ptr<EObject> ),
                             " Feature defined as a back reference : value must be a std::shared_ptr<EObject>" );
                     auto newObject = anyCast<std::shared_ptr<EObject>>( newValue );
 
