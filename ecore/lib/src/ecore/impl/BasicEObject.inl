@@ -280,7 +280,7 @@ namespace ecore::impl
                 auto position = std::stoi( uriSegment.substr( index + 1 ) );
                 auto eFeatureName = uriSegment.substr( 1, index - 1 );
                 auto eFeature = eStructuralFeature( eFeatureName );
-                auto value = eGet( eFeature );
+                auto value = eGet( eFeature , false );
                 auto list = anyListCast<std::shared_ptr<EObject>>( value );
                 if( position < list->size() )
                     return list->get( position );
@@ -289,7 +289,7 @@ namespace ecore::impl
         if( index == std::string::npos )
         {
             auto eFeature = eStructuralFeature( uriSegment.substr( 1 ) );
-            auto value = eGet( eFeature );
+            auto value = eGet( eFeature , false );
             return anyCast<std::shared_ptr<EObject>>( value );
         }
         return std::shared_ptr<EObject>();
