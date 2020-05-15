@@ -25,6 +25,7 @@ set(SOURCE_FILES
     src/NotificationTests.cpp
     src/NotificationChainTests.cpp
     src/ProxyTests.cpp
+    src/ResourceIDManagerTests.cpp
     src/ResourceTests.cpp
     src/ResourceSetTests.cpp
     src/SmartPtrTests.cpp

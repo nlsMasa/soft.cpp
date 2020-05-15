@@ -6,6 +6,7 @@
 #include "ecore/ENotificationChain.hpp"
 #include "ecore/ENotifyingList.hpp"
 #include "ecore/EObject.hpp"
+#include "ecore/EResourceIDManager.hpp"
 #include "ecore/EResourceSet.hpp"
 #include "ecore/EcoreUtils.hpp"
 #include "ecore/Stream.hpp"
@@ -177,7 +178,10 @@ std::shared_ptr<EObject> AbstractResource::getObjectByPath( const std::vector<st
 
 std::shared_ptr<EObject> AbstractResource::getObjectByID( const std::string& id ) const
 {
-    auto allContents = getAllContents();
+    if( resourceIDManager_ )
+        return resourceIDManager_->getEObject( id );
+    
+    auto allContents = std::make_shared<ECollectionView<std::shared_ptr<ecore::EObject>>>( getContents() , false );
     for( auto eObject : *allContents )
     {
         auto objectID = EcoreUtils::getID( eObject );
@@ -271,6 +275,16 @@ std::shared_ptr<EList<std::shared_ptr<EDiagnostic>>> AbstractResource::getErrors
 std::shared_ptr<EList<std::shared_ptr<EDiagnostic>>> AbstractResource::getWarnings() const
 {
     return warnings_;
+}
+
+std::shared_ptr<EResourceIDManager> AbstractResource::getIDManager() const
+{
+    return resourceIDManager_;
+}
+
+void AbstractResource::setIDManager( const std::shared_ptr<EResourceIDManager>& resourceIDManager )
+{
+    resourceIDManager_ = resourceIDManager;
 }
 
 std::shared_ptr<ENotificationChain> AbstractResource::basicSetLoaded( bool isLoaded, const std::shared_ptr<ENotificationChain>& msgs )

@@ -685,7 +685,7 @@ namespace ecore::impl
         std::shared_ptr<EResource> newResource;
         if( oldResource )
         {
-            if( newContainer && !eContainmentFeature( thisObject, newContainer, newContainerFeatureID ) )
+            if( newContainer && !eContainmentFeature( thisObject, newContainer, newContainerFeatureID )->isResolveProxies() )
             {
                 auto list = std::static_pointer_cast<ENotifyingList<std::shared_ptr<EObject>>>( oldResource->getContents() );
                 notifications = list->remove( thisObject, notifications );

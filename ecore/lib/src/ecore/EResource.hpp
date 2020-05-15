@@ -27,6 +27,7 @@ namespace ecore
 
     class EDiagnostic;
     class EObject;
+    class EResourceIDManager;
     class EResourceSet;
     
     class URI;
@@ -90,6 +91,10 @@ namespace ecore
         virtual std::shared_ptr<EList<std::shared_ptr<EDiagnostic>>> getErrors() const = 0;
 
         virtual std::shared_ptr<EList<std::shared_ptr<EDiagnostic>>> getWarnings() const = 0;
+
+        virtual std::shared_ptr<EResourceIDManager> getIDManager() const = 0;
+
+        virtual void setIDManager( const std::shared_ptr<EResourceIDManager>& resourceIDManager ) = 0;
 
     };
 
