@@ -32,6 +32,7 @@ set(HEADER_ECORE_FILES
     src/ecore/EResource.hpp
     src/ecore/EResourceFactory.hpp 
     src/ecore/EResourceFactoryRegistry.hpp 
+    src/ecore/EResourceIDManager.hpp
     src/ecore/EResourceSet.hpp
     src/ecore/ETreeIterator.hpp
     src/ecore/EUnsettableList.hpp
