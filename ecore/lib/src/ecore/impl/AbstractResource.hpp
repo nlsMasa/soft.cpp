@@ -71,6 +71,10 @@ namespace ecore::impl
 
         virtual std::shared_ptr<EList<std::shared_ptr<EDiagnostic>>> getWarnings() const;
 
+        virtual std::shared_ptr<EResourceIDManager> getIDManager() const;
+
+        virtual void setIDManager( const std::shared_ptr<EResourceIDManager>& resourceIDManager );
+
         std::shared_ptr<ENotificationChain> basicSetLoaded(bool isLoaded, const std::shared_ptr<ENotificationChain>& notifications);
 
         std::shared_ptr<ENotificationChain> basicSetResourceSet(const std::shared_ptr<EResourceSet> resourceSet,
@@ -96,6 +100,7 @@ namespace ecore::impl
 
     private:
         std::weak_ptr<EResourceSet> resourceSet_;
+        std::shared_ptr<EResourceIDManager> resourceIDManager_;
         URI uri_;
         Lazy<std::shared_ptr<EList<std::shared_ptr<EObject>>>> eContents_{ [&]() { return initContents(); } };
         Lazy<std::shared_ptr<EList<std::shared_ptr<EDiagnostic>>>> errors_{ [&]() { return initDiagnostics(); } };

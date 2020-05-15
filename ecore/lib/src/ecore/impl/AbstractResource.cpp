@@ -273,6 +273,16 @@ std::shared_ptr<EList<std::shared_ptr<EDiagnostic>>> AbstractResource::getWarnin
     return warnings_;
 }
 
+std::shared_ptr<EResourceIDManager> AbstractResource::getIDManager() const
+{
+    return resourceIDManager_;
+}
+
+void AbstractResource::setIDManager( const std::shared_ptr<EResourceIDManager>& resourceIDManager )
+{
+    resourceIDManager_ = resourceIDManager;
+}
+
 std::shared_ptr<ENotificationChain> AbstractResource::basicSetLoaded( bool isLoaded, const std::shared_ptr<ENotificationChain>& msgs )
 {
     auto notifications = msgs;
