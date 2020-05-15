@@ -24,20 +24,23 @@ namespace ecore
     class ECollectionView<std::shared_ptr<EObject>>
     {
     public:
-        ECollectionView( const std::shared_ptr<EObject>& eObject )
-            : elements_( eObject->eContents() )
+        ECollectionView( const std::shared_ptr<EObject>& eObject, bool resolve = true )
+            : elements_( resolve ? eObject->eContents() : eObject->eContents()->getUnResolvedList() )
+            , resolve_( resolve )
         {
         }
 
-        ECollectionView( const std::shared_ptr<const EList<std::shared_ptr<EObject>>>& elements )
+        ECollectionView( const std::shared_ptr<const EList<std::shared_ptr<EObject>>>& elements, bool resolve = true )
             : elements_( elements )
+            , resolve_( resolve )
         {
         }
 
         ETreeIterator<std::shared_ptr<EObject>> begin() const
         {
-            return ETreeIterator<std::shared_ptr<EObject>>(
-                elements_, []( const std::shared_ptr<EObject>& eObject ) { return eObject->eContents(); } );
+            return ETreeIterator<std::shared_ptr<EObject>>( elements_, [&]( const std::shared_ptr<EObject>& eObject ) {
+                return resolve_ ? eObject->eContents() : eObject->eContents()->getUnResolvedList();
+            } );
         }
 
         ETreeIterator<std::shared_ptr<EObject>> end() const
@@ -47,6 +50,7 @@ namespace ecore
 
     private:
         std::shared_ptr<const EList<std::shared_ptr<EObject>>> elements_;
+        bool resolve_;
     };
 } // namespace ecore
 
