@@ -39,6 +39,8 @@ namespace ecore::tests
         MOCK_METHOD_EXT( save, 1, void( std::ostream& ), saveToStream )
         MOCK_METHOD( getErrors, 0 )
         MOCK_METHOD( getWarnings, 0 )
+        MOCK_METHOD( getIDManager, 0)
+        MOCK_METHOD( setIDManager, 1 )
     };
 
     typedef MockEResourceBase<EResource> MockEResource;
