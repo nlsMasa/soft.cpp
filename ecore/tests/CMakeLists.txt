@@ -58,6 +58,7 @@ add_executable(${PROJECT_NAME} ${CMAKE_FILES}
 target_include_directories(${PROJECT_NAME} PUBLIC src src-gen)
 target_compile_options(${PROJECT_NAME} PRIVATE /MP /wd4250 /bigobj)
 target_compile_definitions(${PROJECT_NAME} PRIVATE _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING)
+target_compile_definitions(${PROJECT_NAME} PRIVATE BOOST_BIND_GLOBAL_PLACEHOLDERS)
 target_link_libraries(${PROJECT_NAME} ecore.static Turtle::Turtle Boost::unit_test_framework)
 
 # Visual studio specific project layout
