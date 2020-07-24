@@ -36,12 +36,12 @@ namespace ecore::impl
     template <typename... I>
     class BasicEObject<I...>::EContentsEList : public AbstractAdapter
     {
-        typedef std::shared_ptr<const EList<std::shared_ptr<ecore::EReference>>> ( EClass::*T_RefsGetter )() const;
+        typedef std::shared_ptr<const EList<std::shared_ptr<ecore::EStructuralFeature>>> ( EClass::*T_FeaturesGetter )() const;
 
     public:
-        EContentsEList( BasicEObject<I...>& obj, T_RefsGetter refsGetter )
+        EContentsEList( BasicEObject<I...>& obj, T_FeaturesGetter featuresGetter )
             : obj_( obj )
-            , refsGetter_( refsGetter )
+            , featuresGetter_( featuresGetter )
         {
             obj_.eAdapters().add( this );
         }
@@ -56,13 +56,9 @@ namespace ecore::impl
             if( l_ )
             {
                 auto feature = notification->getFeature();
-                auto ref = std::dynamic_pointer_cast<EReference>( feature );
-                if( ref )
-                {
-                    auto refs = std::invoke( refsGetter_, *obj_.eClass() );
-                    if( refs->contains( ref ) )
-                        l_.reset();
-                }
+                auto features = std::invoke( featuresGetter_, *obj_.eClass() );
+                if( features->contains( feature ) )
+                    l_.reset();
             }
         }
 
@@ -123,13 +119,13 @@ namespace ecore::impl
 
                     initialized_ = true;
                     const auto& o = l_.obj_;
-                    auto refs = std::invoke( l_.refsGetter_, *o.eClass() );
-                    for( auto ref : *refs )
+                    auto features = std::invoke( l_.featuresGetter_, *o.eClass() );
+                    for( auto feature : features )
                     {
-                        if( o.eIsSet( ref ) )
+                        if( o.eIsSet( feature ) )
                         {
-                            auto value = o.eGet( ref, resolve_ );
-                            if( ref->isMany() )
+                            auto value = o.eGet( feature, resolve_ );
+                            if( feature->isMany() )
                             {
                                 auto l = anyListCast<std::shared_ptr<EObject>>( value );
                                 v_.reserve( v_.size() + l->size() );
@@ -192,7 +188,7 @@ namespace ecore::impl
 
     private:
         BasicEObject<I...>& obj_;
-        T_RefsGetter refsGetter_;
+        T_FeaturesGetter featuresGetter_;
         std::shared_ptr<const EList<std::shared_ptr<EObject>>> l_;
     };
 
@@ -244,7 +240,7 @@ namespace ecore::impl
     typename std::shared_ptr<const EList<std::shared_ptr<EObject>>> BasicEObject<I...>::eContentsList()
     {
         if( !eContents_ )
-            eContents_ = std::make_unique<EContentsEList>( *this, &EClass::getEContainments );
+            eContents_ = std::make_unique<EContentsEList>( *this, &EClass::getEContainmentFeatures );
         return eContents_->getList();
     }
 
@@ -252,7 +248,7 @@ namespace ecore::impl
     typename std::shared_ptr<const EList<std::shared_ptr<EObject>>> BasicEObject<I...>::eCrossReferencesList()
     {
         if( !eCrossReferences_ )
-            eCrossReferences_ = std::make_unique<EContentsEList>( *this, &EClass::getECrossReferences );
+            eCrossReferences_ = std::make_unique<EContentsEList>( *this, &EClass::getECrossReferenceFeatures );
         return eCrossReferences_->getList();
     }
 

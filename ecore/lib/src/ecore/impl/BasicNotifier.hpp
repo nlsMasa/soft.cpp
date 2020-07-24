@@ -80,7 +80,7 @@ namespace ecore::impl
             {
                 auto notifier = notifier_.thisPtr_.lock();
                 auto eAdapter = const_cast<EAdapter*>( adapter );
-                
+
                 //  notify removing adapter
                 if( notifier_.eDeliver_ )
                     eAdapter->notifyChanged(
@@ -125,8 +125,8 @@ namespace ecore::impl
 
     protected:
         std::weak_ptr<BasicNotifier> thisPtr_;
-        std::unique_ptr<EList<EAdapter*>> eAdapters_{new AdapterList( *this )};
-        bool eDeliver_{true};
+        std::unique_ptr<EList<EAdapter*>> eAdapters_{ new AdapterList( *this ) };
+        bool eDeliver_{ true };
     };
 } // namespace ecore::impl
 

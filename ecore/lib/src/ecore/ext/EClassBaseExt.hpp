@@ -51,8 +51,8 @@ namespace ecore::ext
         //*********************************
         virtual void initEReferences();
         virtual void initEAttributes();
-        virtual void initEContainments();
-        virtual void initECrossReferences();
+        virtual void initEContainmentFeatures();
+        virtual void initECrossReferenceFeatures();
         virtual void initEAllAttributes();
         virtual void initEAllReferences();
         virtual void initEAllContainments();
