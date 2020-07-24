@@ -53,7 +53,8 @@ namespace ecore::impl
 
         virtual void notifyChanged( const std::shared_ptr<ENotification>& notification )
         {
-            if( l_ )
+            // if we have a list && the event is not removing this adapter from the object
+            if( l_ && !isThisAdapterRemoved( notification ) )
             {
                 auto feature = notification->getFeature();
                 auto features = std::invoke( featuresGetter_, *obj_.eClass() );
@@ -187,6 +188,13 @@ namespace ecore::impl
         }
 
     private:
+        inline bool isThisAdapterRemoved( const std::shared_ptr<ENotification>& notification ) const
+        {
+            return notification->getEventType() == Notification::REMOVING_ADAPTER
+                   && anyCast<EAdapter*>( notification->getOldValue() ) == this;
+        }
+
+    private:
         BasicEObject<I...>& obj_;
         T_FeaturesGetter featuresGetter_;
         std::shared_ptr<const EList<std::shared_ptr<EObject>>> l_;
@@ -276,7 +284,7 @@ namespace ecore::impl
                 auto position = std::stoi( uriSegment.substr( index + 1 ) );
                 auto eFeatureName = uriSegment.substr( 1, index - 1 );
                 auto eFeature = eStructuralFeature( eFeatureName );
-                auto value = eGet( eFeature , false );
+                auto value = eGet( eFeature, false );
                 auto list = anyListCast<std::shared_ptr<EObject>>( value );
                 if( position < list->size() )
                     return list->get( position );
@@ -285,7 +293,7 @@ namespace ecore::impl
         if( index == std::string::npos )
         {
             auto eFeature = eStructuralFeature( uriSegment.substr( 1 ) );
-            auto value = eGet( eFeature , false );
+            auto value = eGet( eFeature, false );
             return anyCast<std::shared_ptr<EObject>>( value );
         }
         return std::shared_ptr<EObject>();
