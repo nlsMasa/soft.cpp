@@ -38,14 +38,14 @@ BOOST_AUTO_TEST_CASE( LibraryContainments )
 {
     auto p = LibraryPackage::eInstance();
     auto c = p->getLibrary();
-    auto con = c->getEContainments();
+    auto con = c->getEContainmentFeatures();
     BOOST_CHECK_EQUAL( *con,
-                       std::vector<std::shared_ptr<EReference>>( {p->getLibrary_Writers(),
-                                                                  p->getLibrary_Employees(),
-                                                                  p->getLibrary_Borrowers(),
-                                                                  p->getLibrary_Stock(),
-                                                                  p->getLibrary_Books(),
-                                                                  p->getLibrary_Branches()} ) );
+                       std::vector<std::shared_ptr<EStructuralFeature>>( { p->getLibrary_Writers(),
+                                                                           p->getLibrary_Employees(),
+                                                                           p->getLibrary_Borrowers(),
+                                                                           p->getLibrary_Stock(),
+                                                                           p->getLibrary_Books(),
+                                                                           p->getLibrary_Branches() } ) );
 }
 
 BOOST_AUTO_TEST_SUITE_END()
