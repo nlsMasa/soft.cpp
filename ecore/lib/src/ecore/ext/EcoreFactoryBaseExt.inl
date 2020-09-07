@@ -57,7 +57,7 @@ namespace ecore::ext {
     {
         std::istringstream s( literalValue );
         std::chrono::system_clock::time_point tp;
-        s >> date::parse( "%FT%T", tp );
+        s >> date::parse( "%FT%TZ", tp );
         return std::chrono::system_clock::to_time_t(tp);
     }
 
@@ -66,7 +66,7 @@ namespace ecore::ext {
     {
         auto t = anyCast<std::time_t>(instanceValue);
         auto tp = std::chrono::system_clock::from_time_t( t );
-        return date::format( "%FT%T", std::chrono::floor<std::chrono::milliseconds>( tp ) );
+        return date::format( "%FT%TZ", std::chrono::floor<std::chrono::milliseconds>( tp ) );
     }
 
     template <typename... I>
