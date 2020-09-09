@@ -11,6 +11,7 @@
 #include "ecore/URI.hpp"
 
 #include <fstream>
+#include <filesystem>
 
 using namespace ecore;
 using namespace library;
@@ -30,7 +31,7 @@ BOOST_AUTO_TEST_SUITE( SerializationTests )
 BOOST_AUTO_TEST_CASE( GenerateModel, *boost::unit_test::disabled() )
 {
     auto l = LibraryFactory::createLibrary( nb_employees, nb_writers, nb_books, nb_borrowers );
-    auto fileURI = URI("file:D:/dev/mylib.xml");
+    auto fileURI = URI( "file:" + std::filesystem::temp_directory_path().string() +  "/mylib.xml" );
     auto resourceFactory = EResourceFactoryRegistry::getInstance()->getFactory( fileURI );
     BOOST_CHECK( resourceFactory );
     auto resource = resourceFactory->createResource( fileURI );

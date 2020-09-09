@@ -328,13 +328,13 @@ namespace ecore::ext
     }
 
     template <typename... I>
-    void ecore::ext::EClassBaseExt<I...>::initEContainments()
+    void EClassBaseExt<I...>::initEContainmentFeatures()
     {
         initFeaturesSubSet();
     }
 
     template <typename... I>
-    void ecore::ext::EClassBaseExt<I...>::initECrossReferences()
+    void EClassBaseExt<I...>::initECrossReferenceFeatures()
     {
         initFeaturesSubSet();
     }
@@ -384,8 +384,8 @@ namespace ecore::ext
         if( eAllStructuralFeatures_ )
             return;
 
-        eCrossReferences_.reset();
-        eContainments_.reset();
+        eCrossReferenceFeatures_.reset();
+        eContainmentFeatures_.reset();
         nameToFeatureMap_.reset();
 
         std::vector<std::shared_ptr<EStructuralFeature>> allFeatures;
@@ -484,11 +484,11 @@ namespace ecore::ext
     {
         initEAllStructuralFeatures();
 
-        if( eContainments_ )
+        if( eContainmentFeatures_ )
             return;
 
-        std::vector<std::shared_ptr<EReference>> containments;
-        std::vector<std::shared_ptr<EReference>> crossReferences;
+        std::vector<std::shared_ptr<EStructuralFeature>> containments;
+        std::vector<std::shared_ptr<EStructuralFeature>> crossReferences;
         auto eFeatures = getEStructuralFeatures();
         for( const auto& feature : *eFeatures )
         {
@@ -506,8 +506,10 @@ namespace ecore::ext
                 }
             }
         }
-        eContainments_ = std::make_shared<impl::ImmutableHashEList<std::shared_ptr<EReference>>>( std::move( containments ) );
-        eCrossReferences_ = std::make_shared<impl::ImmutableHashEList<std::shared_ptr<EReference>>>( std::move( crossReferences ) );
+        eContainmentFeatures_
+            = std::make_shared<impl::ImmutableHashEList<std::shared_ptr<EStructuralFeature>>>( std::move( containments ) );
+        eCrossReferenceFeatures_
+            = std::make_shared<impl::ImmutableHashEList<std::shared_ptr<EStructuralFeature>>>( std::move( crossReferences ) );
     }
 
     template <typename... I>
