@@ -8,6 +8,7 @@ set(SOURCE_FILES
     src/BasicNotifierTests.cpp
     src/DiamondVsMixinsTests.cpp
     src/DynamicEObjectTests.cpp
+    src/DynamicModelTests.cpp
     src/EContentAdapterTests.cpp
     src/EcoreFactoryTests.cpp
     src/EcorePackageTests.cpp
@@ -15,7 +16,6 @@ set(SOURCE_FILES
     src/EAttributeTests.cpp
     src/EClassTests.cpp
     src/ECollectionViewTests.cpp
-    src/EDynamicModelTests.cpp
     src/EFactoryTests.cpp
     src/EListTests.cpp
     src/EObjectTests.cpp
