@@ -206,10 +206,14 @@ std::shared_ptr<EObject> AbstractResource::getObjectForRootSegment( const std::s
 
 void AbstractResource::attached( const std::shared_ptr<EObject>& object )
 {
+    if( resourceIDManager_ )
+        resourceIDManager_->registerObject( object );
 }
 
 void AbstractResource::detached( const std::shared_ptr<EObject>& object )
 {
+    if( resourceIDManager_ )
+        resourceIDManager_->unregisterObject( object );
 }
 
 void AbstractResource::load()
@@ -326,7 +330,11 @@ std::shared_ptr<ENotificationChain> AbstractResource::basicSetResourceSet( const
 
 void AbstractResource::doUnload()
 {
-    eContents_->clear();
+    eContents_.reset();
+    errors_.reset();
+    warnings_.reset();
+    if( resourceIDManager_)
+        resourceIDManager_->clear();
 }
 
 std::shared_ptr<URIConverter> AbstractResource::getURIConverter() const
