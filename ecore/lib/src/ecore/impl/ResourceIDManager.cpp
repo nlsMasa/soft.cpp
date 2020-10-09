@@ -14,6 +14,12 @@ ResourceIDManager::~ResourceIDManager()
 {
 }
 
+void ResourceIDManager::clear()
+{
+    objectToID_.clear();
+    idToObject_.clear();
+}
+
 void ResourceIDManager::registerObject( const std::shared_ptr<EObject>& eObject )
 {
     auto id = EcoreUtils::getID( eObject );

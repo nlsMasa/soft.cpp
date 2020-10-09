@@ -24,6 +24,8 @@ namespace ecore::impl
 
         virtual ~ResourceIDManager();
 
+        virtual void clear();
+
         virtual void registerObject( const std::shared_ptr<EObject>& eObject );
 
         virtual void unregisterObject( const std::shared_ptr<EObject>& eObject );

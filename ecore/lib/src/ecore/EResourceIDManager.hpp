@@ -22,6 +22,8 @@ namespace ecore
     public:
         virtual ~EResourceIDManager() = default;
 
+        virtual void clear() = 0;
+
         virtual void registerObject( const std::shared_ptr<EObject>& eObject ) = 0;
 
         virtual void unregisterObject( const std::shared_ptr<EObject>& eObject ) = 0;
