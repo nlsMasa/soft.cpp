@@ -400,6 +400,61 @@ namespace ecore::impl
                 else if( eNotificationRequired() )
                     eNotify( std::make_shared<Notification>( getThisPtr(), Notification::SET, dynamicFeature, NO_VALUE, NO_VALUE ) );
             }
+            else if( isBidirectional( dynamicFeature ) || isContains( dynamicFeature ) )
+            {
+                // inverse - opposite
+                auto oldValue = properties_[dynamicFeatureID];
+                if( !oldValue.empty() )
+                {
+                    std::shared_ptr<ENotificationChain> notifications;
+                    std::shared_ptr<EObject> oldObject;
+                    if( !oldValue.empty() )
+                    {
+                        if( isProxy( dynamicFeature ) )
+                            oldObject = anyCast<std::shared_ptr<EObjectProxy>>( oldValue )->get();
+                        else if( isBackReference( dynamicFeature ) )
+                            oldObject = anyCast<std::weak_ptr<EObject>>( oldValue ).lock();
+                        else
+                            oldObject = anyCast<std::shared_ptr<EObject>>( oldValue );
+                    }
+
+                    if( !isBidirectional( dynamicFeature ) )
+                    {
+                        if( oldObject )
+                            notifications = oldObject->getInternal().eInverseRemove(
+                                getThisPtr(), EOPPOSITE_FEATURE_BASE - featureID, notifications );
+                    }
+                    else
+                    {
+                        auto dynamicReference = std::static_pointer_cast<EReference>( dynamicFeature );
+                        auto reverseFeature = dynamicReference->getEOpposite();
+                        if( oldObject )
+                            notifications
+                                = oldObject->getInternal().eInverseRemove( getThisPtr(), reverseFeature->getFeatureID(), notifications );
+                    }
+                    // basic unset
+                    properties_[dynamicFeatureID].reset();
+
+                    // create notification
+                    if( eNotificationRequired() )
+                    {
+                        auto notification
+                            = std::make_shared<Notification>( getThisPtr(),
+                                                              dynamicFeature->isUnsettable() ? Notification::UNSET : Notification::SET,
+                                                              featureID,
+                                                              oldValue,
+                                                              NO_VALUE );
+                        if( notifications )
+                            notifications->add( notification );
+                        else
+                            notifications = notification;
+                    }
+
+                    // notify
+                    if( notifications )
+                        notifications->dispatch();
+                }
+            }
             else
             {
                 auto oldValue = properties_[dynamicFeatureID];
