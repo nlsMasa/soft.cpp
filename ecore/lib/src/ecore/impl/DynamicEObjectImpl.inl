@@ -127,56 +127,46 @@ namespace ecore::impl
         if( dynamicFeatureID >= 0 )
         {
             auto eFeature = eDynamicFeature( featureID );
-
-            // retrieve value or compute it if empty
-            auto result = properties_[dynamicFeatureID];
-            if( result.empty() )
-            {
-                if( eFeature->isMany() )
-                    properties_[dynamicFeatureID] = result = createList( eFeature );
-                else if( isProxy( eFeature ) )
-                    properties_[dynamicFeatureID] = result = std::make_shared<EObjectProxy>();
-                else if( isBackReference( eFeature ) )
-                    properties_[dynamicFeatureID] = result = std::weak_ptr<EObject>();
-            }
-
-            // convert internal value to ouput value
-            if( isProxy( eFeature ) )
-            {
-                auto proxy = anyCast<std::shared_ptr<EObjectProxy>>( result );
-                auto oldObject = proxy->get();
-                if( oldObject && oldObject->eIsProxy() )
+            if (isContainer(eFeature)) {
+                if( eContainerFeatureID() == eFeature->getFeatureID() )
                 {
-                    // resolve
-                    auto newObject = eResolveProxy( oldObject );
-                    if( newObject && newObject != oldObject )
+                    return resolve ? eContainer() : getInternal().eInternalContainer();
+                }
+            }
+            else
+            {
+                // retrieve value or compute it if empty
+                auto result = properties_[dynamicFeatureID];
+                if( result.empty() )
+                {
+                    if( eFeature->isMany() )
+                        properties_[dynamicFeatureID] = result = createList( eFeature );
+                    else if( isProxy( eFeature ) )
+                        properties_[dynamicFeatureID] = result = std::make_shared<EObjectProxy>();
+                    else if( isBackReference( eFeature ) )
+                        properties_[dynamicFeatureID] = result = std::weak_ptr<EObject>();
+                }
+
+                // convert internal value to ouput value
+                if( isProxy( eFeature ) )
+                {
+                    auto proxy = anyCast<std::shared_ptr<EObjectProxy>>( result );
+                    auto oldObject = proxy->get();
+                    if( oldObject && oldObject->eIsProxy() )
                     {
-                        proxy->set( newObject );
-                        if( isContains( eFeature ) )
+                        // resolve
+                        auto newObject = eResolveProxy( oldObject );
+                        if( newObject && newObject != oldObject )
                         {
-                            auto& oldInternal = oldObject->getInternal();
-                            auto& newInternal = newObject->getInternal();
-                            std::shared_ptr<ENotificationChain> notifications;
-                            if( !isBidirectional( eFeature ) )
+                            proxy->set( newObject );
+                            if( isContains( eFeature ) )
                             {
-                                notifications = oldInternal.eInverseRemove(
-                                    getThisAsEObject(), EOPPOSITE_FEATURE_BASE - dynamicFeatureID, notifications );
-                            }
-                            else
-                            {
-                                auto eRererence = derived_pointer_cast<EReference>( eFeature );
-                                if( eRererence )
-                                {
-                                    auto reverseFeature = eRererence->getEOpposite();
-                                    notifications
-                                        = oldInternal.eInverseRemove( getThisAsEObject(), reverseFeature->getFeatureID(), notifications );
-                                }
-                            }
-                            if( !newInternal.eInternalContainer() )
-                            {
+                                auto& oldInternal = oldObject->getInternal();
+                                auto& newInternal = newObject->getInternal();
+                                std::shared_ptr<ENotificationChain> notifications;
                                 if( !isBidirectional( eFeature ) )
                                 {
-                                    notifications = newInternal.eInverseAdd(
+                                    notifications = oldInternal.eInverseRemove(
                                         getThisAsEObject(), EOPPOSITE_FEATURE_BASE - dynamicFeatureID, notifications );
                                 }
                                 else
@@ -185,26 +175,43 @@ namespace ecore::impl
                                     if( eRererence )
                                     {
                                         auto reverseFeature = eRererence->getEOpposite();
-                                        notifications = newInternal.eInverseRemove(
+                                        notifications = oldInternal.eInverseRemove(
                                             getThisAsEObject(), reverseFeature->getFeatureID(), notifications );
                                     }
                                 }
+                                if( !newInternal.eInternalContainer() )
+                                {
+                                    if( !isBidirectional( eFeature ) )
+                                    {
+                                        notifications = newInternal.eInverseAdd(
+                                            getThisAsEObject(), EOPPOSITE_FEATURE_BASE - dynamicFeatureID, notifications );
+                                    }
+                                    else
+                                    {
+                                        auto eRererence = derived_pointer_cast<EReference>( eFeature );
+                                        if( eRererence )
+                                        {
+                                            auto reverseFeature = eRererence->getEOpposite();
+                                            notifications = newInternal.eInverseRemove(
+                                                getThisAsEObject(), reverseFeature->getFeatureID(), notifications );
+                                        }
+                                    }
+                                }
                             }
+                            if( eNotificationRequired() )
+                                eNotify( std::make_shared<ecore::impl::Notification>(
+                                    getThisAsEObject(), ecore::ENotification::RESOLVE, dynamicFeatureID, oldObject, newObject ) );
                         }
-                        if( eNotificationRequired() )
-                            eNotify( std::make_shared<ecore::impl::Notification>(
-                                getThisAsEObject(), ecore::ENotification::RESOLVE, dynamicFeatureID, oldObject, newObject ) );
                     }
+                    result = proxy->get();
                 }
-                result = proxy->get();
+                else if( isBackReference( eFeature ) )
+                {
+                    auto weak = anyCast<std::weak_ptr<EObject>>( result );
+                    result = weak.lock();
+                }
+                return result;
             }
-            else if( isBackReference( eFeature ) )
-            {
-                auto weak = anyCast<std::weak_ptr<EObject>>( result );
-                result = weak.lock();
-            }
-
-            return result;
         }
         return EObjectBase<I...>::eGet( featureID, resolve );
     }
@@ -214,7 +221,13 @@ namespace ecore::impl
     {
         int dynamicFeatureID = featureID - eStaticFeatureCount();
         if( dynamicFeatureID >= 0 )
-            return !properties_[dynamicFeatureID].empty();
+        {
+            auto eFeature = eDynamicFeature( featureID );
+            if( isContainer( eFeature ) )
+                return eContainerFeatureID() == featureID && getInternal().eInternalContainer();
+            else
+                return !properties_[dynamicFeatureID].empty();
+        }
         else
             return EObjectBase<I...>::eIsSet( featureID );
     }
@@ -373,15 +386,86 @@ namespace ecore::impl
         int dynamicFeatureID = featureID - eStaticFeatureCount();
         if( dynamicFeatureID >= 0 )
         {
-            auto oldValue = properties_[dynamicFeatureID];
+            auto dynamicFeature = eDynamicFeature( featureID );
+            if( isContainer( dynamicFeature ) )
+            {
+                auto eContainer = getInternal().eInternalContainer();
+                if( eContainer )
+                {
+                    auto notifications = eBasicRemoveFromContainer( nullptr );
+                    notifications = eBasicSetContainer( nullptr, featureID, notifications );
+                    if( notifications )
+                        notifications->dispatch();
+                }
+                else if( eNotificationRequired() )
+                    eNotify( std::make_shared<Notification>( getThisPtr(), Notification::SET, dynamicFeature, NO_VALUE, NO_VALUE ) );
+            }
+            else if( isBidirectional( dynamicFeature ) || isContains( dynamicFeature ) )
+            {
+                // inverse - opposite
+                auto oldValue = properties_[dynamicFeatureID];
+                if( !oldValue.empty() )
+                {
+                    std::shared_ptr<ENotificationChain> notifications;
+                    std::shared_ptr<EObject> oldObject;
+                    if( !oldValue.empty() )
+                    {
+                        if( isProxy( dynamicFeature ) )
+                            oldObject = anyCast<std::shared_ptr<EObjectProxy>>( oldValue )->get();
+                        else if( isBackReference( dynamicFeature ) )
+                            oldObject = anyCast<std::weak_ptr<EObject>>( oldValue ).lock();
+                        else
+                            oldObject = anyCast<std::shared_ptr<EObject>>( oldValue );
+                    }
 
-            properties_[dynamicFeatureID].reset();
+                    if( !isBidirectional( dynamicFeature ) )
+                    {
+                        if( oldObject )
+                            notifications = oldObject->getInternal().eInverseRemove(
+                                getThisPtr(), EOPPOSITE_FEATURE_BASE - featureID, notifications );
+                    }
+                    else
+                    {
+                        auto dynamicReference = std::static_pointer_cast<EReference>( dynamicFeature );
+                        auto reverseFeature = dynamicReference->getEOpposite();
+                        if( oldObject )
+                            notifications
+                                = oldObject->getInternal().eInverseRemove( getThisPtr(), reverseFeature->getFeatureID(), notifications );
+                    }
+                    // basic unset
+                    properties_[dynamicFeatureID].reset();
 
-            if( eNotificationRequired() )
-                eNotify( std::make_shared<Notification>( getThisPtr(), Notification::UNSET, featureID, oldValue, NO_VALUE ) );
+                    // create notification
+                    if( eNotificationRequired() )
+                    {
+                        auto notification
+                            = std::make_shared<Notification>( getThisPtr(),
+                                                              dynamicFeature->isUnsettable() ? Notification::UNSET : Notification::SET,
+                                                              featureID,
+                                                              oldValue,
+                                                              NO_VALUE );
+                        if( notifications )
+                            notifications->add( notification );
+                        else
+                            notifications = notification;
+                    }
+
+                    // notify
+                    if( notifications )
+                        notifications->dispatch();
+                }
+            }
+            else
+            {
+                auto oldValue = properties_[dynamicFeatureID];
+                properties_[dynamicFeatureID].reset();
+                if( eNotificationRequired() )
+                    eNotify( std::make_shared<Notification>( getThisPtr(), Notification::UNSET, featureID, oldValue, NO_VALUE ) );
+            }
         }
         else
             EObjectBase<I...>::eUnset( featureID );
+        
     }
 
     template <typename... I>
