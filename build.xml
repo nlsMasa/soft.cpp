@@ -205,7 +205,7 @@
     </target>
   
     <target name="ninja.install" depends="aria2.install,ninja.checksum" unless="ninja.installed">
-        <install name="ninja" url="https://github.com/ninja-build/ninja/releases/download/v1.8.2/ninja-win.zip"/>
+        <install name="ninja" url="https://github.com/ninja-build/ninja/releases/download/v1.11.1/ninja-win.zip"/>
     </target>
     
     <macrodef name="ninja_exec">
