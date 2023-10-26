@@ -10,7 +10,7 @@
     <property name="cmake.SHA-512"  value="466fa8fd6bfaea0e338627beb0d6583bd900f2720dcb2a5bc8099a465fbca9b44ec3350549d09128c582d0527ef461ba86cb6e8e47943056ac6f97d6fc605898"/>
     <property name="ninja.SHA-512"  value="56f3b94ed7f9e36446bb6fe2a786156befdde6b279ee6d9d7ebd8b6e5d6664cdfe1d526e158f68bfc5cf947bcf9360df8d1e1a8939b6db1b2f0658256a17d66b"/>
     
-    <property name="ecore.version"              value="1.2.3"/>
+    <property name="ecore.version"  value="1.2.3"/>
     
     <macrodef name="property-to-location">
         <attribute name="name"/>
@@ -138,17 +138,19 @@
     </target>
     
     <target name="cmake.install" depends="aria2.install,cmake.checksum" unless="cmake.installed">
-        <install name="cmake" url="https://github.com/Kitware/CMake/releases/download/v3.18.0/cmake-3.18.0-win64-x64.zip"/>
+        <install name="cmake" url="https://github.com/Kitware/CMake/releases/download/v3.27.6/cmake-3.27.6-windows-x86_64.zip"/>
     </target>
     
     <property name= "cmake.generator.vs2015" value = "Visual Studio 14 2015"/>
     <property name= "cmake.generator.vs2017" value = "Visual Studio 15 2017"/>
     <property name= "cmake.generator.vs2019" value = "Visual Studio 16 2019"/>
+    <property name= "cmake.generator.vs2022" value = "Visual Studio 17 2022"/>
     <property name= "cmake.generator.ninja"  value = "Ninja"/>
     <property name= "cmake.architecture"     value ="x64"/>
     <property name= "cmake.platform.vs2015"  value = "-G '${cmake.generator.vs2015}' -A ${cmake.architecture}"/>
     <property name= "cmake.platform.vs2017"  value = "-G '${cmake.generator.vs2017}' -A ${cmake.architecture}"/>
     <property name= "cmake.platform.vs2019"  value = "-G '${cmake.generator.vs2019}' -A ${cmake.architecture}"/>
+    <property name= "cmake.platform.vs2022"  value = "-G '${cmake.generator.vs2022}' -A ${cmake.architecture}"/>
     <property name= "cmake.platform.ninja"   value = "-G '${cmake.generator.ninja}'"/>
     
     
@@ -203,7 +205,7 @@
     </target>
   
     <target name="ninja.install" depends="aria2.install,ninja.checksum" unless="ninja.installed">
-        <install name="ninja" url="https://github.com/ninja-build/ninja/releases/download/v1.8.2/ninja-win.zip"/>
+        <install name="ninja" url="https://github.com/ninja-build/ninja/releases/download/v1.11.1/ninja-win.zip"/>
     </target>
     
     <macrodef name="ninja_exec">
@@ -308,6 +310,10 @@
         <cmake_exec generator="vs2019" project="ecore" input="${root.dir}/ecore"/>
     </target>
     
+    <target name="ecore.configure.vs2022">
+        <cmake_exec generator="vs2022" project="ecore" input="${root.dir}/ecore"/>
+    </target>
+    
     <target name="ecore.configure.ninja.release">
         <cmake_exec generator="ninja" project="ecore" configuration="release" input="${root.dir}/ecore">
             <arg value="-DCMAKE_MAKE_PROGRAM=${bin.dir}/ninja/ninja.exe"/>
@@ -324,7 +330,7 @@
     
     <target name="ecore.configure.ninja" depends="ecore.configure.ninja.release,ecore.configure.ninja.debug"/>
     
-    <target name="ecore.configure" depends="ecore.configure.vs2019,ecore.configure.ninja"/>
+    <target name="ecore.configure" depends="ecore.configure.vs2022,ecore.configure.ninja"/>
     
     <target name="ecore.build.debug">
         <ninja_exec dir="${out.dir}/cpp/ninja/ecore/debug"/>
@@ -382,6 +388,10 @@
         <cmake_exec generator="vs2019" project="library" input="${root.dir}/library"/>
     </target>
     
+    <target name="library.configure.vs2022">
+        <cmake_exec generator="vs2022" project="library" input="${root.dir}/library"/>
+    </target>
+    
     <target name="library.configure.ninja.release">
         <cmake_exec generator="ninja" project="library" configuration="release" input="${root.dir}/library">
             <arg value="-DCMAKE_MAKE_PROGRAM=${bin.dir}/ninja/ninja.exe"/>
@@ -398,7 +408,7 @@
     
     <target name="library.configure.ninja" depends="library.configure.ninja.release,library.configure.ninja.debug"/>
     
-    <target name="library.configure" depends="library.configure.vs2019,library.configure.ninja"/>
+    <target name="library.configure" depends="library.configure.vs2022,library.configure.ninja"/>
     
     <target name="library.build.debug">
         <ninja_exec dir="${out.dir}/cpp/ninja/library/debug"/>
