@@ -39,4 +39,18 @@ namespace ecore::ext
         return getEPackage() ? static_cast<int>(getEPackage()->getEClassifiers()->indexOf(getThisPtr())) : -1;
     }
 
+    template <typename... I>
+    const std::string& EClassifierBaseExt<I...>::getInstanceTypeName() const
+    {
+        return instanceTypeName_;
+    }
+
+    template <typename... I>
+    void EClassifierBaseExt<I...>::setInstanceTypeName( const std::string& newInstanceTypeName )
+    {
+        auto oldInstanceTypeName = instanceTypeName_;
+        instanceTypeName_ = newInstanceTypeName;
+        if( eNotificationRequired() )
+            eNotify( std::make_shared<ecore::impl::Notification>(getThisAsEObject(), ecore::ENotification::SET, EcorePackage::ECLASSIFIER__INSTANCE_TYPE_NAME, oldInstanceTypeName, newInstanceTypeName));
+    }
 }

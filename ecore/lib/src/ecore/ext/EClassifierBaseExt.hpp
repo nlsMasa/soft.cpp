@@ -27,9 +27,14 @@ namespace ecore::ext
         virtual ~EClassifierBaseExt();
 
         virtual bool isInstance( const ecore::Any& object ) const;
+        virtual const std::string& getInstanceTypeName() const;
+        virtual void setInstanceTypeName( const std::string& newInstanceTypeName );
 
     protected:
         virtual int initClassifierID();
+
+    private:
+        std::string instanceTypeName_;
     };
 
 }
