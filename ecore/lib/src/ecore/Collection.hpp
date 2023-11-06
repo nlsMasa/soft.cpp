@@ -360,6 +360,15 @@ namespace ecore
                 }
             };
 
+            template< template< class, class > class Entry, class K, class A, class B >
+            struct cast< Entry< K, A >, Entry< K, B > >
+            {
+                static inline Entry< K, B > do_cast( const Entry< K, A >& entry )
+                {
+                    return Entry<K, B>( entry.getKey(), cast<A, B>::do_cast( entry.getValue() ) );
+                }
+            };
+
             template <typename A>
             struct cast<A, A>
             {

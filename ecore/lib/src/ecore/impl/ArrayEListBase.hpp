@@ -61,7 +61,7 @@ namespace ecore::impl
             return v_.empty();
         }
 
-protected:
+    protected:
         virtual ValueType doGet( std::size_t index ) const
         {
             return static_cast<ValueType>( v_[index] );
@@ -69,7 +69,7 @@ protected:
 
         virtual ValueType doSet( std::size_t index, const ValueType& e )
         {
-            auto old = static_cast<ValueType>(v_[index]);
+            auto old = static_cast<ValueType>( v_[index] );
             v_[index] = e;
             didSet( index, e, old );
             didChange();
@@ -112,7 +112,7 @@ protected:
         virtual ValueType doRemove( std::size_t index )
         {
             auto it = std::next( v_.begin(), index );
-            auto element = static_cast<ValueType>(*it);
+            auto element = static_cast<ValueType>( *it );
             v_.erase( it );
             didRemove( index, element );
             didChange();
@@ -122,7 +122,7 @@ protected:
         virtual ValueType doMove( std::size_t newIndex, std::size_t oldIndex )
         {
             auto it = std::next( v_.begin(), oldIndex );
-            auto element = static_cast<ValueType>(*it);
+            auto element = static_cast<ValueType>( *it );
             v_.erase( it );
             v_.insert( std::next( v_.begin(), newIndex ), element );
             didMove( newIndex, element, oldIndex );
@@ -135,7 +135,7 @@ protected:
     };
 
     template <typename Base, typename T = typename Base::ValueType>
-    class ArrayEListBase : public AbstractArrayEListBase<Base,T>
+    class ArrayEListBase : public AbstractArrayEListBase<Base, T>
     {
     public:
         typedef typename Base Base;
@@ -147,12 +147,12 @@ protected:
         }
 
         ArrayEListBase( const std::vector<T>&& v )
-            : AbstractArrayEListBase(v)
+            : AbstractArrayEListBase( v )
         {
         }
 
         ArrayEListBase( const std::initializer_list<T>& init )
-            : AbstractArrayEListBase(init)
+            : AbstractArrayEListBase( init )
         {
         }
 
@@ -165,19 +165,24 @@ protected:
         {
         }
 
-        virtual bool contains( const ValueType& e ) const
+        bool contains( const ValueType& e ) const override
         {
             return std::find( v_.begin(), v_.end(), e ) != v_.end();
         }
 
-        virtual std::size_t indexOf( const ValueType& e ) const
+        std::size_t indexOf( const ValueType& e ) const override
         {
             std::size_t index = std::distance( v_.begin(), std::find( v_.begin(), v_.end(), e ) );
             return index == size() ? -1 : index;
         }
 
-    protected:    
+        std::size_t indexOf( std::function<bool( const T& )> predicate ) const override
+        {
+            std::size_t index = std::distance( v_.begin(), std::find_if( v_.begin(), v_.end(), predicate ) );
+            return index == size() ? -1 : index;
+        }
 
+    protected:
         inline ValueType unresolvedGet( std::size_t index ) const
         {
             return v_[index];
@@ -189,7 +194,7 @@ protected:
             return index == size() ? -1 : index;
         }
 
-        virtual std::shared_ptr<EList<T>> doClear()
+        std::shared_ptr<EList<T>> doClear() override
         {
             auto l = std::make_shared<ImmutableArrayEList<T>>( std::move( v_ ) );
             v_.clear();
@@ -198,7 +203,7 @@ protected:
     };
 
     template <typename Base, typename T>
-    class ArrayEListBase<Base, Proxy<T>> : public AbstractArrayEListBase<Base, Proxy<T> >
+    class ArrayEListBase<Base, Proxy<T>> : public AbstractArrayEListBase<Base, Proxy<T>>
     {
     public:
         typedef typename Base Base;
@@ -218,12 +223,12 @@ protected:
         {
         }
 
-        virtual bool contains( const T& e ) const
+        bool contains( const T& e ) const override
         {
             return indexOf( e ) != -1;
         }
 
-        virtual std::size_t indexOf( const T& e ) const
+        std::size_t indexOf( const T& e ) const override
         {
             for( std::size_t i = 0; i < v_.size(); ++i )
             {
@@ -233,8 +238,17 @@ protected:
             return -1;
         }
 
+        std::size_t indexOf( std::function<bool( const T& )> predicate ) const override
+        {
+            for( std::size_t i = 0; i < v_.size(); ++i )
+            {
+                if( predicate( resolve( i, v_[i] ) ) )
+                    return i;
+            }
+            return -1;
+        }
+
     protected:
-        
         virtual T doGet( std::size_t index ) const
         {
             return resolve( index, v_[index] );
@@ -242,7 +256,7 @@ protected:
 
         inline ValueType unresolvedGet( std::size_t index ) const
         {
-            return static_cast<ValueType>(v_[index]);
+            return static_cast<ValueType>( v_[index] );
         }
 
         inline std::size_t unresolvedIndexOf( const ValueType& e ) const
@@ -258,7 +272,7 @@ protected:
         virtual std::shared_ptr<EList<T>> doClear()
         {
             std::vector<T> result;
-            std::transform( v_.begin(), v_.end(), std::back_inserter(result), []( const Proxy<T>& p ) { return p.get(); } );
+            std::transform( v_.begin(), v_.end(), std::back_inserter( result ), []( const Proxy<T>& p ) { return p.get(); } );
             auto l = std::make_shared<ImmutableArrayEList<T>>( std::move( result ) );
             v_.clear();
             return l;
@@ -266,7 +280,6 @@ protected:
 
     protected:
         virtual T resolve( std::size_t index, const Proxy<T>& e ) const = 0;
-
     };
 
 } // namespace ecore::impl

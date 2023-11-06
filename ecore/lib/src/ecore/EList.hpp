@@ -10,25 +10,12 @@
 #ifndef ECORE_ELIST_HPP_
 #define ECORE_ELIST_HPP_
 
+#include "ecore/EObjectHelpers.hpp"
 #include "ecore/EObjectList.hpp"
 #include "ecore/TypeTraits.hpp"
 
 namespace ecore
 {
-    class EObject;
-
-    template <typename T>
-    struct IsSharedEObject : std::false_type
-    {
-    };
-
-    template <typename T>
-    struct IsSharedEObject<std::shared_ptr<T>> : std::is_base_of<EObject, typename T>
-    {
-    };
-
-    template <typename T>
-    using IsSharedEObjectOrAny = std::disjunction<std::is_same<T, Any>, IsSharedEObject<T>>;
 
     template <typename T>
     class EList : public std::conditional_t<IsSharedEObjectOrAny<T>::value, EObjectList<EList<T>, T>, List<T>>
@@ -124,47 +111,52 @@ namespace ecore
             {
             }
 
-            virtual bool add( std::size_t pos, const T& e )
+            bool add( std::size_t pos, const T& e ) override
             {
                 throw "UnsupportedOperationException";
             }
 
-            virtual bool addAll( std::size_t pos, const Collection<T>& l )
+            bool addAll( std::size_t pos, const Collection<T>& l ) override
             {
                 throw "UnsupportedOperationException";
             }
 
-            virtual void move( std::size_t newPos, const T& e )
+            void move( std::size_t newPos, const T& e ) override
             {
                 throw "UnsupportedOperationException";
             }
 
-            virtual T move( std::size_t newPos, std::size_t oldPos )
+            T move( std::size_t newPos, std::size_t oldPos ) override
             {
                 throw "UnsupportedOperationException";
             }
 
-            virtual T set( std::size_t pos, const T& e )
+            T set( std::size_t pos, const T& e ) override
             {
                 throw "UnsupportedOperationException";
             }
 
-            virtual T remove( std::size_t pos )
+            T remove( std::size_t pos ) override
             {
                 throw "UnsupportedOperationException";
             }
 
-            virtual std::size_t indexOf( const T& e ) const
+            std::size_t indexOf( const T& e ) const override
             {
                 return delegate_->indexOf( cast<T, Q>::do_cast( e ) );
             }
 
-            virtual std::shared_ptr<LT> getUnResolvedList()
+            std::size_t indexOf( std::function<bool( const T& )> predicate ) const override
+            {
+                return delegate_->indexOf( [&predicate]( const Q& e ) { return predicate( cast<Q, T>::do_cast( e ) ); } );
+            }
+
+            std::shared_ptr<LT> getUnResolvedList() override
             {
                 throw "UnsupportedOperationException";
             }
 
-            virtual std::shared_ptr<const LT> getUnResolvedList() const
+            std::shared_ptr<const LT> getUnResolvedList() const override
             {
                 if constexpr( IsSharedEObjectOrAny<Q>::value )
                     return delegate_->getUnResolvedList()->asEListOf<T>();
@@ -190,40 +182,46 @@ namespace ecore
             {
             }
 
-            virtual bool add( std::size_t pos, const T& e )
+            bool add( std::size_t pos, const T& e ) override
             {
                 return delegate_->add( pos, cast<T, Q>::do_cast( e ) );
             }
 
-            virtual bool addAll( std::size_t pos, const Collection<T>& l )
+            bool addAll( std::size_t pos, const Collection<T>& l ) override
             {
                 auto transformed = l.asCollectionOf<Q>();
                 return delegate_->addAll( pos, *transformed );
             }
 
-            virtual void move( std::size_t newPos, const T& e )
+            void move( std::size_t newPos, const T& e ) override
             {
                 delegate_->move( newPos, cast<T, Q>::do_cast( e ) );
             }
 
-            virtual T move( std::size_t newPos, std::size_t oldPos )
+            T move( std::size_t newPos, std::size_t oldPos ) override
             {
                 return cast<Q, T>::do_cast( delegate_->move( newPos, oldPos ) );
             }
 
-            virtual T set( std::size_t pos, const T& e )
+            T set( std::size_t pos, const T& e ) override
             {
                 return cast<Q, T>::do_cast( delegate_->set( pos, cast<T, Q>::do_cast( e ) ) );
             }
 
-            virtual T remove( std::size_t pos )
+            T remove( std::size_t pos ) override
             {
                 return cast<Q, T>::do_cast( delegate_->remove( pos ) );
             }
 
-            virtual std::size_t indexOf( const T& e ) const
+            std::size_t indexOf( const T& e ) const override
             {
                 return delegate_->indexOf( cast<T, Q>::do_cast( e ) );
+            }
+
+            std::size_t indexOf( std::function<bool( const T& )> predicate ) const override
+            {
+                std::function<bool( const Q& )> flatmap = [&predicate]( const Q& e ) { return predicate( cast<Q, T>::do_cast( e ) ); };
+                return delegate_->indexOf( flatmap );
             }
 
             virtual std::shared_ptr<LT> getUnResolvedList()

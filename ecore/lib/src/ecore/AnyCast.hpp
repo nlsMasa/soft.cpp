@@ -12,9 +12,11 @@
 
 #include "ecore/Any.hpp"
 #include "ecore/EList.hpp"
+#include "ecore/EMap.hpp"
 #include "ecore/EObject.hpp"
 #include "ecore/SmartPtr.hpp"
 #include "ecore/impl/BasicEList.hpp"
+#include "ecore/impl/BasicEMap.hpp"
 
 namespace ecore
 {

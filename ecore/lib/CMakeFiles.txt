@@ -26,7 +26,10 @@ set(HEADER_ECORE_FILES
     src/ecore/ENotificationChain.hpp
     src/ecore/ENotifier.hpp
     src/ecore/ENotifyingList.hpp
+    src/ecore/ENotifyingMap.hpp
+    src/ecore/EObjectHelpers.hpp
     src/ecore/EObjectList.hpp
+    src/ecore/EObjectMap.hpp
     src/ecore/EPackageRegistry.hpp
     src/ecore/EPackageResourceRegistry.hpp
     src/ecore/EResource.hpp
@@ -52,10 +55,13 @@ set(HEADER_ECORE_IMPL_FILES
     src/ecore/impl/AbstractResource.hpp
     src/ecore/impl/ArrayEListBase.hpp
     src/ecore/impl/BasicEList.hpp
+    src/ecore/impl/BasicEMap.hpp
     src/ecore/impl/BasicENotifyingList.hpp
+    src/ecore/impl/BasicENotifyingMap.hpp
     src/ecore/impl/BasicEObject.hpp
     src/ecore/impl/BasicEObject.inl
     src/ecore/impl/BasicEObjectList.hpp
+    src/ecore/impl/BasicEObjectMap.hpp
     src/ecore/impl/BasicNotifier.hpp
     src/ecore/impl/DeepCopy.hpp
     src/ecore/impl/DeepEqual.hpp
@@ -63,6 +69,7 @@ set(HEADER_ECORE_IMPL_FILES
     src/ecore/impl/DynamicEObjectImpl.hpp
     src/ecore/impl/DynamicEObjectImpl.inl
     src/ecore/impl/EListBase.hpp
+    src/ecore/impl/EMapBase.hpp
     src/ecore/impl/ENotifyingListBase.hpp
     src/ecore/impl/EObjectInternal.hpp
     src/ecore/impl/EObjectListBase.hpp

@@ -7,31 +7,7 @@
 using namespace ecore;
 using namespace ecore::tests;
 
-namespace
-{
-    class EObjectDerived : public EObject
-    {
-    public:
-        virtual ~EObjectDerived() = default;
-    };
-
-    class NotEObject 
-    {
-    public:
-        virtual ~NotEObject() = default;
-    };
-}
-
 BOOST_AUTO_TEST_SUITE( EListTests )
-
-BOOST_AUTO_TEST_CASE( IsEObjectOrAnyTest )
-{
-    BOOST_CHECK( IsSharedEObjectOrAny<Any>::value );
-    BOOST_CHECK( IsSharedEObjectOrAny<std::shared_ptr<EObject>>::value );    
-    BOOST_CHECK( IsSharedEObjectOrAny<std::shared_ptr<EObjectDerived>>::value );
-    BOOST_CHECK( !IsSharedEObjectOrAny<int>::value );
-    BOOST_CHECK( !IsSharedEObjectOrAny<NotEObject>::value );
-}
 
 BOOST_AUTO_TEST_CASE( PrimitiveList)
 {

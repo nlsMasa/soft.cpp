@@ -41,29 +41,35 @@ namespace ecore::impl
 
         virtual ~ImmutableArrayEList() = default;
 
-        virtual T get( std::size_t pos ) const
+        T get( std::size_t pos ) const override
         {
             return v_.at( pos );
         }
 
-        virtual std::size_t size() const
+        std::size_t size() const override
         {
             return v_.size();
         }
 
-        virtual bool empty() const
+        bool empty() const override
         {
             return v_.empty();
         }
 
-        virtual bool contains( const T& e ) const
+        bool contains( const T& e ) const override
         {
             return std::find( v_.begin(), v_.end(), e ) != v_.end();
         }
 
-        virtual std::size_t indexOf( const T& e ) const
+        std::size_t indexOf( const T& e ) const override
         {
             std::size_t index = std::distance( v_.begin(), std::find( v_.begin(), v_.end(), e ) );
+            return index == size() ? -1 : index;
+        }
+
+        std::size_t indexOf( std::function<bool( const T& )> predicate ) const override
+        {
+            std::size_t index = std::distance( v_.begin(), std::find_if( v_.begin(), v_.end(), predicate ) );
             return index == size() ? -1 : index;
         }
 

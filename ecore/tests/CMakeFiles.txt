@@ -4,7 +4,9 @@ set(SOURCE_FILES
     src/main.cpp
     src/AnyTests.cpp
     src/BasicEListTests.cpp
+    src/BasicEMapTests.cpp
     src/BasicEObjectListTests.cpp
+    src/BasicEObjectMapTests.cpp
     src/BasicNotifierTests.cpp
     src/DiamondVsMixinsTests.cpp
     src/DynamicEObjectTests.cpp
@@ -18,6 +20,7 @@ set(SOURCE_FILES
     src/ECollectionViewTests.cpp
     src/EFactoryTests.cpp
     src/EListTests.cpp
+    src/EMapTests.cpp
     src/EObjectTests.cpp
     src/FileURIHandlerTests.cpp
     src/LazyTests.cpp
@@ -43,6 +46,7 @@ set(HEADER_FILES
 set(SOURCE_ECORE_TESTS_FILES
     src/ecore/tests/MockEAdapter.hpp
     src/ecore/tests/MockEList.hpp
+    src/ecore/tests/MockEMap.hpp
     src/ecore/tests/MockENotifier.hpp
     src/ecore/tests/MockENotification.hpp
     src/ecore/tests/MockEObjectInternal.hpp

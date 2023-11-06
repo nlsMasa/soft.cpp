@@ -29,7 +29,7 @@ namespace ecore::impl
         using ENotifyingList<T>::add;
 
         BasicEObjectList( const std::weak_ptr<EObject>& owner, int featureID, int inverseFeatureID = -1 )
-            : owner_(owner)
+            : owner_( owner )
             , featureID_( featureID )
             , inverseFeatureID_( inverseFeatureID )
             , isSet_( false )
@@ -38,17 +38,17 @@ namespace ecore::impl
 
         virtual ~BasicEObjectList() = default;
 
-        virtual std::shared_ptr<ENotifier> getNotifier() const
+        std::shared_ptr<ENotifier> getNotifier() const override
         {
             return owner_.lock();
         }
 
-        virtual int getFeatureID() const
+        int getFeatureID() const override
         {
             return featureID_;
         }
 
-        virtual std::shared_ptr<EStructuralFeature> getFeature() const
+        std::shared_ptr<EStructuralFeature> getFeature() const override
         {
             auto owner = owner_.lock();
             return owner ? owner->eClass()->getEStructuralFeature( featureID_ ) : nullptr;
@@ -95,22 +95,22 @@ namespace ecore::impl
             return owner_.lock();
         }
 
-        virtual void didChange()
+        void didChange() override
         {
             isSet_ = true;
         }
 
-        virtual std::shared_ptr<AbstractNotification> createNotification( ENotification::EventType eventType,
-                                                                          const Any& oldValue,
-                                                                          const Any& newValue,
-                                                                          std::size_t position ) const
+        std::shared_ptr<AbstractNotification> createNotification( ENotification::EventType eventType,
+                                                                  const Any& oldValue,
+                                                                  const Any& newValue,
+                                                                  std::size_t position ) const override
         {
             auto owner = owner_.lock();
             return owner ? std::make_shared<Notification>( owner, eventType, featureID_, oldValue, newValue, position ) : nullptr;
         }
 
-        virtual std::shared_ptr<ENotificationChain> inverseAdd( const T& object,
-                                                                const std::shared_ptr<ENotificationChain>& notifications ) const
+        std::shared_ptr<ENotificationChain> inverseAdd( const T& object,
+                                                        const std::shared_ptr<ENotificationChain>& notifications ) const override
         {
             if constexpr( inverse )
             {
@@ -123,8 +123,8 @@ namespace ecore::impl
                 return notifications;
         }
 
-        virtual std::shared_ptr<ENotificationChain> inverseRemove( const T& object,
-                                                                   const std::shared_ptr<ENotificationChain>& notifications ) const
+        std::shared_ptr<ENotificationChain> inverseRemove( const T& object,
+                                                           const std::shared_ptr<ENotificationChain>& notifications ) const override
         {
             if constexpr( inverse )
             {
@@ -165,8 +165,6 @@ namespace ecore::impl
         }
 
     private:
-        
-
         template <typename C>
         class UnResolvedList : public ENotifyingListBase<typename C::InterfaceType, true>
         {
@@ -183,37 +181,42 @@ namespace ecore::impl
             {
             }
 
-            virtual bool empty() const
+            bool empty() const override
             {
                 return list_->empty();
             }
 
-            virtual std::size_t size() const
+            std::size_t size() const override
             {
                 return list_->size();
             }
 
-            virtual bool contains( const ValueType& e ) const
+            bool contains( const ValueType& e ) const override
             {
                 return indexOf( e ) != -1;
             }
 
-            virtual std::size_t indexOf( const ValueType& e ) const
+            std::size_t indexOf( const ValueType& e ) const override
             {
                 return list_->unresolvedIndexOf( e );
             }
 
-            virtual std::shared_ptr<ENotifier> getNotifier() const
+            std::size_t indexOf( std::function<bool( const ValueType& )> predicate ) const override
+            {
+                return list_->indexOf( predicate );
+            }
+
+            std::shared_ptr<ENotifier> getNotifier() const override
             {
                 return list_->getNotifier();
             }
 
-            virtual int getFeatureID() const
+            int getFeatureID() const override
             {
                 return list_->getFeatureID();
             }
 
-            virtual std::shared_ptr<EStructuralFeature> getFeature() const
+            std::shared_ptr<EStructuralFeature> getFeature() const override
             {
                 return list_->getFeature();
             }
@@ -229,55 +232,54 @@ namespace ecore::impl
             }
 
         protected:
-            
-            virtual ValueType doGet( std::size_t index ) const
+            ValueType doGet( std::size_t index ) const override
             {
                 return list_->unresolvedGet( index );
             }
 
-            virtual T doSet( std::size_t index, const ValueType& e )
+            T doSet( std::size_t index, const ValueType& e ) override
             {
                 return list_->doSet( index, e );
             }
 
-            virtual void doAdd( const ValueType& e )
+            void doAdd( const ValueType& e ) override
             {
                 return list_->doAdd( e );
             }
 
-            virtual void doAdd( std::size_t index, const ValueType& e )
+            void doAdd( std::size_t index, const ValueType& e ) override
             {
                 return list_->doAdd( index, e );
             }
 
-            virtual bool doAddAll( std::size_t index, const Collection<ValueType>& l )
+            bool doAddAll( std::size_t index, const Collection<ValueType>& l ) override
             {
                 return list_->doAddAll( index, l );
             }
 
-            virtual T doRemove( std::size_t index )
+            T doRemove( std::size_t index ) override
             {
                 return list_->doRemove( index );
             }
 
-            virtual T doMove( std::size_t newIndex, std::size_t oldIndex )
+            T doMove( std::size_t newIndex, std::size_t oldIndex ) override
             {
                 return list_->doMove( newIndex, oldIndex );
             }
 
-            virtual std::shared_ptr<EList<ValueType>> doClear()
+            std::shared_ptr<EList<ValueType>> doClear() override
             {
                 return list_->doClear();
             }
 
-            virtual std::shared_ptr<ENotificationChain> inverseAdd( const ValueType& object,
-                                                                    const std::shared_ptr<ENotificationChain>& notifications ) const
+            std::shared_ptr<ENotificationChain> inverseAdd( const ValueType& object,
+                                                            const std::shared_ptr<ENotificationChain>& notifications ) const override
             {
                 return list_->inverseAdd( object, notifications );
             }
 
-            virtual std::shared_ptr<ENotificationChain> inverseRemove( const ValueType& object,
-                                                                       const std::shared_ptr<ENotificationChain>& notifications ) const
+            std::shared_ptr<ENotificationChain> inverseRemove( const ValueType& object,
+                                                               const std::shared_ptr<ENotificationChain>& notifications ) const override
             {
                 return list_->inverseRemove( object, notifications );
             }
@@ -294,7 +296,7 @@ namespace ecore::impl
             typedef typename C::ValueType ValueType;
 
             ConstUnResolvedList( const std::shared_ptr<const C>& list )
-                : UnResolvedList<C>( std::const_pointer_cast<C>(list) )
+                : UnResolvedList<C>( std::const_pointer_cast<C>( list ) )
             {
             }
 
@@ -303,77 +305,82 @@ namespace ecore::impl
             }
 
             // EList public non const methods
-            virtual bool add( const ValueType& e )
+            bool add( const ValueType& e ) override
             {
                 throw "UnsupportedOperationException";
             }
 
-            virtual bool addAll( const Collection<ValueType>& l )
+            bool addAll( const Collection<ValueType>& l ) override
             {
                 throw "UnsupportedOperationException";
             }
 
-            virtual bool add( std::size_t index, const ValueType& e )
+            bool add( std::size_t index, const ValueType& e ) override
             {
                 throw "UnsupportedOperationException";
             }
 
-            virtual bool addAll( std::size_t index, const Collection<ValueType>& l )
+            bool addAll( std::size_t index, const Collection<ValueType>& l ) override
             {
                 throw "UnsupportedOperationException";
             }
 
-            virtual ValueType move( std::size_t newIndex, std::size_t oldIndex )
+            ValueType move( std::size_t newIndex, std::size_t oldIndex ) override
             {
                 throw "UnsupportedOperationException";
             }
 
-            virtual void move( std::size_t newIndex, const ValueType& e )
+            void move( std::size_t newIndex, const ValueType& e ) override
             {
                 throw "UnsupportedOperationException";
             }
 
-            virtual ValueType set( std::size_t index, const ValueType& e )
+            ValueType set( std::size_t index, const ValueType& e ) override
             {
                 throw "UnsupportedOperationException";
             }
 
-            virtual bool remove( const ValueType& e )
+            bool remove( const ValueType& e ) override
             {
                 throw "UnsupportedOperationException";
             }
 
-            virtual ValueType remove( std::size_t index )
+            ValueType remove( std::size_t index ) override
             {
                 throw "UnsupportedOperationException";
             }
 
-            virtual void clear()
+            void clear() override
+            {
+                throw "UnsupportedOperationException";
+            }
+
+            std::size_t indexOf( std::function<bool( const ValueType& )> ) const override
             {
                 throw "UnsupportedOperationException";
             }
 
             // NotifyingEList public non const methods
-            virtual std::shared_ptr<ENotificationChain> add( const ValueType& t, const std::shared_ptr<ENotificationChain>& notifications )
+            std::shared_ptr<ENotificationChain> add( const ValueType& t, const std::shared_ptr<ENotificationChain>& notifications ) override
             {
                 throw "UnsupportedOperationException";
             }
 
-            virtual std::shared_ptr<ENotificationChain> remove( const ValueType& t,
-                                                                const std::shared_ptr<ENotificationChain>& notifications )
+            std::shared_ptr<ENotificationChain> remove( const ValueType& t,
+                                                        const std::shared_ptr<ENotificationChain>& notifications ) override
             {
                 throw "UnsupportedOperationException";
             }
 
-            virtual std::shared_ptr<ENotificationChain> set( std::size_t index,
-                                                             const ValueType& t,
-                                                             const std::shared_ptr<ENotificationChain>& notifications )
+            std::shared_ptr<ENotificationChain> set( std::size_t index,
+                                                     const ValueType& t,
+                                                     const std::shared_ptr<ENotificationChain>& notifications ) override
             {
                 throw "UnsupportedOperationException";
             }
 
             // EUnsettableList non const methods
-            virtual void unset()
+            void unset() override
             {
                 throw "UnsupportedOperationException";
             }

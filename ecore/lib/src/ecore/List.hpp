@@ -12,6 +12,8 @@
 
 #include "ecore/Collection.hpp"
 
+#include <functional>
+
 namespace ecore
 {
     template <typename T>
@@ -45,6 +47,8 @@ namespace ecore
         using Collection::contains;
 
         virtual std::size_t indexOf( const T& e ) const = 0;
+
+        virtual std::size_t indexOf( std::function<bool( const T& )> ) const = 0;
     };
 
 } // namespace ecore

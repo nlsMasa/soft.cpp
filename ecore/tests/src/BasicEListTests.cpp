@@ -79,22 +79,11 @@ BOOST_AUTO_TEST_CASE( Get )
     BOOST_CHECK_EQUAL( list.get( 1 ), 2 );
 }
 
-BOOST_AUTO_TEST_CASE( Iterators_Empty )
+BOOST_AUTO_TEST_CASE( Iterators )
 {
     BasicEList<int> list;
     BOOST_CHECK( list.begin() == list.end() );
 
-    for( int i = 0; i < 10; ++i )
-        list.add( i );
-
-    int test = 0;
-    for( int i : list )
-        BOOST_CHECK_EQUAL( i, test++ );
-}
-
-BOOST_AUTO_TEST_CASE( Iterators )
-{
-    BasicEList<int> list;
     for( int i = 0; i < 10; ++i )
         list.add( i );
 
