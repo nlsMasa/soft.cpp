@@ -294,7 +294,7 @@
         <local name="models.dir"/>
         <property name="models.dir" location="../models"/>
         <exec executable="docker.exe" dir="." failonerror="true">
-            <arg line="run --rm -v '${root.dir}:/pwd' -v '${models.dir}:/models' -w /pwd masagroup/soft.generator.cpp -m /models/ecore.ecore -o /pwd -P /pwd/generator.properties -t !generateLibraryCMakeProject -t !generateTestsCMakeProject"/>
+            <arg line="run --rm -v '${root.dir}:/pwd' -v '${models.dir}:/models' -w /pwd masagroup/soft.generator.cpp -m /models/ecore.ecore -o /pwd -P /pwd/generator.properties -t generateModel -t generateLibraryCMakeSources -t generateTests -t generateTestsCMakeSources -t generateTestsCMakeDependencies"/>
         </exec>
     </target>
     
